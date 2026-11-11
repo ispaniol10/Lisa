@@ -1,0 +1,858 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Knochen-Expedition</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: Röntgenbild-Expedition. Heller Lernbereich, dunkle Röntgen-Tafeln für das Skelett, Stationen als Lernpfad. */
+:root{
+  --bg:#eaf4f6; --surface:#ffffff; --ink:#12243a; --muted:#4a6073; --line:#cde0e6;
+  --accent:#0c7f93; --on-accent:#ffffff; --accent-soft:#d6f0f4;
+  --sun:#ffc531; --sun-bg:#fff3cc; --sun-ink:#5a4100;
+  --ok:#1e8c52; --ok-bg:#dff5e8; --bad:#c93a30; --bad-bg:#fde3e0;
+  --xray:#0a1d2e; --xray-2:#17415c; --glow:#5ee3f5;
+  --bone:#f4eedb; --bone-edge:#a89c78;
+  --display:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1722; --surface:#12263a; --ink:#e7f1f6; --muted:#9db4c3; --line:#244058;
+  --accent:#3dd0e6; --on-accent:#06222b; --accent-soft:#12394a;
+  --sun-bg:#3a3014; --sun-ink:#ffe08a;
+  --ok:#4fd68c; --ok-bg:#12382a; --bad:#ff7a6e; --bad-bg:#40201e;
+  --xray:#06111b; --xray-2:#0f2a40; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1722; --surface:#12263a; --ink:#e7f1f6; --muted:#9db4c3; --line:#244058;
+  --accent:#3dd0e6; --on-accent:#06222b; --accent-soft:#12394a;
+  --sun-bg:#3a3014; --sun-ink:#ffe08a;
+  --ok:#4fd68c; --ok-bg:#12382a; --bad:#ff7a6e; --bad-bg:#40201e;
+  --xray:#06111b; --xray-2:#0f2a40; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.05rem;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.1rem,7vw,3.6rem);font-weight:800}
+h2{font-size:clamp(1.5rem,4.5vw,2rem);font-weight:800}
+h3{font-size:1.25rem;font-weight:800}
+p{margin:0 0 .8em}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Kopf */
+.top{display:grid;grid-template-columns:1fr minmax(150px,230px);gap:20px;align-items:center;padding-block:22px 10px}
+.top .eyebrow{font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem;color:var(--accent)}
+.top .sub{color:var(--muted);margin-top:8px;max-width:46ch}
+.score{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.score .num{font-family:var(--display);font-weight:800;font-size:1.4rem}
+.meter{flex:1 1 140px;max-width:260px;height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--sun));transition:width .6s}
+.hero{padding:8px 10px}
+.hero .sk{max-height:300px;margin:0 auto}
+@media (max-width:620px){.top{grid-template-columns:1fr}.hero{display:none}}
+
+/* Navigation */
+.nav{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 12px;margin-bottom:10px;scrollbar-width:thin}
+.tab{flex:none;border:2px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;min-height:44px;font-weight:700;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tab .n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.8rem;font-weight:800}
+.tab .st{color:var(--sun);font-size:.85rem;letter-spacing:1px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tab[aria-selected="true"] .n{background:rgba(255,255,255,.25);color:inherit}
+
+/* Stationen */
+.station{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(16px,3.5vw,32px)}
+.station>h2{margin-bottom:8px}
+.lead{color:var(--muted);max-width:68ch}
+.starline{display:inline-flex;gap:3px;align-items:center;font-weight:800;color:var(--muted);font-size:.9rem}
+.stars svg{width:22px;height:22px}
+.stars .on{fill:var(--sun);stroke:#b98700}
+.stars .off{fill:none;stroke:var(--line);stroke-width:2}
+.nextrow{margin-top:26px;display:flex;justify-content:flex-end}
+.btn{border:0;border-radius:14px;background:var(--accent);color:var(--on-accent);font-weight:800;padding:10px 20px;min-height:46px}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.fun{background:var(--sun-bg);color:var(--sun-ink);border-left:6px solid var(--sun);border-radius:12px;padding:10px 14px;margin-top:12px}
+.fun b{display:block;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
+.fb{min-height:1.6em;margin-top:12px;font-weight:700}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.two{display:grid;grid-template-columns:minmax(240px,360px) 1fr;gap:24px;margin-top:18px;align-items:start}
+.two>*{min-width:0}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+
+/* Röntgen-Tafel und Skelett */
+.xray{background:radial-gradient(120% 90% at 50% 15%,var(--xray-2),var(--xray));border-radius:20px;padding:14px;position:relative;overflow:hidden}
+.xray::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(94,227,245,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(94,227,245,.08) 1px,transparent 1px);background-size:24px 24px}
+.sk{display:block;width:100%;height:auto;position:relative}
+.sk .b{fill:var(--bone);stroke:var(--bone-edge);stroke-width:2.5;stroke-linejoin:round}
+.sk .es{stroke:var(--bone-edge);fill:none}
+.sk .fs{stroke:var(--bone);fill:none}
+.sk .ec{fill:var(--bone-edge)}
+.sk .fc{fill:var(--bone)}
+.sk .eye{fill:var(--xray)}
+.bone{cursor:pointer;transition:filter .2s}
+.bone:hover,.bone:focus-visible{filter:drop-shadow(0 0 5px var(--glow));outline:none}
+.bone.sel{filter:drop-shadow(0 0 7px var(--sun))}
+.bone.sel .b{fill:var(--sun)}.bone.sel .fs{stroke:var(--sun)}.bone.sel .fc{fill:var(--sun)}
+.static .bone,.lbl .bone{pointer-events:none;cursor:default}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05,1.02)}}
+.breathe .rib-g{transform-origin:160px 180px;animation:breathe 3.6s ease-in-out infinite}
+@keyframes armw{0%,100%{transform:rotate(128deg)}50%{transform:rotate(150deg)}}
+@keyframes forew{0%,100%{transform:rotate(-22deg)}50%{transform:rotate(26deg)}}
+.armwave{transform-origin:98px 132px;animation:armw 1.6s ease-in-out infinite}
+.forewave{transform-origin:80px 212px;animation:forew .8s ease-in-out infinite}
+.info h3{margin-bottom:2px}
+.info .lat{color:var(--accent);font-weight:800;font-size:.85rem;letter-spacing:.05em}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{border:2px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 12px;min-height:40px;font-weight:700}
+.chip.seen{border-color:var(--ok);background:var(--ok-bg)}
+.chip.on{border-color:var(--sun);background:var(--sun-bg)}
+.counter{font-weight:800;color:var(--muted);margin-top:10px}
+
+/* Start */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:18px}
+.fcard{border:2px solid var(--line);border-radius:18px;background:var(--bg);text-align:left;padding:12px 14px;display:block;width:100%}
+.fcard .head{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:800;font-size:1.2rem}
+.fcard svg{width:40px;height:40px;flex:none;stroke:var(--accent);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s}
+.fcard.open{border-color:var(--accent);background:var(--accent-soft)}
+.fcard.open svg{transform:rotate(360deg) scale(1.1)}
+.fcard .body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s}
+.fcard.open .body{grid-template-rows:1fr}
+.fcard .body>div{overflow:hidden}
+.fcard .body p{margin:10px 0 2px;font-size:1rem}
+.bars{margin-top:26px;display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;font-weight:700}
+.bar .track{height:30px;background:var(--line);border-radius:10px;overflow:hidden}
+.bar .fill{height:100%;width:0;border-radius:10px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-family:var(--display);font-weight:800;color:var(--on-accent);background:var(--accent);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.bar.adult .fill{background:var(--sun);color:#3d2c00}
+
+/* Beschriften */
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.tag{border:2px solid var(--accent);background:var(--surface);border-radius:12px;padding:4px 12px;min-height:42px;font-weight:800;cursor:grab}
+.tag.pick{background:var(--sun);border-color:#b98700;color:#3d2c00}
+.slots{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.slots li{display:flex;align-items:center;gap:10px;border:2px dashed var(--line);border-radius:12px;padding:4px 10px;min-height:44px;font-weight:700}
+.slots li .no{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--sun);color:#12243a;font-size:.85rem;font-weight:800;flex:none}
+.slots li.ok{border:2px solid var(--ok);background:var(--ok-bg)}
+.mk{cursor:pointer}
+.mk circle{fill:var(--sun);stroke:#12243a;stroke-width:2;transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-in-out infinite}
+.mk text{font:800 12px var(--display);fill:#12243a;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.mk.ok circle{fill:var(--ok);animation:none}.mk.ok text{fill:#fff}
+.mk.shake{animation:shake .4s}
+@keyframes pulse{50%{transform:scale(1.18)}}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* Memory */
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+@media (max-width:620px){.mgrid{grid-template-columns:repeat(3,1fr)}}
+.mc{perspective:600px;border:0;background:none;padding:0;height:104px}
+.mc .in{position:relative;display:block;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.mc.flip .in{transform:rotateY(180deg)}
+.mc .f,.mc .k{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;display:grid;place-items:center;padding:6px;text-align:center;font-weight:800;font-size:.9rem;line-height:1.2;overflow:hidden}
+.mc .f{background:var(--xray-2);border:2px solid var(--glow);color:var(--glow)}
+.mc .f svg{width:34px;height:34px;stroke:var(--glow);fill:none;stroke-width:3;stroke-linecap:round}
+.mc .k{transform:rotateY(180deg);background:var(--surface);border:2px solid var(--accent)}
+.mc.done .k{background:var(--ok-bg);border-color:var(--ok)}
+.mc.t .k{font-family:var(--display);font-size:1rem}
+
+/* Gelenke und Aufbau */
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.pair>*{min-width:0}
+@media (max-width:700px){.pair{grid-template-columns:1fr}}
+.gl text{fill:#cfeff5;font:700 13px var(--body)}
+.gl .pin{fill:#12243a;stroke:var(--glow);stroke-width:2}
+@keyframes hinge{0%,100%{transform:rotate(0)}50%{transform:rotate(-105deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hinge-fore{transform-origin:150px 110px;animation:hinge 2.6s ease-in-out infinite}
+.ball-arm{transform-origin:150px 110px;animation:spin 4.5s linear infinite}
+.paused *{animation-play-state:paused!important}
+.gcap{margin:8px 0 0;font-size:.95rem}
+.items{display:grid;gap:8px;margin-top:20px}
+.item{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;border:2px solid var(--line);border-radius:14px;padding:8px 12px}
+.item .t{flex:1 1 220px;font-weight:700;min-width:0}
+.item .t small{display:block;color:var(--muted);font-weight:600}
+.item.ok{border-color:var(--ok);background:var(--ok-bg)}
+.item.bad{border-color:var(--bad);background:var(--bad-bg)}
+.tog{display:flex;gap:6px}
+.tog button{border:2px solid var(--accent);background:transparent;color:var(--accent);border-radius:10px;padding:2px 12px;min-height:42px;font-weight:800}
+.tog button:disabled{opacity:.5;cursor:default}
+.tog button.picked{background:var(--accent);color:var(--on-accent)}
+.bonesvg{width:100%;max-width:300px;margin:0 auto;display:block}
+.hs{cursor:pointer}
+.hs:hover,.hs:focus-visible{filter:drop-shadow(0 0 6px var(--glow));outline:none}
+.hs.sel{filter:drop-shadow(0 0 8px var(--sun))}
+.pn circle{fill:var(--sun);stroke:#12243a;stroke-width:2}
+.pn text{font:800 12px var(--display);fill:#12243a;text-anchor:middle;dominant-baseline:central}
+.sel-row{display:flex;align-items:center;gap:10px;margin:6px 0}
+.sel-row .no{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--sun);color:#12243a;font-weight:800;flex:none}
+select{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:5px 8px;min-height:42px;max-width:100%}
+select.ok{border-color:var(--ok);background:var(--ok-bg)}
+select.bad{border-color:var(--bad);background:var(--bad-bg)}
+
+/* Quiz, Wahr/Falsch */
+.qhead{display:flex;align-items:center;gap:12px;font-weight:800;color:var(--muted);margin-top:16px}
+.qhead .pbar{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.qhead .pbar i{display:block;height:100%;background:var(--accent);transition:width .4s}
+.q{margin:14px 0}
+.opts{display:grid;gap:10px;max-width:640px}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 16px;min-height:50px;text-align:left;font-weight:700}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.wfopts{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:520px}
+.wfopts .opt{text-align:center;font-family:var(--display);font-size:1.3rem}
+.result{text-align:center;padding:20px 0}
+.result .big{font-family:var(--display);font-size:2.2rem;font-weight:800}
+
+/* Lückentext */
+.text{max-width:72ch;line-height:2.4}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.bank span{background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:2px 10px;font-weight:800}
+
+/* Buchstabensalat */
+.slotrow,.tiles{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.sl,.tile{width:42px;height:48px;border-radius:10px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.4rem;padding:0}
+.sl{border:2px dashed var(--line);background:var(--bg)}
+.sl.f{border:2px solid var(--accent);background:var(--accent-soft);color:var(--accent)}
+.tile{border:2px solid var(--accent);background:var(--surface);color:var(--ink)}
+.tile:disabled{opacity:.25}
+.sl.good{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.sl.badl{border-color:var(--bad);background:var(--bad-bg);animation:shake .4s}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+
+/* Urkunde */
+.cert{max-width:600px;margin:20px auto 0;border:4px double var(--accent);border-radius:20px;padding:26px 18px;text-align:center;background:var(--bg)}
+.cert .tt{font-family:var(--display);font-weight:800;font-size:2.4rem;color:var(--accent)}
+.cert .nm{font-family:var(--display);font-weight:800;font-size:1.8rem;margin:8px 0;min-height:1.2em;overflow-wrap:anywhere}
+.cert .lvl{display:inline-block;background:var(--sun);color:#3d2c00;font-weight:800;border-radius:99px;padding:4px 18px;margin:8px 0}
+.cert .stars{margin:8px 0}
+.cert small{color:var(--muted)}
+.namein{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:16px}
+.namein input{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:8px 12px;min-height:44px;min-width:0;width:min(260px,100%)}
+footer{margin-top:28px;color:var(--muted);font-size:.9rem;text-align:center}
+
+/* Konfetti */
+.cf{position:fixed;top:-20px;width:10px;height:14px;border-radius:2px;z-index:50;pointer-events:none;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.9}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head><body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">Biologie · Klasse 5</div>
+    <h1>Knochen-Expedition</h1>
+    <p class="sub">Entdecke das Skelett des Menschen: Knochen, Gelenke und ihre Aufgaben. Löse die Stationen und sammle Sterne!</p>
+    <div class="score"><span class="num" id="totalNum">0 / 30</span><span class="stars" id="totalStar"></span><div class="meter"><i id="meterFill"></i></div></div>
+  </div>
+  <div class="xray hero static" id="hero" aria-hidden="true"></div>
+</header>
+
+<nav class="nav" id="nav" role="tablist" aria-label="Stationen"></nav>
+
+<section class="station" id="s-start" hidden>
+  <h2>Wozu brauchen wir eigentlich Knochen?</h2>
+  <p class="lead">Stell dir vor, du hättest keine Knochen: Du wärst weich wie eine Qualle! Dein Skelett kann aber viel mehr, als dich nur aufrecht zu halten. Tippe auf die fünf Karten und finde alle Aufgaben heraus.</p>
+  <div class="fgrid" id="funcGrid"></div>
+  <p class="counter" id="funcNote"></p>
+  <div class="bars" id="bars">
+    <h3>Wie viele Knochen haben wir?</h3>
+    <div class="bar baby"><span>Baby</span><div class="track"><div class="fill" data-w="100">etwa 300</div></div></div>
+    <div class="bar adult"><span>Erwachsene</span><div class="track"><div class="fill" data-w="69">206</div></div></div>
+    <p class="lead">Das ist komisch: Babys haben mehr Knochen als Erwachsene! Beim Wachsen verschmelzen manche kleinen Knochen zu einem großen. So wird zum Beispiel das Kreuzbein am unteren Ende der Wirbelsäule aus mehreren Knochen zu einem einzigen.</p>
+  </div>
+</section>
+
+<section class="station" id="s-atlas" hidden>
+  <h2>Skelett-Atlas</h2>
+  <p class="lead">Das ist dein Skelett im Röntgenbild. Tippe auf einen Knochen oder wähle unten einen Namen. Entdecke mindestens 5, 10 oder alle 15 Knochen für 1, 2 oder 3 Sterne.</p>
+  <div class="two">
+    <div class="xray" id="atlasBox"></div>
+    <div>
+      <div class="info" id="info"></div>
+    </div>
+  </div>
+  <div class="chips" id="boneChips"></div>
+  <p class="counter" id="atlasCount"></p>
+</section>
+
+<section class="station" id="s-beschriften" hidden>
+  <h2>Beschrifte das Skelett</h2>
+  <p class="lead">Ziehe jeden Namen auf die passende Nummer. Auf dem Handy: Tippe erst den Namen an, dann die Nummer am Skelett (oder in der Liste).</p>
+  <div class="two">
+    <div class="xray lbl" id="lblBox"></div>
+    <div>
+      <div class="pool" id="pool"></div>
+      <ol class="slots" id="slots"></ol>
+      <div class="fb" id="lblFb" aria-live="polite"></div>
+      <div class="tools"><button class="btn ghost" id="lblReset">Nochmal von vorn</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="station" id="s-memory" hidden>
+  <h2>Knochen-Memory</h2>
+  <p class="lead">Finde die Paare: Jeder Knochen gehört zu seiner Aufgabe. Drehe zwei Karten um. Passen sie zusammen, bleiben sie offen.</p>
+  <p class="counter" id="memCount"></p>
+  <div class="mgrid" id="memGrid"></div>
+  <div class="fb" id="memFb" aria-live="polite"></div>
+  <div class="tools"><button class="btn ghost" id="memReset">Neu mischen</button></div>
+</section>
+
+<section class="station" id="s-gelenke" hidden>
+  <h2>Gelenke: Hier knickt das Skelett ein</h2>
+  <p class="lead">Knochen sind steif. Trotzdem kannst du dich bücken, tanzen und werfen. Das geht, weil an vielen Stellen zwei Knochen in einem <b>Gelenk</b> zusammentreffen. Ein glatter Knorpel überzieht die Knochenenden und die Gelenkschmiere wirkt wie Öl in einer Maschine. Bänder halten alles zusammen.</p>
+  <div class="pair">
+    <div>
+      <div class="xray gl" id="hingeBox"></div>
+      <p class="gcap"><b>Scharniergelenk</b> (Ellenbogen, Knie, Finger): Es klappt nur in eine Richtung, wie eine Tür.</p>
+      <button class="btn ghost" data-pause="hingeBox">Stopp / Start</button>
+    </div>
+    <div>
+      <div class="xray gl" id="ballBox"></div>
+      <p class="gcap"><b>Kugelgelenk</b> (Schulter, Hüfte): Der runde Gelenkkopf steckt in der Gelenkpfanne und kann in alle Richtungen schwingen.</p>
+      <button class="btn ghost" data-pause="ballBox">Stopp / Start</button>
+    </div>
+  </div>
+  <div class="fun"><b>Wusstest du schon?</b>Es gibt noch mehr Gelenke: Dein Kopf dreht sich in einem Drehgelenk am Hals, und dein Daumen sitzt in einem Sattelgelenk. Deshalb kann er sich so gut zu den anderen Fingern bewegen.</div>
+  <h3 style="margin-top:24px">Welches Gelenk ist das?</h3>
+  <div class="items" id="gItems"></div>
+  <div class="fb" id="gFb" aria-live="polite"></div>
+</section>
+
+<section class="station" id="s-aufbau" hidden>
+  <h2>Wie ist ein Knochen gebaut?</h2>
+  <p class="lead">Knochen sind nicht tot und trocken wie Stöcke. Sie leben, wachsen und heilen nach einem Bruch wieder zusammen. Ein langer Röhrenknochen, wie dein Oberschenkelknochen, hat mehrere Schichten. Tippe auf die Teile!</p>
+  <div class="two">
+    <div class="xray" id="ruehrBox"></div>
+    <div>
+      <div class="info" id="partInfo"></div>
+      <h3 style="margin-top:20px">Ordne zu</h3>
+      <div id="partTask"></div>
+      <div class="tools"><button class="btn" id="partCheck">Prüfen</button></div>
+      <div class="fb" id="partFb" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="fun"><b>Mach den Versuch (mit Erwachsenen)</b>Lege einen sauberen, gekochten Hühnerknochen etwa zwei bis drei Tage in ein Glas mit Essig. Danach ist er biegsam wie Gummi. Der Essig löst den Kalk heraus, der Knochen hart macht. Übrig bleibt das elastische Eiweiß. Nach dem Versuch gründlich die Hände waschen!</div>
+</section>
+
+<section class="station" id="s-quiz" hidden>
+  <h2>Das große Knochen-Quiz</h2>
+  <p class="lead">Acht Fragen, eine richtige Antwort. Nach jeder Antwort erfährst du, warum sie stimmt.</p>
+  <div id="quizBox"></div>
+</section>
+
+<section class="station" id="s-wf" hidden>
+  <h2>Wahr oder falsch?</h2>
+  <p class="lead">Stimmt die Aussage? Entscheide schnell und erfahre dann den Grund.</p>
+  <div id="wfBox"></div>
+</section>
+
+<section class="station" id="s-luecke" hidden>
+  <h2>Lückentext</h2>
+  <p class="lead">Wähle in jeder Lücke das passende Wort. Aufgepasst: Zwei Wörter im Wortspeicher gehören gar nicht in den Text.</p>
+  <div class="bank" id="bank"></div>
+  <div class="text" id="gap"></div>
+  <div class="tools"><button class="btn" id="gapCheck">Prüfen</button><button class="btn ghost" id="gapReset">Zurücksetzen</button></div>
+  <div class="fb" id="gapFb" aria-live="polite"></div>
+</section>
+
+<section class="station" id="s-salat" hidden>
+  <h2>Buchstabensalat</h2>
+  <p class="lead">Die Buchstaben sind durcheinander geraten. Tippe sie in der richtigen Reihenfolge an. Ein Tipp hilft dir, kostet aber Sterne.</p>
+  <div id="salatBox"></div>
+</section>
+
+<section class="station" id="s-urkunde" hidden>
+  <h2>Deine Urkunde</h2>
+  <p class="lead">Hier siehst du, wie weit du auf deiner Expedition gekommen bist. Trage deinen Namen ein.</p>
+  <div class="namein"><label for="nameIn">Dein Name</label><input id="nameIn" maxlength="30" autocomplete="off"></div>
+  <div class="cert">
+    <div class="tt">Urkunde</div>
+    <div>Knochen-Expedition · Das Skelett des Menschen</div>
+    <div class="nm" id="certName">&nbsp;</div>
+    <div class="lvl" id="certLvl"></div>
+    <div class="stars" id="certStars"></div>
+    <div id="certTxt"></div>
+    <small id="certDate"></small>
+  </div>
+  <div class="tools" style="justify-content:center;margin-top:18px"><button class="btn ghost" id="resetAll">Alle Sterne löschen</button></div>
+  <div class="fb" id="resetFb"></div>
+</section>
+<footer>Lernseite zum Skelett, Biologie Klasse 5 · erstellt von Ingo Spaniol</footer>
+</div>
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const STORE='knochen-expedition-v1';
+let progress={},playerName='';
+try{const d=JSON.parse(localStorage.getItem(STORE)||'{}');progress=d.p||{};playerName=d.n||''}catch(e){}
+function save(){try{localStorage.setItem(STORE,JSON.stringify({p:progress,n:playerName}))}catch(e){}}
+
+const STATIONS=[
+ {id:'start',label:'Start'},{id:'atlas',label:'Skelett-Atlas'},{id:'beschriften',label:'Beschriften'},
+ {id:'memory',label:'Memory'},{id:'gelenke',label:'Gelenke'},{id:'aufbau',label:'Knochenbau'},
+ {id:'quiz',label:'Quiz'},{id:'wf',label:'Wahr oder falsch'},{id:'luecke',label:'Lückentext'},
+ {id:'salat',label:'Buchstabensalat'},{id:'urkunde',label:'Urkunde'}
+];
+const SCORED=STATIONS.filter(s=>s.id!=='urkunde').map(s=>s.id);
+const MAXSTARS=SCORED.length*3;
+const STAR='<path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4 6.1 20.7l1.3-6.6L2.5 9.5l6.6-.8z" stroke-linejoin="round"/>';
+const starsHTML=n=>`<span class="stars" aria-label="${n} von 3 Sternen">${[0,1,2].map(i=>`<svg viewBox="0 0 24 24" class="${i<n?'on':'off'}">${STAR}</svg>`).join('')}</span>`;
+function total(){return SCORED.reduce((s,id)=>s+(progress[id]||0),0)}
+function award(id,n){if(n>(progress[id]||0)){progress[id]=n;save();refresh()}}
+function refresh(){
+  const t=total();
+  $('#totalNum').textContent=t+' / '+MAXSTARS;
+  $('#meterFill').style.width=(t/MAXSTARS*100)+'%';
+  $('#totalStar').innerHTML=starsHTML(Math.floor(t/MAXSTARS*3+0.0001));
+  $$('.tab').forEach(b=>{const id=b.dataset.id;const st=b.querySelector('.st');if(st&&id!=='urkunde')st.textContent='★'.repeat(progress[id]||0)});
+  renderCert();
+}
+function burst(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const cols=['#ffc531','#0c7f93','#5ee3f5','#ff6b5b','#f4eedb','#1e8c52'];
+  for(let i=0;i<34;i++){const s=document.createElement('span');s.className='cf';
+    s.style.left=Math.random()*100+'vw';s.style.background=cols[i%cols.length];
+    s.style.animationDelay=Math.random()*.5+'s';s.style.animationDuration=1.4+Math.random()*1.2+'s';
+    document.body.appendChild(s);setTimeout(()=>s.remove(),3200)}
+}
+function fbSet(el,txt,cls){el.textContent=txt;el.className='fb '+(cls||'')}
+
+/* ---------- Knochen-Daten ---------- */
+const BONES={
+ schaedel:{n:'Schädel',lat:'Cranium',t:'Dein Schädel ist wie ein Helm, den du nie ablegst. Er besteht aus vielen festen Knochenplatten, die wie Puzzleteile zusammenpassen. Darin liegt dein Gehirn sicher und geschützt.',f:'Bei Babys sind die Platten noch nicht zusammengewachsen. Die weichen Stellen am Kopf heißen Fontanellen.'},
+ unterkiefer:{n:'Unterkiefer',lat:'Mandibula',t:'Der Unterkiefer ist der einzige Knochen im Kopf, den du bewegen kannst. Ohne ihn könntest du nicht kauen, sprechen oder gähnen. Er hängt mit Gelenken am Schädel.',f:'Zähne sind keine Knochen. Der Zahnschmelz ist sogar das härteste Material in deinem Körper.'},
+ wirbelsaeule:{n:'Wirbelsäule',lat:'Columna vertebralis',t:'Die Wirbelsäule ist die Hauptstütze deines Körpers. Viele einzelne Wirbel liegen wie Bausteine übereinander. Dazwischen sitzen weiche Bandscheiben als Stoßdämpfer. Im Inneren verläuft das empfindliche Rückenmark, das sie auch beschützt.',f:'Du hast 7 Halswirbel, 12 Brustwirbel und 5 Lendenwirbel. Eine Giraffe hat auch nur 7 Halswirbel, ihre sind nur riesig lang!'},
+ schluesselbein:{n:'Schlüsselbein',lat:'Clavicula',t:'Das Schlüsselbein ist wie eine Strebe, die deine Schulter mit dem Brustbein verbindet. Du kannst es unter der Haut ertasten.',f:'Es bricht recht leicht, zum Beispiel wenn man vom Fahrrad stürzt.'},
+ schulterblatt:{n:'Schulterblatt',lat:'Scapula',t:'Das Schulterblatt ist ein flacher, dreieckiger Knochen auf deinem Rücken. In einer Mulde daran sitzt der Oberarmknochen.',f:'Es ist nicht fest mit der Wirbelsäule verbunden, sondern wird von Muskeln gehalten. So bleibt es beweglich.'},
+ brustbein:{n:'Brustbein',lat:'Sternum',t:'Das Brustbein ist ein flacher Knochen mitten auf deiner Brust. Vorne halten sich die Rippen daran fest, so entsteht ein stabiler Käfig.',f:'Von der Form her sieht es aus wie eine kurze Krawatte.'},
+ rippen:{n:'Rippen',lat:'Costae',t:'Du hast 12 Rippenpaare, also 24 Rippen. Zusammen mit Brustbein und Wirbelsäule bilden sie den Brustkorb, einen Käfig für Herz und Lunge. Die Rippen federn ein bisschen, so kann sich dein Brustkorb beim Atmen heben und senken.',f:'Schau genau hin: Der Brustkorb im Bild atmet gerade mit!'},
+ oberarm:{n:'Oberarmknochen',lat:'Humerus',t:'Der Oberarmknochen reicht von der Schulter bis zum Ellenbogen. Oben steckt sein runder Kopf im Schultergelenk (ein Kugelgelenk), unten bildet er mit dem Unterarm das Ellenbogengelenk (ein Scharniergelenk).',f:'Wenn du dir den Ellenbogen anstößt, kribbelt es gemein. Das nennt man „Musikantenknochen“. Dabei ist es gar kein Knochen, sondern ein Nerv, der dort ungeschützt liegt!'},
+ unterarm:{n:'Elle und Speiche',lat:'Ulna und Radius',t:'Dein Unterarm hat zwei Knochen: die Elle (auf der Seite des kleinen Fingers) und die Speiche (auf der Daumenseite). Wenn du die Hand drehst, kreuzt sich die Speiche über die Elle.',f:'Probiere es aus: Leg den Unterarm auf den Tisch und dreh die Handfläche nach oben und unten. Die zwei Knochen drehen sich umeinander!'},
+ hand:{n:'Handknochen',lat:'Manus',t:'In jeder Hand stecken 27 Knochen: 8 kleine in der Handwurzel, 5 in der Mittelhand und 14 in den Fingern. Darum ist deine Hand so geschickt. Du kannst schreiben, malen, greifen und Knöpfe schließen.',f:'In deinen beiden Händen und Füßen steckt ungefähr die Hälfte aller Knochen deines Körpers!'},
+ becken:{n:'Becken',lat:'Pelvis',t:'Das Becken ist ein kräftiger Knochenring. Es trägt das Gewicht deines Oberkörpers und schützt Organe wie Blase und Darm. An den Seiten sitzen die Hüftgelenke, in denen die Oberschenkel stecken.',f:'Das Kreuzbein ganz unten an der Wirbelsäule besteht aus mehreren Wirbeln, die zu einem Knochen verwachsen sind.'},
+ oberschenkel:{n:'Oberschenkelknochen',lat:'Femur',t:'Der Oberschenkelknochen ist der längste und stärkste Knochen deines Körpers. Er muss beim Rennen, Springen und Stehen dein ganzes Gewicht aushalten. Oben sitzt er im Hüftgelenk, unten im Kniegelenk.',f:'Er macht ungefähr ein Viertel deiner Körpergröße aus.'},
+ kniescheibe:{n:'Kniescheibe',lat:'Patella',t:'Die Kniescheibe ist ein kleiner, runder Knochen vorne am Knie. Sie schützt das Kniegelenk wie ein Schutzschild und hilft den Muskeln beim Strecken des Beins.',f:'Kleine Kinder haben noch eine Kniescheibe aus Knorpel. Erst später wird sie zu Knochen.'},
+ unterschenkel:{n:'Schienbein und Wadenbein',lat:'Tibia und Fibula',t:'Dein Unterschenkel hat zwei Knochen. Das dicke Schienbein trägt dein Gewicht. Das dünne Wadenbein liegt daneben und gibt dem Knöchel Halt.',f:'Ein Stoß ans Schienbein tut besonders weh, weil dort kaum Muskeln und Fett als Polster liegen.'},
+ fuss:{n:'Fußknochen',lat:'Pes',t:'Jeder Fuß hat 26 Knochen. Sie bilden ein Gewölbe wie eine kleine Brücke. Das federt Stöße ab, wenn du gehst, hüpfst oder landest.',f:'Beim Gehen rollt dein Fuß von der Ferse bis zu den Zehen ab.'}
+};
+const BONE_ORDER=['schaedel','unterkiefer','wirbelsaeule','schluesselbein','schulterblatt','brustbein','rippen','oberarm','unterarm','hand','becken','oberschenkel','kniescheibe','unterschenkel','fuss'];
+
+/* ---------- Skelett zeichnen ---------- */
+const mirror=i=>`<g transform="translate(320,0) scale(-1,1)">${i}</g>`;
+function limb(x1,y1,x2,y2,w){
+  const r=w*.72, c=(a,b,cl,rr)=>`<circle class="${cl}" cx="${a}" cy="${b}" r="${rr}"/>`;
+  const ln=(cl,sw)=>`<line class="${cl}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  return ln('es',w+3)+c(x1,y1,'ec',r+1.5)+c(x2,y2,'ec',r+1.5)+ln('fs',w)+c(x1,y1,'fc',r)+c(x2,y2,'fc',r);
+}
+function sline(d,w){return `<path class="es" d="${d}" stroke-width="${w+3}" stroke-linecap="round"/><path class="fs" d="${d}" stroke-width="${w}" stroke-linecap="round"/>`}
+function skeletonSVG(o={}){
+  const {interactive=true,wave=false,cls='',extra=''}=o;
+  const B=(id,inner)=>`<g class="bone" data-b="${id}"${interactive?` tabindex="0" role="button" aria-label="${BONES[id].n}"`:''}>${inner}</g>`;
+  const S=(id,inner)=>B(id,inner+mirror(inner));
+  let spine='';
+  for(let i=0;i<24;i++){const y=122+i*7.4,w=i<7?15:i<19?18:22;spine+=`<rect class="b" x="${160-w/2}" y="${y}" width="${w}" height="6" rx="3"/>`}
+  const skull=`<path class="b" d="M160 14C122 14 112 42 116 66C118 80 126 88 134 92L134 100L186 100L186 92C194 88 202 80 204 66C208 42 198 14 160 14Z"/><ellipse class="eye" cx="145" cy="62" rx="9" ry="10"/><ellipse class="eye" cx="175" cy="62" rx="9" ry="10"/><path class="eye" d="M160 74L154 86L166 86Z"/>`;
+  const jaw=`<path class="b" d="M136 99L184 99L180 114C176 122 144 122 140 114Z"/><path class="eye" d="M144 104h5v5h-5zM152 104h5v5h-5zM160 104h5v5h-5zM168 104h5v5h-5z" opacity=".55"/>`;
+  const W=[46,54,58,58,54,48,40];let rb='';
+  W.forEach((w,i)=>{const y=134+i*15;rb+=sline(`M156 ${y} C ${160-w-6} ${y-2}, ${160-w-8} ${y+24}, 156 ${y+22}`,4)});
+  const ribs=`<g class="rib-g">${rb+mirror(rb)}</g>`;
+  const sternum=`<path class="b" d="M152 128H168L166 150L164 190L160 202L156 190L154 150Z"/>`;
+  const clav=sline('M153 124Q130 116 104 127',6);
+  const blade=`<path class="b" d="M104 134Q114 130 126 136L118 176Q108 168 104 134Z"/>`;
+  const upper=limb(98,132,80,212,9);
+  const fore=limb(84,218,70,297,6)+limb(72,220,54,295,5);
+  const hand=[[53,314,51,334],[59,316,58,338],[65,316,66,338],[71,314,73,333]].map(f=>limb(...f,3.5)).join('')+limb(50,306,40,320,3.5)+`<ellipse class="b" cx="62" cy="308" rx="12" ry="9"/>`;
+  let arms;
+  if(wave)arms=B('oberarm',upper)+B('unterarm',fore)+B('hand',hand)+mirror(`<g class="armwave">${upper}<g class="forewave">${fore}${hand}</g></g>`);
+  else arms=S('oberarm',upper)+S('unterarm',fore)+S('hand',hand);
+  const pelvis=`<path class="b" d="M112 296C96 300 92 330 106 348C116 362 134 366 146 362L160 346L174 362C186 366 204 362 214 348C228 330 224 300 208 296C192 304 176 308 160 308C144 308 128 304 112 296Z"/><ellipse class="eye" cx="137" cy="338" rx="8" ry="10"/><ellipse class="eye" cx="183" cy="338" rx="8" ry="10"/><path class="b" d="M148 306H172L160 342Z"/>`;
+  const femur=limb(128,356,134,488,13);
+  const patella=`<circle class="b" cx="135" cy="501" r="8.5"/>`;
+  const shin=limb(135,511,132,606,9)+limb(123,513,121,602,5);
+  const foot=`<ellipse class="b" cx="131" cy="618" rx="11" ry="7"/>`+[119,125,131,137,143].map(x=>limb(x,626,x,641,3.5)).join('');
+  return `<svg class="sk ${cls}" viewBox="0 0 320 650" role="img" aria-label="Röntgenbild eines Skeletts">`+
+    B('wirbelsaeule',spine)+B('schulterblatt',blade+mirror(blade))+B('rippen',ribs)+B('brustbein',sternum)+
+    B('schluesselbein',clav+mirror(clav))+B('schaedel',skull)+B('unterkiefer',jaw)+arms+
+    B('becken',pelvis)+S('oberschenkel',femur)+S('kniescheibe',patella)+S('unterschenkel',shin)+S('fuss',foot)+extra+`</svg>`;
+}
+/* ---------- Navigation ---------- */
+function buildNav(){
+  $('#nav').innerHTML=STATIONS.map((s,i)=>`<button class="tab" role="tab" data-id="${s.id}" aria-selected="false"><span class="n">${i+1}</span>${s.label}<span class="st"></span></button>`).join('');
+  $$('.station').forEach((sec,i)=>{
+    const next=STATIONS[i+1];
+    if(next)sec.insertAdjacentHTML('beforeend',`<div class="nextrow"><button class="btn" data-go="${next.id}">Weiter: ${next.label} →</button></div>`);
+  });
+  document.addEventListener('click',e=>{
+    const t=e.target.closest('.tab,[data-go]');
+    if(t)show(t.dataset.id||t.dataset.go,true);
+  });
+}
+function show(id,scroll){
+  if(!STATIONS.some(s=>s.id===id))id='start';
+  $$('.station').forEach(s=>s.hidden=s.id!=='s-'+id);
+  $$('.tab').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.id===id)));
+  try{if(location.hash.slice(1)!==id)location.hash=id}catch(e){}
+  if(id==='start')animateBars();
+  if(scroll)$('#nav').scrollIntoView({block:'start',behavior:'smooth'});
+  const act=$('.tab[aria-selected="true"]');if(act&&act.scrollIntoView)act.scrollIntoView({inline:'center',block:'nearest'});
+}
+function animateBars(){$$('.fill').forEach(f=>{f.style.width='0';requestAnimationFrame(()=>setTimeout(()=>f.style.width=f.dataset.w+'%',60))})}
+
+/* ---------- Start ---------- */
+const FUNCS=[
+ {n:'Stützen',ic:'<path d="M6 42h36M12 42V16M36 42V16M24 42V16M5 16h38M8 10h32"/>',t:'Dein Skelett ist das Gerüst deines Körpers, so wie die Stangen eines Zeltes. Es gibt dir Form und hält dich aufrecht. Ohne Skelett würdest du in dich zusammensacken.'},
+ {n:'Schützen',ic:'<path d="M24 5L41 11V24C41 34 33 40 24 44C15 40 7 34 7 24V11Z"/>',t:'Wichtige Organe liegen gut verpackt: Der Schädel schützt das Gehirn, der Brustkorb schützt Herz und Lunge und die Wirbelsäule schützt das Rückenmark.'},
+ {n:'Bewegen',ic:'<path d="M6 24h36M33 15l9 9-9 9M15 15l-9 9 9 9"/>',t:'Knochen bewegen sich nicht von allein. Muskeln ziehen an ihnen wie Fäden an einer Marionette. Die Gelenke sind die Drehpunkte. So wird aus steifen Knochen ein beweglicher Körper.'},
+ {n:'Blut bilden',ic:'<path d="M24 5C24 5 10 22 10 30a14 14 0 0 0 28 0C38 22 24 5 24 5Z"/>',t:'Im Inneren mancher Knochen sitzt das Knochenmark. Es ist wie eine Blutfabrik: Dort entstehen ständig neue Blutzellen.'},
+ {n:'Speichern',ic:'<path d="M8 8h32v7H8zM10 15v27h28V15M19 24h10"/>',t:'Knochen sind ein Vorratslager für Kalk und andere Mineralstoffe. Dein Körper braucht sie auch für Muskeln und Nerven. Wenn etwas fehlt, holt er es aus den Knochen.'}
+];
+const opened=new Set();
+function initStart(){
+  $('#funcGrid').innerHTML=FUNCS.map((f,i)=>`<button class="fcard" data-i="${i}" aria-expanded="false"><span class="head"><svg viewBox="0 0 48 48">${f.ic}</svg>${f.n}</span><span class="body"><div><p>${f.t}</p></div></span></button>`).join('');
+  $('#funcGrid').addEventListener('click',e=>{
+    const c=e.target.closest('.fcard');if(!c)return;
+    const o=c.classList.toggle('open');c.setAttribute('aria-expanded',o);
+    if(o)opened.add(+c.dataset.i);
+    note();
+  });
+  note();
+}
+function note(){
+  const n=opened.size;
+  $('#funcNote').textContent=n<5?`Entdeckt: ${n} von 5 Aufgaben`:'Alle 5 Aufgaben entdeckt. Gut gemacht!';
+  if(n===5&&!progress.start){award('start',3);burst()}
+}
+
+/* ---------- Atlas ---------- */
+const seen=new Set();
+function initAtlas(){
+  $('#atlasBox').innerHTML=skeletonSVG({cls:'atlas'});
+  $('#boneChips').innerHTML=BONE_ORDER.map(b=>`<button class="chip" data-b="${b}">${BONES[b].n}</button>`).join('');
+  $('#info').innerHTML='<h3>Tippe auf einen Knochen</h3><p class="lead">Fahre mit dem Finger oder der Maus über das Röntgenbild. Die Knochen leuchten auf. Mit einem Tipp erfährst du mehr.</p>';
+  const pick=b=>pickBone(b);
+  $('#atlasBox').addEventListener('click',e=>{const g=e.target.closest('.bone');if(g)pick(g.dataset.b)});
+  $('#atlasBox').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('.bone');if(g){e.preventDefault();pick(g.dataset.b)}}});
+  $('#boneChips').addEventListener('click',e=>{const c=e.target.closest('.chip');if(c)pick(c.dataset.b)});
+  countAtlas();
+}
+function pickBone(b){
+  const d=BONES[b];
+  $$('#atlasBox .bone').forEach(g=>g.classList.toggle('sel',g.dataset.b===b));
+  $('#atlasBox .sk').classList.toggle('breathe',b==='rippen');
+  $$('#boneChips .chip').forEach(c=>{c.classList.toggle('on',c.dataset.b===b);if(c.dataset.b===b)c.classList.add('seen')});
+  $('#info').innerHTML=`<h3>${d.n}</h3><div class="lat">${d.lat}</div><p style="margin-top:8px">${d.t}</p><div class="fun"><b>Wusstest du schon?</b>${d.f}</div>`;
+  seen.add(b);countAtlas();
+}
+function countAtlas(){
+  const n=seen.size;
+  $('#atlasCount').textContent=`Entdeckt: ${n} von 15 Knochen`;
+  const st=n>=15?3:n>=10?2:n>=5?1:0;
+  if(st){const had=progress.atlas||0;award('atlas',st);if(st===3&&had<3)burst()}
+}
+
+/* ---------- Beschriften ---------- */
+const LBL=[
+ {b:'schaedel',name:'Schädel',x:160,y:44},{b:'schluesselbein',name:'Schlüsselbein',x:132,y:121},
+ {b:'brustbein',name:'Brustbein',x:160,y:152},{b:'rippen',name:'Rippen',x:122,y:182},
+ {b:'oberarm',name:'Oberarmknochen',x:86,y:185},{b:'wirbelsaeule',name:'Wirbelsäule',x:160,y:262},
+ {b:'becken',name:'Becken',x:126,y:318},{b:'oberschenkel',name:'Oberschenkelknochen',x:131,y:420},
+ {b:'kniescheibe',name:'Kniescheibe',x:135,y:501},{b:'unterschenkel',name:'Schienbein',x:134,y:560}
+];
+let lblSel=null,lblMist=0,lblDone=new Set();
+function initLabel(){
+  const mk=LBL.map((l,i)=>`<g class="mk" data-n="${i}" role="button" tabindex="0" aria-label="Nummer ${i+1}"><circle cx="${l.x}" cy="${l.y}" r="11"/><text x="${l.x}" y="${l.y}">${i+1}</text></g>`).join('');
+  $('#lblBox').innerHTML=skeletonSVG({interactive:false,cls:'',extra:mk});
+  lblReset();
+  const box=$('#lblBox');
+  box.addEventListener('click',e=>{const m=e.target.closest('.mk');if(m)place(+m.dataset.n)});
+  box.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const m=e.target.closest('.mk');if(m){e.preventDefault();place(+m.dataset.n)}}});
+  box.addEventListener('dragover',e=>{if(e.target.closest('.mk'))e.preventDefault()});
+  box.addEventListener('drop',e=>{const m=e.target.closest('.mk');if(m){e.preventDefault();const nm=e.dataTransfer.getData('text/plain');if(nm){lblSel=nm;place(+m.dataset.n)}}});
+  $('#slots').addEventListener('click',e=>{const li=e.target.closest('li');if(li)place(+li.dataset.n)});
+  $('#slots').addEventListener('dragover',e=>{if(e.target.closest('li'))e.preventDefault()});
+  $('#slots').addEventListener('drop',e=>{const li=e.target.closest('li');if(li){e.preventDefault();const nm=e.dataTransfer.getData('text/plain');if(nm){lblSel=nm;place(+li.dataset.n)}}});
+  $('#pool').addEventListener('click',e=>{const t=e.target.closest('.tag');if(!t)return;lblSel=t.dataset.name;$$('#pool .tag').forEach(x=>x.classList.toggle('pick',x===t));fbSet($('#lblFb'),'Jetzt die passende Nummer antippen.')});
+  $('#pool').addEventListener('dragstart',e=>{const t=e.target.closest('.tag');if(t){e.dataTransfer.setData('text/plain',t.dataset.name);lblSel=t.dataset.name}});
+  $('#lblReset').addEventListener('click',lblReset);
+}
+function lblReset(){
+  lblSel=null;lblMist=0;lblDone=new Set();
+  $('#pool').innerHTML=shuffle(LBL.map(l=>l.name)).map(n=>`<button class="tag" draggable="true" data-name="${n}">${n}</button>`).join('');
+  $('#slots').innerHTML=LBL.map((l,i)=>`<li data-n="${i}"><span class="no">${i+1}</span><span class="nm">…</span></li>`).join('');
+  $$('#lblBox .mk').forEach(m=>m.classList.remove('ok'));
+  fbSet($('#lblFb'),'');
+}
+function place(n){
+  if(lblDone.has(n))return;
+  if(!lblSel){fbSet($('#lblFb'),'Wähle zuerst einen Namen aus.','bad');return}
+  const m=$(`#lblBox .mk[data-n="${n}"]`);
+  if(LBL[n].name===lblSel){
+    lblDone.add(n);m.classList.add('ok');
+    const li=$(`#slots li[data-n="${n}"]`);li.classList.add('ok');$('.nm',li).textContent=lblSel;
+    const t=$(`#pool .tag[data-name="${lblSel}"]`);if(t)t.remove();
+    lblSel=null;
+    if(lblDone.size===LBL.length){
+      const st=lblMist<=2?3:lblMist<=6?2:1;award('beschriften',st);
+      fbSet($('#lblFb'),`Geschafft! Du hattest ${lblMist} Fehlversuche.`,'ok');if(st===3)burst();
+    }else fbSet($('#lblFb'),'Richtig!','ok');
+  }else{
+    lblMist++;m.classList.remove('shake');void m.getBoundingClientRect();m.classList.add('shake');
+    fbSet($('#lblFb'),'Das passt nicht. Versuche es noch einmal.','bad');
+  }
+}
+
+/* ---------- Memory ---------- */
+const PAIRS=[['Schädel','schützt das Gehirn'],['Rippen','schützen Herz und Lunge'],['Wirbelsäule','hält dich aufrecht'],['Kniescheibe','schützt das Kniegelenk'],['Oberschenkel-knochen','längster Knochen im Körper'],['Becken','trägt den Oberkörper']];
+let memOpen=[],memMoves=0,memFound=0,memLock=false;
+function initMemory(){$('#memReset').addEventListener('click',memStart);$('#memGrid').addEventListener('click',memClick);memStart()}
+function memStart(){
+  memOpen=[];memMoves=0;memFound=0;memLock=false;
+  const cards=shuffle(PAIRS.flatMap((p,i)=>[{i,t:p[0],k:'t'},{i,t:p[1],k:'d'}]));
+  const q='<svg viewBox="0 0 24 24"><path d="M5 5l14 14M5 19L19 5M3 8a2.5 2.5 0 1 0 2-3M21 16a2.5 2.5 0 1 0-2 3"/></svg>';
+  $('#memGrid').innerHTML=cards.map((c,j)=>`<button class="mc ${c.k}" data-i="${c.i}" aria-label="Karte ${j+1}"><span class="in"><span class="f">${q}</span><span class="k">${c.t.replace('-','&shy;')}</span></span></button>`).join('');
+  $('#memCount').textContent='Züge: 0';fbSet($('#memFb'),'');
+}
+function memClick(e){
+  const c=e.target.closest('.mc');
+  if(!c||memLock||c.classList.contains('flip'))return;
+  c.classList.add('flip');memOpen.push(c);
+  if(memOpen.length<2)return;
+  memMoves++;$('#memCount').textContent='Züge: '+memMoves;
+  const [a,b]=memOpen;memOpen=[];
+  if(a.dataset.i===b.dataset.i){
+    a.classList.add('done');b.classList.add('done');memFound++;
+    if(memFound===PAIRS.length){
+      const st=memMoves<=9?3:memMoves<=14?2:1;award('memory',st);
+      fbSet($('#memFb'),`Alle Paare gefunden in ${memMoves} Zügen!`,'ok');if(st===3)burst();
+    }
+  }else{
+    memLock=true;
+    setTimeout(()=>{a.classList.remove('flip');b.classList.remove('flip');memLock=false},900);
+  }
+}
+/* ---------- Gelenke ---------- */
+function initGelenke(){
+  const T=(x,y,t)=>`<text x="${x}" y="${y}">${t}</text>`;
+  $('#hingeBox').innerHTML=`<svg viewBox="0 0 300 200" class="sk" role="img" aria-label="Animation Scharniergelenk">
+   <g class="sk">${limb(30,110,150,110,14)}</g>
+   <g class="hinge-fore sk">${limb(150,110,268,110,12)}</g>
+   <circle class="pin" cx="150" cy="110" r="6"/>${T(24,150,'Oberarm')}${T(176,160,'Unterarm')}${T(104,64,'Scharniergelenk')}</svg>`;
+  $('#ballBox').innerHTML=`<svg viewBox="0 0 300 200" class="sk" role="img" aria-label="Animation Kugelgelenk">
+   <g class="ball-arm sk"><circle class="fc" cx="150" cy="110" r="20"/><circle class="es" cx="150" cy="110" r="20" stroke-width="2.5"/>${limb(150,110,268,110,12)}</g>
+   <g class="sk"><path class="es" d="M140 72C112 88 112 132 140 148" stroke-width="12" stroke-linecap="round"/><path class="fs" d="M140 72C112 88 112 132 140 148" stroke-width="8" stroke-linecap="round"/></g>
+   ${T(14,50,'Gelenkpfanne')}${T(14,176,'Gelenkkopf (Kugel)')}${T(196,50,'Kugelgelenk')}</svg>`;
+  $$('[data-pause]').forEach(b=>b.addEventListener('click',()=>$('#'+b.dataset.pause).classList.toggle('paused')));
+  const G=[
+   ['Schulter','k','Der runde Kopf des Oberarmknochens steckt in einer Pfanne.'],
+   ['Ellenbogen','s','Der Unterarm lässt sich nur auf- und zuklappen wie eine Tür.'],
+   ['Hüfte','k','Das Bein kann nach vorn, hinten und zur Seite schwingen.'],
+   ['Knie','s','Du kannst das Bein beugen und strecken, aber nicht im Kreis schwingen.'],
+   ['Fingergelenk','s','Der Finger knickt nur in eine Richtung ab.'],
+   ['Ein Gelenk, in dem der Arm im Kreis schwingen kann','k','Ball in der Pfanne: Das ist ein Kugelgelenk.']
+  ];
+  let wrong=0,done=0;
+  $('#gItems').innerHTML=G.map((g,i)=>`<div class="item" data-i="${i}"><div class="t">${g[0]}</div><div class="tog"><button data-a="k">Kugelgelenk</button><button data-a="s">Scharniergelenk</button></div></div>`).join('');
+  $('#gItems').addEventListener('click',e=>{
+    const b=e.target.closest('button[data-a]');if(!b)return;
+    const it=b.closest('.item'),g=G[+it.dataset.i];
+    if(b.dataset.a===g[1]){
+      it.classList.remove('bad');it.classList.add('ok');b.classList.add('picked');
+      $$('button',it).forEach(x=>x.disabled=true);
+      it.querySelector('.t').insertAdjacentHTML('beforeend',`<small>${g[2]}</small>`);
+      done++;
+      if(done===G.length){const st=wrong<=1?3:wrong<=3?2:1;award('gelenke',st);fbSet($('#gFb'),`Alles richtig zugeordnet! Fehlversuche: ${wrong}`,'ok');if(st===3)burst()}
+    }else{wrong++;it.classList.add('bad');fbSet($('#gFb'),'Das war nicht ganz richtig. Denke an die Bewegung: Nur eine Richtung oder alle Richtungen?','bad')}
+  });
+}
+
+/* ---------- Knochenbau ---------- */
+const PARTS={
+ haut:{n:'Knochenhaut',t:'Eine dünne Haut, die den ganzen Knochen umhüllt. In ihr verlaufen Blutgefäße und Nerven. Sie versorgt den Knochen und hilft beim Wachsen und Heilen. Darum tut ein Schlag aufs Schienbein so weh!'},
+ kompakta:{n:'Harte Knochenschicht',t:'Die feste Außenwand des Knochens. Sie ist sehr hart und trägt die Last. Eine Röhre ist erstaunlich stabil und dabei viel leichter als ein dicker Stab.'},
+ mark:{n:'Knochenmark',t:'Im Inneren liegt das weiche Knochenmark. Das rote Knochenmark bildet Blutzellen. Im gelben Knochenmark wird Fett gespeichert.'},
+ schwamm:{n:'Schwammknochen',t:'An den Enden sieht der Knochen innen aus wie ein Schwamm mit vielen kleinen Streben. Das macht ihn leicht, aber trotzdem stabil, wie die Stützen einer Brücke. In den Lücken sitzt rotes Knochenmark.'},
+ knorpel:{n:'Gelenkknorpel',t:'Eine glatte, glitschige Schicht auf den Knochenenden. Sie wirkt wie ein Polster und lässt die Knochen im Gelenk geschmeidig aneinander gleiten.'}
+};
+const PORDER=['haut','kompakta','mark','schwamm','knorpel'];
+function initAufbau(){
+  const out='M92 40C92 26 168 26 168 40L168 78C168 92 156 96 154 104L154 316C156 324 168 328 168 342L168 380C168 394 92 394 92 380L92 342C92 328 104 324 106 316L106 104C104 96 92 92 92 78Z';
+  const spT='M100 42C100 36 160 36 160 42L160 78C160 88 146 92 144 100L116 100C114 92 100 88 100 78Z';
+  const spB='M100 378C100 384 160 384 160 378L160 342C160 332 146 328 144 320L116 320C114 328 100 332 100 342Z';
+  const pn=(n,x,y,tx,ty)=>`<g class="pn"><line x1="${tx}" y1="${ty}" x2="${x}" y2="${y}" stroke="#5ee3f5" stroke-width="2"/><circle cx="${x}" cy="${y}" r="12"/><text x="${x}" y="${y}">${n}</text></g>`;
+  $('#ruehrBox').innerHTML=`<svg class="bonesvg" viewBox="0 0 260 420" role="img" aria-label="Querschnitt eines Röhrenknochens">
+   <defs><pattern id="spg" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#e9dfc2"/><circle cx="2" cy="2" r="1.7" fill="#a89c78"/><circle cx="6" cy="6" r="1.7" fill="#a89c78"/><path d="M0 8L8 0" stroke="#a89c78" stroke-width=".8"/></pattern></defs>
+   <g class="hs" data-p="kompakta" tabindex="0" role="button" aria-label="Harte Knochenschicht"><path d="${out}" fill="#f4eedb"/></g>
+   <g class="hs" data-p="schwamm" tabindex="0" role="button" aria-label="Schwammknochen"><path d="${spT}" fill="url(#spg)"/><path d="${spB}" fill="url(#spg)"/></g>
+   <g class="hs" data-p="mark" tabindex="0" role="button" aria-label="Knochenmark"><rect x="116" y="100" width="28" height="220" rx="12" fill="#ffc94d"/></g>
+   <g class="hs" data-p="knorpel" tabindex="0" role="button" aria-label="Gelenkknorpel"><path d="M90 42C90 12 170 12 170 42C150 32 110 32 90 42Z" fill="#7fd0e6" stroke="#2a8aa3" stroke-width="2"/><path d="M90 378C90 408 170 408 170 378C150 388 110 388 90 378Z" fill="#7fd0e6" stroke="#2a8aa3" stroke-width="2"/></g>
+   <g class="hs" data-p="haut" tabindex="0" role="button" aria-label="Knochenhaut"><path d="${out}" fill="none" stroke="#e0554a" stroke-width="4" stroke-linejoin="round"/></g>
+   ${pn(1,44,200,106,200)}
+   ${pn(2,216,170,150,170)}${pn(3,216,250,134,250)}${pn(4,44,60,110,62)}${pn(5,216,26,156,24)}</svg>`;
+  $('#partInfo').innerHTML='<h3>Tippe auf einen Teil</h3><p class="lead">Jeder Teil hat eine eigene Aufgabe.</p>';
+  $('#ruehrBox').addEventListener('click',e=>{const g=e.target.closest('.hs');if(g)showPart(g.dataset.p)});
+  $('#ruehrBox').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('.hs');if(g){e.preventDefault();showPart(g.dataset.p)}}});
+  const names=PORDER.map(k=>PARTS[k].n).sort((a,b)=>a.localeCompare(b,'de'));
+  $('#partTask').innerHTML=PORDER.map((k,i)=>`<div class="sel-row"><span class="no">${i+1}</span><select data-k="${k}" id="part-${k}"><option value="">Wähle…</option>${names.map(n=>`<option>${n}</option>`).join('')}</select></div>`).join('');
+  let tries=0;
+  $('#partCheck').addEventListener('click',()=>{
+    tries++;let ok=0;
+    $$('#partTask select').forEach(s=>{const r=PARTS[s.dataset.k].n===s.value;s.className=r?'ok':'bad';if(r)ok++});
+    if(ok===5){const st=tries===1?3:tries<=3?2:1;award('aufbau',st);fbSet($('#partFb'),'Alle fünf Teile richtig benannt!','ok');if(st===3)burst()}
+    else fbSet($('#partFb'),`${ok} von 5 richtig. Die roten Felder prüfst du noch einmal.`,'bad');
+  });
+}
+function showPart(p){
+  $$('#ruehrBox .hs').forEach(g=>g.classList.toggle('sel',g.dataset.p===p));
+  $('#partInfo').innerHTML=`<h3>${PARTS[p].n}</h3><p style="margin-top:6px">${PARTS[p].t}</p>`;
+}
+
+/* ---------- Quiz und Wahr/Falsch ---------- */
+const QUIZ=[
+ {q:'Welcher Knochen schützt dein Gehirn?',o:['Schädel','Brustbein','Becken','Schlüsselbein'],a:0,why:'Der Schädel ist wie ein Helm aus festen Knochenplatten.'},
+ {q:'Wie viele Knochen hat ein Erwachsener ungefähr?',o:['106','206','506','1006'],a:1,why:'Erwachsene haben 206 Knochen. Babys haben mit etwa 300 sogar mehr.'},
+ {q:'Welcher Knochen ist der längste im Körper?',o:['Schienbein','Oberarmknochen','Oberschenkelknochen','Wirbelsäule'],a:2,why:'Der Oberschenkelknochen ist der längste und stärkste Knochen.'},
+ {q:'Was ist ein Gelenk?',o:['Eine Stelle, an der zwei Knochen beweglich verbunden sind','Ein besonders harter Knochen','Ein Muskel im Bein','Die Haut um den Knochen'],a:0,why:'Im Gelenk treffen Knochen zusammen und können sich bewegen.'},
+ {q:'Wozu dienen die Bandscheiben?',o:['Sie speichern Blut','Sie sind Stoßdämpfer zwischen den Wirbeln','Sie schützen das Herz','Sie halten den Unterkiefer'],a:1,why:'Bandscheiben liegen zwischen den Wirbeln und federn Stöße ab.'},
+ {q:'Wo im Knochen entsteht neues Blut?',o:['In der Knochenhaut','Im Gelenkknorpel','Im Knochenmark','In der harten Knochenschicht'],a:2,why:'Das rote Knochenmark ist die Blutfabrik des Körpers.'},
+ {q:'Welches Gelenk ist ein Kugelgelenk?',o:['Ellenbogen','Knie','Fingergelenk','Schulter'],a:3,why:'Die Schulter ist ein Kugelgelenk. Der Arm kann in alle Richtungen schwingen.'},
+ {q:'Wodurch sind Knochen hart und trotzdem etwas biegsam?',o:['Durch Kalk und Eiweiß','Nur durch Wasser','Nur durch Fett','Durch Luft in den Knochen'],a:0,why:'Kalk macht Knochen hart, das Eiweiß macht sie elastisch.'}
+];
+const WF=[
+ {q:'Dein Skelett hilft dir, aufrecht zu stehen.',a:0,why:'Das Skelett stützt den Körper wie das Gerüst eines Zeltes.'},
+ {q:'Knochen sind tot und trocken wie Stöcke.',a:1,why:'Knochen leben: Sie werden durchblutet, wachsen und heilen nach einem Bruch.'},
+ {q:'Die Rippen schützen Herz und Lunge.',a:0,why:'Rippen, Brustbein und Wirbelsäule bilden einen schützenden Käfig.'},
+ {q:'Babys haben weniger Knochen als Erwachsene.',a:1,why:'Babys haben etwa 300 Knochen. Manche wachsen später zusammen.'},
+ {q:'Das Knie ist ein Kugelgelenk.',a:1,why:'Das Knie ist ein Scharniergelenk und lässt sich nur beugen und strecken.'},
+ {q:'Giraffen haben mehr Halswirbel als Menschen.',a:1,why:'Beide haben 7 Halswirbel. Bei der Giraffe sind sie nur viel länger.'},
+ {q:'Gebrochene Knochen können wieder zusammenwachsen.',a:0,why:'Dank der Knochenhaut und neuer Knochenzellen heilt ein Bruch wieder.'},
+ {q:'Muskeln ziehen an den Knochen und bewegen sie.',a:0,why:'Ohne Muskeln könnten sich die Knochen nicht bewegen.'}
+];
+function choiceStation(root,items,sid,shuf,labels){
+  const el=document.getElementById(root);let i=0,wrong=0,order=[];
+  function start(){i=0;wrong=0;order=shuffle(items);draw()}
+  function draw(){
+    if(i>=order.length){
+      const st=wrong<=1?3:wrong<=3?2:1;award(sid,st);if(st===3)burst();
+      el.innerHTML=`<div class="result"><div class="big">${order.length-wrong} von ${order.length} richtig</div>${starsHTML(st)}<p>${st===3?'Super! Das war fast perfekt.':'Gut gemacht! Mit einem neuen Versuch kannst du mehr Sterne holen.'}</p><button class="btn" id="${root}-again">Nochmal spielen</button></div>`;
+      $('#'+root+'-again').addEventListener('click',start);return;
+    }
+    const it=order[i];
+    let opts=it.o?it.o.map((t,k)=>({t,ok:k===it.a})):labels.map((t,k)=>({t,ok:k===it.a}));
+    if(shuf)opts=shuffle(opts);
+    el.innerHTML=`<div class="qhead"><span>${i+1} von ${order.length}</span><div class="pbar"><i style="width:${i/order.length*100}%"></i></div></div><h3 class="q">${it.q}</h3><div class="${shuf?'opts':'wfopts'}">${opts.map((o,k)=>`<button class="opt" data-k="${k}">${o.t}</button>`).join('')}</div><div class="fb" aria-live="polite"></div><div class="tools"></div>`;
+    $$('.opt',el).forEach(b=>b.addEventListener('click',()=>{
+      const o=opts[+b.dataset.k];
+      $$('.opt',el).forEach((x,k)=>{x.disabled=true;if(opts[k].ok)x.classList.add('ok')});
+      const fb=$('.fb',el);
+      if(o.ok)fbSet(fb,'Richtig! '+it.why,'ok');else{wrong++;b.classList.add('bad');fbSet(fb,'Nicht ganz. '+it.why,'bad')}
+      $('.tools',el).innerHTML=`<button class="btn">${i+1<order.length?'Weiter':'Ergebnis ansehen'}</button>`;
+      const nb=$('.tools .btn',el);nb.focus();nb.addEventListener('click',()=>{i++;draw()});
+    }));
+  }
+  start();
+}
+
+/* ---------- Lückentext ---------- */
+const GAP=['Dein Skelett besteht aus etwa ',{a:'206'},' Knochen. Der ',{a:'Schädel'},' schützt das Gehirn. Die ',{a:'Rippen'},' bilden zusammen mit dem Brustbein den Brustkorb und schützen Herz und Lunge. Die ',{a:'Wirbelsäule'},' hält dich aufrecht. Zwischen den einzelnen Wirbeln liegen die ',{a:'Bandscheiben'},' als Stoßdämpfer. Zwei Knochen treffen sich in einem ',{a:'Gelenk'},'. Im ',{a:'Knochenmark'},' wird Blut gebildet. Der ',{a:'Oberschenkelknochen'},' ist der längste Knochen im Körper.'];
+function initGap(){
+  const words=['206','Schädel','Rippen','Wirbelsäule','Bandscheiben','Gelenk','Knochenmark','Oberschenkelknochen','Muskeln','Haut'].sort((a,b)=>a.localeCompare(b,'de',{numeric:true}));
+  $('#bank').innerHTML=words.map(w=>`<span>${w}</span>`).join('');
+  let k=0;
+  $('#gap').innerHTML=GAP.map(p=>typeof p==='string'?p:`<select data-a="${p.a}" id="gap${k++}" aria-label="Lücke ${k}"><option value="">…</option>${words.map(w=>`<option>${w}</option>`).join('')}</select>`).join('');
+  let tries=0;
+  $('#gapCheck').addEventListener('click',()=>{
+    tries++;let ok=0;const sels=$$('#gap select');
+    sels.forEach(s=>{const r=s.value===s.dataset.a;s.className=r?'ok':'bad';if(r)ok++});
+    if(ok===sels.length){const st=tries===1?3:tries<=3?2:1;award('luecke',st);fbSet($('#gapFb'),'Der Text ist komplett und richtig!','ok');if(st===3)burst()}
+    else fbSet($('#gapFb'),`${ok} von ${sels.length} Lücken stimmen. Die roten Lücken prüfst du noch einmal.`,'bad');
+  });
+  $('#gapReset').addEventListener('click',()=>{$$('#gap select').forEach(s=>{s.value='';s.className=''});tries=0;fbSet($('#gapFb'),'')});
+}
+
+/* ---------- Buchstabensalat ---------- */
+const SALAT=[
+ {w:'SCHÄDEL',h:'Er schützt dein Gehirn wie ein Helm.'},
+ {w:'RIPPEN',h:'Davon hast du 12 Paare. Sie schützen Herz und Lunge.'},
+ {w:'WIRBELSÄULE',h:'Sie hält dich aufrecht und besteht aus vielen einzelnen Wirbeln.'},
+ {w:'KNIESCHEIBE',h:'Ein kleiner runder Knochen, der das Knie schützt.'},
+ {w:'BECKEN',h:'Es trägt deinen Oberkörper und verbindet ihn mit den Beinen.'},
+ {w:'SCHLÜSSELBEIN',h:'Es verbindet die Schulter mit dem Brustbein.'}
+];
+function initSalat(){
+  const el=$('#salatBox');let i=0,pen=0,order=[],ans=[],tiles=[],lock=false;
+  function start(){i=0;pen=0;order=shuffle(SALAT);next()}
+  function next(){
+    if(i>=order.length){
+      const st=pen<=1?3:pen<=4?2:1;award('salat',st);if(st===3)burst();
+      el.innerHTML=`<div class="result"><div class="big">Alle ${order.length} Wörter gelöst!</div>${starsHTML(st)}<p>Fehler und Tipps: ${pen}</p><button class="btn" id="salatAgain">Nochmal spielen</button></div>`;
+      $('#salatAgain').addEventListener('click',start);return;
+    }
+    const w=order[i].w;ans=[];lock=false;
+    let t;do{t=shuffle(w.split('').map((ch,k)=>({ch,k})))}while(t.map(x=>x.ch).join('')===w);
+    tiles=t;draw();
+  }
+  function draw(state){
+    const w=order[i].w;
+    el.innerHTML=`<div class="qhead"><span>${i+1} von ${order.length}</span><div class="pbar"><i style="width:${i/order.length*100}%"></i></div></div>
+     <p class="q"><b>Tipp:</b> ${order[i].h}</p>
+     <div class="slotrow" id="slr">${w.split('').map((_,k)=>`<button class="sl ${ans[k]!==undefined?'f':''} ${state==='good'?'good':state==='bad'?'badl':''}" data-s="${k}" ${ans[k]===undefined?'disabled':''}>${ans[k]!==undefined?tiles[ans[k]].ch:''}</button>`).join('')}</div>
+     <div class="tiles">${tiles.map((t,k)=>`<button class="tile" data-t="${k}" ${ans.includes(k)||lock?'disabled':''}>${t.ch}</button>`).join('')}</div>
+     <div class="tools"><button class="btn ghost" id="sHint" ${lock?'disabled':''}>Tipp: nächster Buchstabe</button><button class="btn ghost" id="sClear" ${lock?'disabled':''}>Alles löschen</button></div>
+     <div class="fb" id="sFb" aria-live="polite">${state==='good'?'Richtig!':state==='bad'?'Leider falsch. Versuche es noch einmal.':''}</div>`;
+    $('#sFb',el).className='fb '+(state==='good'?'ok':state==='bad'?'bad':'');
+    $$('.tile',el).forEach(b=>b.addEventListener('click',()=>{ans.push(+b.dataset.t);after()}));
+    $$('.sl',el).forEach(b=>b.addEventListener('click',()=>{if(!lock){ans.splice(+b.dataset.s,1);draw()}}));
+    $('#sClear',el).addEventListener('click',()=>{ans=[];draw()});
+    $('#sHint',el).addEventListener('click',()=>{
+      pen++;const ok=ans.every((a,k)=>tiles[a].ch===w[k]);if(!ok)ans=[];
+      const need=w[ans.length];const idx=tiles.findIndex((t,k)=>t.ch===need&&!ans.includes(k));
+      if(idx>=0)ans.push(idx);after();
+    });
+  }
+  function after(){
+    const w=order[i].w;
+    if(ans.length<w.length){draw();return}
+    const guess=ans.map(a=>tiles[a].ch).join('');
+    if(guess===w){
+      lock=true;draw('good');
+      const row=$('.tools',el);row.innerHTML=`<button class="btn" id="sNext">${i+1<order.length?'Weiter':'Ergebnis ansehen'}</button>`;
+      $('#sNext',el).addEventListener('click',()=>{i++;next()});$('#sNext',el).focus();
+    }else{pen++;lock=true;draw('bad');setTimeout(()=>{ans=[];lock=false;draw()},1000)}
+  }
+  start();
+}
+
+/* ---------- Urkunde ---------- */
+function level(t){return t>=28?'Skelett-Meister/in':t>=20?'Knochen-Profi':t>=10?'Skelett-Forscher/in':'Knochen-Entdecker/in'}
+function renderCert(){
+  const t=total();
+  if(!$('#certLvl'))return;
+  $('#certName').textContent=playerName||'Dein Name';
+  $('#certLvl').textContent=level(t);
+  $('#certStars').innerHTML=starsHTML(Math.round(t/MAXSTARS*3));
+  $('#certTxt').textContent=`${t} von ${MAXSTARS} Sternen gesammelt`;
+  $('#certDate').textContent=new Date().toLocaleDateString('de-DE',{day:'numeric',month:'long',year:'numeric'});
+}
+function initCert(){
+  const inp=$('#nameIn');inp.value=playerName;
+  inp.addEventListener('input',()=>{playerName=inp.value.trim();save();renderCert()});
+  let armed=false;
+  $('#resetAll').addEventListener('click',()=>{
+    if(!armed){armed=true;$('#resetAll').textContent='Sicher? Nochmal tippen zum Löschen';setTimeout(()=>{armed=false;$('#resetAll').textContent='Alle Sterne löschen'},4000);return}
+    progress={};save();armed=false;$('#resetAll').textContent='Alle Sterne löschen';fbSet($('#resetFb'),'Alle Sterne wurden gelöscht.');refresh();
+  });
+}
+
+/* ---------- Start der Seite ---------- */
+buildNav();
+$('#hero').innerHTML=skeletonSVG({interactive:false,wave:true,cls:'breathe'});
+initStart();initAtlas();initLabel();initMemory();initGelenke();initAufbau();
+choiceStation('quizBox',QUIZ,'quiz',true);
+choiceStation('wfBox',WF,'wf',false,['Wahr','Falsch']);
+initGap();initSalat();initCert();
+refresh();
+show((location.hash||'#start').slice(1));
+window.addEventListener('hashchange',()=>show((location.hash||'#start').slice(1)));
+</script></body></html>

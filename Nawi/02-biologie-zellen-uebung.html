@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biologie: Zellen – Übung</title>
+<style>
+  :root{
+    --primary:#2e6b4f; --primary-dark:#204d39; --accent:#c9622a; --accent-dark:#a94f1f;
+    --bg:#f6f9f7; --card:#ffffff; --correct:#2e8b57; --wrong:#c0392b;
+    --text:#2b2b2b; --muted:#6b7a70;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12181a; --card:#1c2522; --text:#eef2f0; --muted:#a8b6b0;
+      --primary:#5fae87; --primary-dark:#4a8e6c;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12181a; --card:#1c2522; --text:#eef2f0; --muted:#a8b6b0;
+    --primary:#5fae87; --primary-dark:#4a8e6c;
+  }
+  * { box-sizing: border-box; }
+  body{
+    margin:0; font-family: 'Segoe UI', Verdana, Arial, sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5; padding: 24px 16px 60px;
+  }
+  .wrap{ max-width: 840px; margin: 0 auto; }
+  header{ text-align:center; margin-bottom: 24px; }
+  header h1{ color:var(--primary); font-size:1.6rem; margin-bottom:4px; }
+  header p{ color:var(--muted); margin-top:0; }
+
+  nav.tabs{ display:flex; gap:8px; margin-bottom: 20px; flex-wrap:wrap; justify-content:center; }
+  nav.tabs button{
+    background:var(--card); border:2px solid var(--primary); color:var(--primary);
+    padding:8px 14px; border-radius: 999px; cursor:pointer; font-size:0.88rem;
+    font-weight:600; transition: all .15s ease;
+  }
+  nav.tabs button.active{ background:var(--primary); color:#fff; }
+
+  section.panel{ display:none; }
+  section.panel.active{ display:block; animation: fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .card{
+    background:var(--card); border-radius:14px; padding:20px 22px; margin-bottom:18px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+  .card h2{ color:var(--primary); margin-top:0; font-size:1.1rem; }
+  .card h3{ color:var(--accent-dark); font-size:0.98rem; margin-bottom:4px; }
+  .memo{
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-left:4px solid var(--accent); padding:10px 14px; border-radius:6px; margin: 10px 0;
+  }
+
+  table.ref-table{ border-collapse:collapse; width:100%; margin-top:8px; font-size:0.9rem; }
+  table.ref-table th, table.ref-table td{
+    border:1px solid color-mix(in srgb, var(--muted) 35%, transparent);
+    padding:7px 9px; text-align:left; vertical-align: top;
+  }
+  table.ref-table th{ background: color-mix(in srgb, var(--primary) 12%, transparent); color:var(--primary); }
+  table.ref-table td.center, table.ref-table th.center{ text-align:center; }
+
+  .qcard{
+    border:1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+    border-radius: 10px; padding:14px 16px; margin-bottom:14px;
+  }
+  .qcard .qtitle{ font-weight:600; margin-bottom:8px; }
+  .choice-group{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+  .choice-btn{
+    border:2px solid var(--primary); background:transparent; color:var(--primary);
+    padding:6px 13px; border-radius:8px; cursor:pointer; font-size:0.9rem; font-weight:600;
+  }
+  .choice-btn.selected{ background:var(--primary); color:#fff; }
+  .choice-btn.correct{ background:var(--correct); border-color:var(--correct); color:#fff; }
+  .choice-btn.incorrect{ background:var(--wrong); border-color:var(--wrong); color:#fff; }
+  .choice-btn:disabled{ cursor:default; }
+  .feedback{ font-size:0.87rem; margin-top:4px; min-height:1.2em; font-weight:600; }
+  .feedback.ok{ color:var(--correct); }
+  .feedback.bad{ color:var(--wrong); }
+
+  .progress-wrap{
+    background: color-mix(in srgb, var(--muted) 25%, transparent);
+    border-radius:999px; height:10px; overflow:hidden; margin-bottom:14px;
+  }
+  .progress-bar{ height:100%; background:var(--accent); width:0%; transition: width .3s ease; }
+  .score-line{ text-align:center; font-weight:700; color:var(--primary); margin-bottom:10px; }
+
+  button.reset{
+    display:block; margin: 18px auto 0; background:var(--accent); color:#fff; border:none;
+    padding:10px 22px; border-radius:8px; cursor:pointer; font-weight:700;
+  }
+  button.reset:hover{ background:var(--accent-dark); }
+
+  .diagram-svg{ width:100%; height:auto; display:block; margin: 10px auto; }
+  .diagram-svg text{ font-family: inherit; }
+  .diagram-svg .lbl{ font-weight:700; fill:var(--accent-dark); font-size:15px; }
+  .diagram-svg .pointer{ stroke:var(--accent); stroke-width:1.3; }
+  .diagram-svg .wall{ fill:#eef5e9; stroke:#4a7c3f; stroke-width:2.5; }
+  .diagram-svg .membrane{ fill:none; stroke:#7aa66a; stroke-width:1.3; stroke-dasharray:3,2; }
+  .diagram-svg .nucleus{ fill:#b39ddb; stroke:#6a4fa0; stroke-width:1.5; }
+  .diagram-svg .vacuole{ fill:#a8d8ea; stroke:#4a90a4; stroke-width:1.2; opacity:0.75; }
+  .diagram-svg .chloro{ fill:#3f9142; stroke:#2c6b2f; stroke-width:0.8; }
+  .diagram-svg .animalmem{ fill:#fdf0e4; stroke:#c9622a; stroke-width:2.5; }
+
+  footer{ text-align:center; color:var(--muted); font-size:0.82rem; margin-top:30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🔬 Biologie: Zellen</h1>
+    <p>Pflanzenzelle, Tierzelle und ihre Bestandteile üben</p>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="grundlagen" class="active">📖 Grundlagen</button>
+    <button data-tab="vergleich">🌱🐾 Pflanze vs. Tier</button>
+    <button data-tab="begriffe">🔤 Fachbegriffe</button>
+    <button data-tab="beschriften">🔍 Zelle beschriften</button>
+    <button data-tab="groesse">📏 Größenvergleich</button>
+  </nav>
+
+  <!-- ================= TAB 1: GRUNDLAGEN ================= -->
+  <section class="panel active" id="grundlagen">
+    <div class="card">
+      <h2>Was ist eine Zelle?</h2>
+      <p>Alle Lebewesen sind aus <b>Zellen</b> aufgebaut. Betrachtet man z.&nbsp;B. ein
+      Laubblatt oder die Mundschleimhaut unter dem Mikroskop, erkennt man viele einzelne
+      Zellen. Bei starker Vergrößerung sieht man in den Zellen kleine Bestandteile, die
+      <b>Zellorganellen</b> genannt werden.</p>
+      <div class="memo">💡 <b>Merke:</b> Jede Zelle ist ein kleines Wunderwerk der Natur –
+      nur wenn die Zellorganellen richtig zusammenarbeiten, kann die Zelle leben.</div>
+    </div>
+
+    <div class="card">
+      <h2>Die Pflanzenzelle</h2>
+      <table class="ref-table">
+        <tr><th>Bestandteil</th><th>Aufgabe / Merkmal</th></tr>
+        <tr><td><b>Zellwand</b></td><td>Umschließt die Zelle, gibt ihr feste Form und Stabilität.</td></tr>
+        <tr><td><b>Zellmembran</b></td><td>Liegt innen an der Zellwand an, reguliert den Stoffaustausch.</td></tr>
+        <tr><td><b>Zellplasma</b></td><td>Durchsichtige, zähflüssige Masse, füllt die Zelle aus.</td></tr>
+        <tr><td><b>Zellkern</b></td><td>Steuert alle Vorgänge in der Zelle.</td></tr>
+        <tr><td><b>Vakuole (Zellsaftraum)</b></td><td>Hohlraum, in dem Stoffe wie Öle, Farbstoffe oder Abfallstoffe gelagert werden.</td></tr>
+        <tr><td><b>Blattgrünkörner (Chloroplasten)</b></td><td>Bei grünen Pflanzenteilen; enthalten Blattgrün (Chlorophyll), stellen Nährstoffe her.</td></tr>
+        <tr><td><b>Tüpfel</b></td><td>Verbindungsstellen der Zellwände, ermöglichen Stofftransport zwischen Zellen.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Die Tierzelle</h2>
+      <p>Tier- und Menschenzellen besitzen <b>keine Zellwand</b>, sondern nur eine
+      <b>Zellmembran</b>. Ihnen fehlen außerdem die <b>Blattgrünkörner</b> und meist auch
+      die <b>Vakuole</b>.</p>
+      <table class="ref-table">
+        <tr><th>Bestandteil</th><th>Vorhanden?</th></tr>
+        <tr><td>Zellmembran</td><td class="center">✓</td></tr>
+        <tr><td>Zellplasma</td><td class="center">✓</td></tr>
+        <tr><td>Zellkern</td><td class="center">✓</td></tr>
+        <tr><td>Zellwand</td><td class="center">✗</td></tr>
+        <tr><td>Vakuole</td><td class="center">meist ✗</td></tr>
+        <tr><td>Blattgrünkörner</td><td class="center">✗</td></tr>
+      </table>
+      <div class="memo">💡 <b>Gewebe und Organ:</b> Zellen mit der gleichen Aufgabe bilden
+      zusammen ein <b>Gewebe</b> (z.&nbsp;B. Muskelgewebe). Mehrere verschiedene Gewebe
+      bilden zusammen ein <b>Organ</b> (z.&nbsp;B. die Haut).</div>
+    </div>
+  </section>
+
+  <!-- ================= TAB 2: VERGLEICH ================= -->
+  <section class="panel" id="vergleich">
+    <div class="card">
+      <h2>Pflanzenzelle, Tierzelle oder beide?</h2>
+      <div class="progress-wrap"><div class="progress-bar" id="vglProgress"></div></div>
+      <p class="score-line" id="vglScore">0 / 7 richtig</p>
+      <div id="vglQuiz"></div>
+      <button class="reset" onclick="resetVgl()">🔄 Nochmal von vorn</button>
+    </div>
+  </section>
+
+  <!-- ================= TAB 3: FACHBEGRIFFE ================= -->
+  <section class="panel" id="begriffe">
+    <div class="card">
+      <h2>Welcher Fachbegriff ist gemeint?</h2>
+      <div class="progress-wrap"><div class="progress-bar" id="begProgress"></div></div>
+      <p class="score-line" id="begScore">0 / 9 richtig</p>
+      <div id="begQuiz"></div>
+      <button class="reset" onclick="resetBeg()">🔄 Nochmal von vorn</button>
+    </div>
+  </section>
+
+  <!-- ================= TAB 4: BESCHRIFTEN ================= -->
+  <section class="panel" id="beschriften">
+    <div class="card">
+      <h2>Beschrifte die Pflanzenzelle</h2>
+      <svg class="diagram-svg" viewBox="0 0 420 280" id="plantSvg"></svg>
+      <div id="plantQuiz"></div>
+    </div>
+    <div class="card">
+      <h2>Beschrifte die Tierzelle</h2>
+      <svg class="diagram-svg" viewBox="0 0 420 220" id="animalSvg"></svg>
+      <div id="animalQuiz"></div>
+    </div>
+  </section>
+
+  <!-- ================= TAB 5: GRÖSSENVERGLEICH ================= -->
+  <section class="panel" id="groesse">
+    <div class="card">
+      <h2>Wie groß sind Zellen?</h2>
+      <p>Zellen sind winzig klein – man misst ihre Größe in <b>Mikrometern (µm)</b>.
+      1&nbsp;µm ist der 1000. Teil von 1&nbsp;mm.</p>
+      <div class="progress-wrap"><div class="progress-bar" id="groProgress"></div></div>
+      <p class="score-line" id="groScore">0 / 6 richtig</p>
+      <div id="groQuiz"></div>
+      <button class="reset" onclick="resetGro()">🔄 Nochmal von vorn</button>
+    </div>
+  </section>
+
+  <footer>Übungsseite zum Thema „Zellen" – viel Erfolg beim Bio-Test! 🍀</footer>
+</div>
+
+<script>
+// ---- Tabs ----
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// generic multiple-choice quiz builder
+function buildChoiceQuiz(containerId, data, progressId, scoreId, state){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  data.forEach((q, qi)=>{
+    const qcard = document.createElement('div');
+    qcard.className = 'qcard';
+    qcard.innerHTML = `<div class="qtitle">${q.text}</div>
+      <div class="choice-group" id="${containerId}-choices-${qi}"></div>
+      <div class="feedback" id="${containerId}-feedback-${qi}"></div>`;
+    container.appendChild(qcard);
+    const cg = qcard.querySelector(`#${containerId}-choices-${qi}`);
+    q.options.forEach((opt, oi)=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = opt;
+      b.onclick = ()=> selectChoice(containerId, qi, oi, data, progressId, scoreId, state);
+      cg.appendChild(b);
+    });
+  });
+  if(progressId) updateChoiceProgress(data, progressId, scoreId, state);
+}
+function selectChoice(containerId, qi, oi, data, progressId, scoreId, state){
+  if(state.answered[qi] !== undefined) return;
+  state.answered[qi] = oi;
+  const q = data[qi];
+  const correctIdx = q.options.indexOf(q.correct);
+  const buttons = document.querySelectorAll(`#${containerId}-choices-${qi} .choice-btn`);
+  buttons.forEach((b,i)=>{
+    b.disabled = true;
+    if(i===correctIdx) b.classList.add('correct');
+    else if(i===oi) b.classList.add('incorrect');
+  });
+  const fb = document.getElementById(`${containerId}-feedback-${qi}`);
+  if(oi === correctIdx){
+    state.score++;
+    fb.textContent = '✔ Richtig!' + (q.explain ? ' ' + q.explain : '');
+    fb.className = 'feedback ok';
+  } else {
+    fb.textContent = `✘ Richtig wäre: ${q.correct}` + (q.explain ? ' – ' + q.explain : '');
+    fb.className = 'feedback bad';
+  }
+  if(progressId) updateChoiceProgress(data, progressId, scoreId, state);
+}
+function updateChoiceProgress(data, progressId, scoreId, state){
+  const answeredCount = state.answered.filter(a=>a!==undefined).length;
+  document.getElementById(scoreId).textContent = `${state.score} / ${data.length} richtig`;
+  document.getElementById(progressId).style.width = (answeredCount/data.length*100)+'%';
+}
+
+// ---- Tab 2: Pflanze vs. Tier ----
+const vglOptions = ['Nur Pflanzenzelle', 'Nur Tierzelle', 'Beide'];
+const vglData = [
+  {text:'Zellwand', options:vglOptions, correct:'Nur Pflanzenzelle'},
+  {text:'Zellmembran', options:vglOptions, correct:'Beide'},
+  {text:'Zellplasma', options:vglOptions, correct:'Beide'},
+  {text:'Zellkern', options:vglOptions, correct:'Beide'},
+  {text:'Vakuole (Zellsaftraum)', options:vglOptions, correct:'Nur Pflanzenzelle'},
+  {text:'Blattgrünkörner (Chloroplasten)', options:vglOptions, correct:'Nur Pflanzenzelle'},
+  {text:'Tüpfel', options:vglOptions, correct:'Nur Pflanzenzelle'},
+];
+let vglState = {answered:[], score:0};
+function resetVgl(){ vglState = {answered:[], score:0}; buildChoiceQuiz('vglQuiz', vglData, 'vglProgress', 'vglScore', vglState); }
+resetVgl();
+
+// ---- Tab 3: Fachbegriffe ----
+const begOptions = ['Zellkern','Zellplasma','Zellmembran','Zellwand','Vakuole','Blattgrünkörner','Tüpfel','Gewebe','Organ'];
+const begData = [
+  {text:'„Steuert alle Vorgänge in der Zelle.“', options:['Zellkern','Zellplasma','Zellmembran','Vakuole'], correct:'Zellkern'},
+  {text:'„Füllt die Zelle aus; darin schwimmen die anderen Bestandteile.“', options:['Zellwand','Zellplasma','Zellkern','Tüpfel'], correct:'Zellplasma'},
+  {text:'„Reguliert den Stoffaustausch, liegt innen an der Zellwand an.“', options:['Zellmembran','Zellwand','Vakuole','Zellkern'], correct:'Zellmembran'},
+  {text:'„Gibt der Pflanzenzelle ihre feste Form und Stabilität.“', options:['Zellmembran','Zellwand','Zellplasma','Blattgrünkörner'], correct:'Zellwand'},
+  {text:'„Hohlraum, in dem Öle, Farbstoffe oder Abfallstoffe gelagert werden.“', options:['Zellkern','Tüpfel','Vakuole','Zellwand'], correct:'Vakuole'},
+  {text:'„Enthalten Blattgrün und stellen Nährstoffe her.“', options:['Blattgrünkörner','Vakuole','Zellkern','Zellmembran'], correct:'Blattgrünkörner'},
+  {text:'„Verbindungsstellen in der Zellwand zum Stoffaustausch zwischen Zellen.“', options:['Tüpfel','Zellmembran','Vakuole','Gewebe'], correct:'Tüpfel'},
+  {text:'„Verband gleichartiger Zellen mit einer gemeinsamen Aufgabe.“', options:['Organ','Gewebe','Zellkern','Zellwand'], correct:'Gewebe'},
+  {text:'„Besteht aus mehreren verschiedenen Geweben, z.\u202fB. die Haut.“', options:['Gewebe','Zellplasma','Organ','Tüpfel'], correct:'Organ'},
+];
+let begState = {answered:[], score:0};
+function resetBeg(){ begState = {answered:[], score:0}; buildChoiceQuiz('begQuiz', begData, 'begProgress', 'begScore', begState); }
+resetBeg();
+
+// ---- Tab 4: Zelle beschriften ----
+const plantSvg = `
+  <rect class="wall" x="30" y="30" width="330" height="200" rx="26"/>
+  <rect class="membrane" x="42" y="42" width="306" height="176" rx="20"/>
+  <ellipse class="nucleus" cx="160" cy="130" rx="42" ry="34"/>
+  <ellipse class="vacuole" cx="270" cy="150" rx="65" ry="48"/>
+  <circle class="chloro" cx="90" cy="200" r="8"/>
+  <circle class="chloro" cx="320" cy="70" r="8"/>
+  <circle class="chloro" cx="330" cy="190" r="8"/>
+  <circle class="chloro" cx="80" cy="80" r="8"/>
+  <line class="pointer" x1="30" y1="30" x2="10" y2="10"/>
+  <text class="lbl" x="2" y="10">1</text>
+  <line class="pointer" x1="46" y1="46" x2="20" y2="30"/>
+  <text class="lbl" x="8" y="30">2</text>
+  <line class="pointer" x1="230" y1="90" x2="255" y2="55"/>
+  <text class="lbl" x="248" y="50">3</text>
+  <line class="pointer" x1="160" y1="130" x2="160" y2="255"/>
+  <text class="lbl" x="154" y="270">4</text>
+  <line class="pointer" x1="270" y1="150" x2="330" y2="255"/>
+  <text class="lbl" x="318" y="270">5</text>
+  <line class="pointer" x1="90" y1="200" x2="60" y2="255"/>
+  <text class="lbl" x="48" y="270">6</text>
+`;
+document.getElementById('plantSvg').innerHTML = plantSvg;
+
+const animalSvg = `
+  <ellipse class="animalmem" cx="210" cy="110" rx="170" ry="85"/>
+  <ellipse class="nucleus" cx="210" cy="110" rx="45" ry="36"/>
+  <line class="pointer" x1="90" y1="55" x2="60" y2="20"/>
+  <text class="lbl" x="48" y="18">1</text>
+  <line class="pointer" x1="150" y1="150" x2="120" y2="195"/>
+  <text class="lbl" x="108" y="210">2</text>
+  <line class="pointer" x1="210" y1="110" x2="210" y2="195"/>
+  <text class="lbl" x="204" y="210">3</text>
+`;
+document.getElementById('animalSvg').innerHTML = animalSvg;
+
+const cellOptions = ['Zellwand','Zellmembran','Zellplasma','Zellkern','Vakuole','Blattgrünkörner'];
+const plantData = [
+  {text:'Nummer 1', options:cellOptions, correct:'Zellwand'},
+  {text:'Nummer 2', options:cellOptions, correct:'Zellmembran'},
+  {text:'Nummer 3', options:cellOptions, correct:'Zellplasma'},
+  {text:'Nummer 4', options:cellOptions, correct:'Zellkern'},
+  {text:'Nummer 5', options:cellOptions, correct:'Vakuole'},
+  {text:'Nummer 6', options:cellOptions, correct:'Blattgrünkörner'},
+];
+let plantState = {answered:[], score:0};
+buildChoiceQuiz('plantQuiz', plantData, null, null, plantState);
+
+const animalOptions = ['Zellmembran','Zellplasma','Zellkern'];
+const animalData = [
+  {text:'Nummer 1', options:animalOptions, correct:'Zellmembran'},
+  {text:'Nummer 2', options:animalOptions, correct:'Zellplasma'},
+  {text:'Nummer 3', options:animalOptions, correct:'Zellkern'},
+];
+let animalState = {answered:[], score:0};
+buildChoiceQuiz('animalQuiz', animalData, null, null, animalState);
+
+// ---- Tab 5: Größenvergleich ----
+const groData = [
+  {text:'Zwiebelzelle (Länge)', options:['8 µm','70 µm','250 µm','400 µm'], correct:'400 µm'},
+  {text:'Muskelzelle (Länge)', options:['8 µm','100 µm','300 µm','400 µm'], correct:'300 µm'},
+  {text:'Moosblattzelle (Länge)', options:['8 µm','70 µm','250 µm','400 µm'], correct:'250 µm'},
+  {text:'Menschliche Eizelle (Durchmesser)', options:['8 µm','70 µm','100 µm','300 µm'], correct:'100 µm'},
+  {text:'Menschliche Mundschleimhautzelle (Durchmesser)', options:['8 µm','70 µm','100 µm','250 µm'], correct:'70 µm'},
+  {text:'Rote Blutzelle (Durchmesser)', options:['8 µm','70 µm','100 µm','250 µm'], correct:'8 µm'},
+];
+let groState = {answered:[], score:0};
+function resetGro(){ groState = {answered:[], score:0}; buildChoiceQuiz('groQuiz', groData, 'groProgress', 'groScore', groState); }
+resetGro();
+</script>
+</body>
+</html>
