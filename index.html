@@ -41,16 +41,39 @@
   li a::before{content:"▸";color:var(--c);font-size:1.1rem}
   .empty{padding:16px 20px;color:var(--muted);font-style:italic}
   .note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:28px}
+  #gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+  #gate form{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+             padding:28px 24px;width:100%;max-width:340px;text-align:center}
+  #gate h2{margin:0 0 4px;font-size:1.4rem}
+  #gate p{margin:0 0 16px;color:var(--muted);font-size:.95rem}
+  #gate input{width:100%;font:inherit;padding:10px 12px;border-radius:10px;border:2px solid var(--line);
+              background:var(--bg);color:var(--text);margin-bottom:10px}
+  #gate input:focus{outline:none;border-color:#2f6fd0}
+  #gate button{width:100%;font:inherit;font-weight:700;padding:10px;border:0;border-radius:10px;
+               background:#2f6fd0;color:#fff;cursor:pointer}
+  #gate .err{color:#d6495a;font-size:.9rem;min-height:1.3em;margin:8px 0 0}
+  .logout{display:block;margin:10px auto 0;background:none;border:0;color:var(--muted);font:inherit;
+          font-size:.85rem;text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div id="gate">
+  <form id="gateForm" autocomplete="off">
+    <h2>🔒 Lisas Lernseiten</h2>
+    <p>Bitte Passwort eingeben.</p>
+    <input type="password" id="pw" aria-label="Passwort" autofocus>
+    <button type="submit">Öffnen</button>
+    <div class="err" id="err"></div>
+  </form>
+</div>
+<div class="wrap" id="app" hidden>
   <header>
     <h1>📚 Lisas Lernseiten</h1>
     <p>Wähle ein Fach und eine Übung aus.</p>
   </header>
   <main class="grid" id="grid"></main>
   <p class="note" id="note"></p>
+  <button class="logout" id="logout" type="button">Abmelden</button>
 </div>
 
 <script>
@@ -126,7 +149,37 @@ async function load(){
       'Hinweis: Die Liste konnte gerade nicht aktualisiert werden – es werden die bekannten Übungen angezeigt.';
   }
 }
-load();
+/* ---------- Passwortschutz ---------- */
+const PW_HASH = '9c029d8c6966648df193f72c3903322ee4ea77583fcedf5c975bdd624892cdbb'; // SHA-256
+const KEY = 'lisa-lernseiten-ok';
+async function sha256(s){
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function unlock(){
+  document.getElementById('gate').remove();
+  document.getElementById('app').hidden = false;
+  load();
+}
+let remembered = null;
+try{ remembered = localStorage.getItem(KEY); }catch(e){}
+document.getElementById('gateForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const pw = document.getElementById('pw');
+  const h = await sha256(pw.value.trim());
+  if(h === PW_HASH){
+    try{ localStorage.setItem(KEY, h); }catch(e){}
+    unlock();
+  } else {
+    document.getElementById('err').textContent = 'Falsches Passwort – versuch es nochmal.';
+    pw.select();
+  }
+});
+document.getElementById('logout').addEventListener('click', ()=>{
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  location.reload();
+});
+if(remembered === PW_HASH) unlock();
 </script>
 </body>
 </html>
