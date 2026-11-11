@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Briefe schreiben – Anrede-Übung</title>
+<style>
+  :root{
+    --primary:#1f5c6b;
+    --primary-dark:#153f49;
+    --accent:#e8963c;
+    --accent-dark:#c97a24;
+    --bg:#f6f9f9;
+    --card:#ffffff;
+    --correct:#2e8b57;
+    --wrong:#c0392b;
+    --text:#2b2b2b;
+    --muted:#6b7a7d;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12181a; --card:#1c2528; --text:#eef2f2; --muted:#a8b6b8;
+      --primary:#4fa3b5; --primary-dark:#3d8494;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12181a; --card:#1c2528; --text:#eef2f2; --muted:#a8b6b8;
+    --primary:#4fa3b5; --primary-dark:#3d8494;
+  }
+  * { box-sizing: border-box; }
+  body{
+    margin:0; font-family: 'Segoe UI', Verdana, Arial, sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5;
+    padding: 24px 16px 60px;
+  }
+  .wrap{ max-width: 780px; margin: 0 auto; }
+  header{ text-align:center; margin-bottom: 24px; }
+  header h1{ color:var(--primary); font-size:1.7rem; margin-bottom:4px; }
+  header p{ color:var(--muted); margin-top:0; }
+
+  nav.tabs{
+    display:flex; gap:8px; margin-bottom: 20px; flex-wrap:wrap;
+    justify-content:center;
+  }
+  nav.tabs button{
+    background:var(--card); border:2px solid var(--primary); color:var(--primary);
+    padding:8px 16px; border-radius: 999px; cursor:pointer; font-size:0.95rem;
+    font-weight:600; transition: all .15s ease;
+  }
+  nav.tabs button.active{ background:var(--primary); color:#fff; }
+  nav.tabs button:hover{ opacity:0.9; }
+
+  section.panel{ display:none; }
+  section.panel.active{ display:block; animation: fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .card{
+    background:var(--card); border-radius:14px; padding:20px 22px;
+    margin-bottom:18px; box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+  .card h2{ color:var(--primary); margin-top:0; font-size:1.15rem; }
+  .card h3{ color:var(--accent-dark); font-size:1rem; margin-bottom:4px; }
+  .example{
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    border-left: 4px solid var(--primary);
+    padding: 10px 14px; border-radius: 6px; font-style: italic;
+    margin: 8px 0 14px;
+  }
+  .rule-box{
+    display:flex; gap:14px; align-items:flex-start; margin-bottom: 14px;
+  }
+  .rule-num{
+    flex: 0 0 30px; height:30px; border-radius:50%; background:var(--accent);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.95rem;
+  }
+  .badge{
+    display:inline-block; padding:2px 10px; border-radius:999px;
+    font-size:0.8rem; font-weight:700; margin-left:6px;
+  }
+  .badge.gross{ background:#e6f4ea; color:var(--correct); }
+  .badge.klein{ background:#fdeeee; color:var(--wrong); }
+  :root[data-theme="dark"] .badge.gross, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .badge.gross{ background:#1d3a29; } }
+  :root[data-theme="dark"] .badge.klein, @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .badge.klein{ background:#3a2020; } }
+
+  .sentence{
+    font-size:1.05rem; margin: 14px 0 8px; line-height:1.8;
+  }
+  .choice-group{
+    display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap;
+  }
+  .choice-btn{
+    border:2px solid var(--primary); background:transparent; color:var(--primary);
+    padding:6px 14px; border-radius:8px; cursor:pointer; font-size:0.95rem; font-weight:600;
+  }
+  .choice-btn.selected{ background:var(--primary); color:#fff; }
+  .choice-btn.correct{ background:var(--correct); border-color:var(--correct); color:#fff; }
+  .choice-btn.incorrect{ background:var(--wrong); border-color:var(--wrong); color:#fff; }
+  .feedback{ font-size:0.9rem; margin-top:-14px; margin-bottom:16px; min-height:1.2em; font-weight:600; }
+  .feedback.ok{ color:var(--correct); }
+  .feedback.bad{ color:var(--wrong); }
+
+  .qcard{
+    border:1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+    border-radius: 10px; padding:16px; margin-bottom:16px;
+  }
+
+  .progress-wrap{
+    background: color-mix(in srgb, var(--muted) 25%, transparent);
+    border-radius:999px; height:10px; overflow:hidden; margin-bottom:18px;
+  }
+  .progress-bar{
+    height:100%; background:var(--accent); width:0%; transition: width .3s ease;
+  }
+  .score-line{
+    text-align:center; font-weight:700; color:var(--primary); margin-bottom:10px;
+  }
+  button.reset{
+    display:block; margin: 18px auto 0; background:var(--accent); color:#fff;
+    border:none; padding:10px 22px; border-radius:8px; cursor:pointer; font-weight:700;
+  }
+  button.reset:hover{ background:var(--accent-dark); }
+
+  .fill-blank{
+    background: transparent; border:none; border-bottom:2px solid var(--primary);
+    font-size:1rem; font-family:inherit; color:var(--text); width:110px;
+    text-align:center; padding:2px 4px;
+  }
+  .fill-blank:focus{ outline:none; border-color:var(--accent); }
+  .fill-blank.correct{ border-color:var(--correct); color:var(--correct); font-weight:700; }
+  .fill-blank.incorrect{ border-color:var(--wrong); color:var(--wrong); font-weight:700; }
+  .check-btn{
+    background:var(--primary); color:#fff; border:none; padding:8px 18px;
+    border-radius:8px; cursor:pointer; font-weight:600; margin-top:8px;
+  }
+  .check-btn:hover{ background:var(--primary-dark); }
+
+  .table-wrap{ overflow-x:auto; }
+  table.brief-table{ border-collapse:collapse; width:100%; margin-top:8px; }
+  table.brief-table th, table.brief-table td{
+    border:1px solid color-mix(in srgb, var(--muted) 35%, transparent);
+    padding:8px 10px; text-align:left; font-size:0.92rem; vertical-align: top;
+  }
+  table.brief-table th{ background: color-mix(in srgb, var(--primary) 12%, transparent); color:var(--primary); }
+
+  .memo{
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-left:4px solid var(--accent); padding:10px 14px; border-radius:6px;
+    margin: 12px 0;
+  }
+  footer{ text-align:center; color:var(--muted); font-size:0.82rem; margin-top:30px; }
+
+  /* Envelope */
+  .envelope{
+    position:relative; width:100%; max-width:560px; aspect-ratio: 2 / 1;
+    border:2px solid var(--text); border-radius:6px; margin:14px auto 4px; background:transparent;
+  }
+  .env-zone{
+    position:absolute; border:1.5px dashed var(--muted); border-radius:4px;
+    display:flex; flex-direction:column; justify-content:center; padding:6px 8px;
+    font-size:0.8rem; color:var(--text); box-sizing:border-box;
+  }
+  .env-sender{ top:6%; left:4%; width:38%; height:22%; }
+  .env-stamp{ top:6%; right:5%; width:16%; height:26%; align-items:center; text-align:center; color:var(--muted); }
+  .env-recipient{ top:38%; left:40%; width:56%; height:48%; font-size:0.95rem; gap:6px; }
+  .env-label{ font-size:0.72rem; color:var(--muted); margin-bottom:4px; }
+  .env-line{ border-bottom:1px solid var(--muted); margin-top:10px; }
+
+  .env-zone.clickable{ cursor:pointer; transition: background .15s ease; }
+  .env-zone.clickable:hover{ background: color-mix(in srgb, var(--primary) 10%, transparent); }
+  .env-zone.assigned{ border-style:solid; border-color:var(--primary); }
+  .env-zone.correct{ border-color:var(--correct); background: color-mix(in srgb, var(--correct) 12%, transparent); }
+  .env-zone.incorrect{ border-color:var(--wrong); background: color-mix(in srgb, var(--wrong) 12%, transparent); }
+  .env-zone .zone-answer{ font-weight:700; font-size:0.85rem; }
+
+  .word-bank{ display:flex; gap:10px; flex-wrap:wrap; margin: 14px 0; justify-content:center; }
+  .word-chip{
+    border:2px solid var(--accent); color:var(--accent-dark); background:transparent;
+    padding:6px 16px; border-radius:999px; font-weight:700; cursor:pointer; font-size:0.9rem;
+  }
+  .word-chip.active{ background:var(--accent); color:#fff; }
+  .word-chip.used{ opacity:0.35; cursor:default; }
+
+  /* Line-matching exercise */
+  .letter-box{
+    background:var(--card); border:1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+    border-radius:10px; padding:10px 14px; margin: 10px 0 16px; font-size:0.95rem;
+  }
+  .letter-line{
+    display:flex; gap:10px; padding:3px 6px; border-radius:5px; align-items:baseline;
+    cursor:pointer; transition: background .12s ease;
+  }
+  .letter-line:hover{ background: color-mix(in srgb, var(--primary) 8%, transparent); }
+  .letter-line .lnum{ color:var(--muted); font-size:0.8rem; width:22px; flex-shrink:0; text-align:right; }
+  .letter-line.tagged{ font-weight:600; }
+  .letter-line .tag-badge{
+    font-size:0.7rem; padding:1px 8px; border-radius:999px; margin-left:auto;
+    background: color-mix(in srgb, var(--primary) 15%, transparent); color:var(--primary);
+  }
+  .letter-line.correct{ background: color-mix(in srgb, var(--correct) 14%, transparent); }
+  .letter-line.incorrect{ background: color-mix(in srgb, var(--wrong) 14%, transparent); }
+
+  .cat-bank{ display:flex; gap:8px; flex-wrap:wrap; margin: 12px 0; }
+  .cat-chip{
+    border:2px solid var(--primary); color:var(--primary); background:transparent;
+    padding:5px 12px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem;
+  }
+  .cat-chip.active{ background:var(--primary); color:#fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>✉️ Briefe schreiben</h1>
+    <p>Regeln, Beispiele und Übungen zur Anrede-Großschreibung</p>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="regeln" class="active">📖 Regeln &amp; Aufbau</button>
+    <button data-tab="anrede">🔤 Anrede: Groß/klein</button>
+    <button data-tab="uebung1">✏️ Übung: Lückentext</button>
+    <button data-tab="uebung2">🎯 Übung: Multiple Choice</button>
+    <button data-tab="uebung3">🔢 Übung: Zeilen zuordnen</button>
+    <button data-tab="uebung4">✉️ Übung: Briefumschlag</button>
+  </nav>
+
+  <!-- ================= TAB 1: REGELN ================= -->
+  <section class="panel active" id="regeln">
+    <div class="card">
+      <h2>Der Aufbau eines Briefes</h2>
+      <div class="table-wrap">
+        <table class="brief-table">
+          <tr><th>Baustein</th><th>Was gehört hinein?</th><th>Beispiel</th></tr>
+          <tr>
+            <td><b>1. Ort und Datum</b></td>
+            <td>Oben rechts im Brief</td>
+            <td><i>Idar-Oberstein, den 12. September 2026</i></td>
+          </tr>
+          <tr>
+            <td><b>2. Anrede</b></td>
+            <td>Komma + klein weiter <b>oder</b> Ausrufezeichen + groß weiter</td>
+            <td><i>Liebe Mia,</i> &nbsp;/&nbsp; <i>Hallo Tom!</i></td>
+          </tr>
+          <tr>
+            <td><b>3. Brieftext</b></td>
+            <td>Einleitung, Hauptteil, Schluss (siehe unten)</td>
+            <td>&ndash;</td>
+          </tr>
+          <tr>
+            <td><b>4. Grußformel</b></td>
+            <td>Eigene Zeile, kein Komma/Punkt danach</td>
+            <td><i>Liebe Grüße</i>, <i>Bis bald</i></td>
+          </tr>
+          <tr>
+            <td><b>5. Unterschrift</b></td>
+            <td>Zeile darunter</td>
+            <td><i>deine Lisa</i></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Der Brieftext: Einleitung – Hauptteil – Schluss</h2>
+
+      <h3>1️⃣ Einleitung</h3>
+      <p>Du begrüßt die Person und sagst kurz, worum es geht oder warum du schreibst.</p>
+      <div class="example">„Endlich ist Freitag und ich habe Zeit, dir zu schreiben. Ich muss dir unbedingt von der neuen Schule berichten.“</div>
+
+      <h3>2️⃣ Hauptteil</h3>
+      <p>Hier erzählst du Neuigkeiten, Erlebnisse, Gedanken und Gefühle. Sprich die Empfängerin/den Empfänger direkt an, stelle Fragen und beantworte gestellte Fragen.</p>
+      <div class="example">„Die ersten Tage an der neuen Schule waren ziemlich aufregend. In meiner Klasse sind 26 Kinder. Wie gefällt es dir an deiner neuen Schule?“</div>
+
+      <h3>3️⃣ Schluss</h3>
+      <p>Du rundest den Brief ab, z.&nbsp;B. mit dem Wunsch nach einer Antwort oder einem Treffen.</p>
+      <div class="example">„Schick mir doch mal ein Foto von deiner Schule und schreib mir schnell zurück.“</div>
+
+      <div class="memo">
+        💡 <b>Merke:</b> Im Hauptteil sprichst du wie in einem echten Gespräch mit der Person –
+        stell Fragen, teile Gedanken mit, und geh auf das ein, was die andere Person geschrieben hat.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Der Briefumschlag</h2>
+      <p>Auch der Umschlag hat feste Bereiche: der <b>Empfänger</b> steht groß und mittig,
+      der <b>Absender</b> klein oben links, und die <b>Briefmarke</b> kommt oben rechts hin.</p>
+      <div class="envelope" id="envelopeDemo">
+        <div class="env-zone env-sender">
+          <span class="env-label">Absender</span>
+          <div class="env-line"></div>
+        </div>
+        <div class="env-zone env-stamp"><span class="env-label">Briefmarke</span></div>
+        <div class="env-zone env-recipient">
+          <div>Vorname Nachname</div>
+          <div>Straße Hausnummer</div>
+          <div>PLZ Ort</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TAB 2: ANREDE REGEL ================= -->
+  <section class="panel" id="anrede">
+    <div class="card">
+      <h2>Groß oder klein? – Anredewörter im Brief</h2>
+      <p>Wenn du jemanden in einem Brief <b>siezt</b> (z.&nbsp;B. eine Lehrerin, die du nicht gut kennst),
+      schreibst du die Anredepronomen, die sich auf diese Person beziehen, <b>groß</b>:</p>
+      <div class="example">Sie, Ihnen, Ihr, Ihre, Ihrer</div>
+
+      <p>Wenn du jemanden <b>duzt</b> (z.&nbsp;B. eine Freundin), schreibst du die Anredepronomen <b>klein</b>:</p>
+      <div class="example">du, dir, dein, deine, dich, dich</div>
+
+      <div class="memo">
+        ⚠️ <b>Vorsicht, Falle:</b> Ein ganz normales „sie“ (z.&nbsp;B. wenn von einer dritten Person
+        oder einer Sache die Rede ist) bleibt <b>immer klein</b> – auch mitten in einem förmlichen Brief!
+      </div>
+
+      <p><b>Beispielsatz mit beiden Fällen:</b></p>
+      <div class="example">
+        „Ich habe bemerkt, dass <span class="badge gross">Sie</span> Ihre Jacke vergessen haben.
+        Ich schicke <span class="badge klein">sie</span> Ihnen zu.“
+      </div>
+      <p style="font-size:0.9rem; color:var(--muted);">
+        Das erste „Sie“ meint die angesprochene Person → groß.
+        Das zweite „sie“ meint die Jacke (eine Sache) → klein.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= TAB 3: LÜCKENTEXT ================= -->
+  <section class="panel" id="uebung1">
+    <div class="card">
+      <h2>Ergänze die Lücken</h2>
+      <p>Trage <i>Sie, Ihnen, Ihre, sie</i> oder <i>ihr</i> in die Lücken ein &ndash; achte
+      genau darauf, wer gemeint ist! Klicke dann auf „Prüfen“.</p>
+
+      <div class="example" style="font-style:normal; line-height:2;">
+        Sehr geehrte Frau Berger,<br><br>
+        wie geht es <input class="fill-blank" data-answer="Ihnen" id="b1"> ? Ich hoffe,
+        dass <input class="fill-blank" data-answer="Sie" id="b2"> gut in das neue Jahr
+        gestartet sind.<br><br>
+        Ihre Kollegin, Frau Klein, hat mir letzte Woche sehr geholfen. Ich habe
+        <input class="fill-blank" data-answer="ihr" id="b3"> alle Unterlagen zurückgegeben,
+        weil <input class="fill-blank" data-answer="sie" id="b4"> diese dringend brauchte.<br><br>
+        Könnten <input class="fill-blank" data-answer="Sie" id="b5"> mir bitte sagen, ob
+        <input class="fill-blank" data-answer="Ihre" id="b6"> Anmeldung schon bei
+        <input class="fill-blank" data-answer="Ihnen" id="b7"> eingegangen ist? Meine
+        eigene Anmeldung habe ich <input class="fill-blank" data-answer="Ihnen" id="b8">
+        bereits letzte Woche geschickt.<br><br>
+        Herzliche Grüße<br>
+        Lisa Spaniol
+      </div>
+
+      <button class="check-btn" onclick="checkFill()">Prüfen</button>
+      <p id="fillResult" class="feedback"></p>
+    </div>
+  </section>
+
+  <!-- ================= TAB 4: MULTIPLE CHOICE ================= -->
+  <section class="panel" id="uebung2">
+    <div class="card">
+      <h2>Groß oder klein? Wähle das richtige Wort</h2>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      <p class="score-line" id="scoreLine">0 / 6 richtig</p>
+
+      <div id="quizContainer"></div>
+      <button class="reset" onclick="resetQuiz()">🔄 Nochmal von vorn</button>
+    </div>
+  </section>
+
+  <!-- ================= TAB 5: ZEILEN ZUORDNEN ================= -->
+  <section class="panel" id="uebung3">
+    <div class="card">
+      <h2>Ordne die Zeilen den Bausteinen zu</h2>
+      <p>Wähle unten eine Kategorie aus und klicke dann auf die passenden Zeilen im Brief.
+      Nicht jede Zeile braucht eine Kategorie (Leerzeilen kannst du auslassen).</p>
+
+      <div class="cat-bank" id="catBank"></div>
+
+      <div class="letter-box" id="letterBox"></div>
+
+      <button class="check-btn" onclick="checkLines()">Prüfen</button>
+      <button class="reset" onclick="resetLines()">🔄 Zurücksetzen</button>
+      <p id="lineResult" class="feedback"></p>
+    </div>
+  </section>
+
+  <!-- ================= TAB 6: BRIEFUMSCHLAG ================= -->
+  <section class="panel" id="uebung4">
+    <div class="card">
+      <h2>Beschrifte den Briefumschlag</h2>
+      <p>Wähle unten einen Begriff aus und klicke dann auf die passende Stelle auf dem
+      Umschlag.</p>
+
+      <div class="word-bank" id="wordBank"></div>
+
+      <div class="envelope" id="envelopeQuiz">
+        <div class="env-zone clickable env-sender" data-zone="absender"></div>
+        <div class="env-zone clickable env-stamp" data-zone="briefmarke"></div>
+        <div class="env-zone clickable env-recipient" data-zone="empfaenger"></div>
+      </div>
+
+      <button class="check-btn" onclick="checkEnvelope()">Prüfen</button>
+      <button class="reset" onclick="resetEnvelope()">🔄 Zurücksetzen</button>
+      <p id="envResult" class="feedback"></p>
+
+      <div class="memo" style="margin-top:18px;">
+        ✍️ <b>Zum Weiterüben:</b> Schreib jetzt auf einen echten (oder gedachten) Umschlag
+        als Empfänger <i>Lisa Spaniol, Bergstraße 4, 55743 Idar-Oberstein</i> – und als
+        Absender deine eigene Adresse.
+      </div>
+    </div>
+  </section>
+
+  <footer>Übungsseite zum Thema „Briefe schreiben“ – viel Erfolg bei der Klassenarbeit! 🍀</footer>
+</div>
+
+<script>
+// ---- Tabs ----
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---- Lückentext check ----
+function checkFill(){
+  const inputs = document.querySelectorAll('.fill-blank');
+  let correctCount = 0;
+  inputs.forEach(inp=>{
+    const val = inp.value.trim();
+    const answer = inp.dataset.answer;
+    const alt = inp.dataset.alt;
+    // Exact match required (case-sensitive!) - Groß-/Kleinschreibung ist hier der Punkt der Übung.
+    const ok = val === answer || (alt && val === alt);
+    inp.classList.remove('correct','incorrect');
+    inp.classList.add(ok ? 'correct' : 'incorrect');
+    if(ok) correctCount++;
+  });
+  const result = document.getElementById('fillResult');
+  result.textContent = correctCount === inputs.length
+    ? `Super, alle ${inputs.length} Lücken richtig! 🎉`
+    : `${correctCount} von ${inputs.length} richtig – schau dir die roten Lücken nochmal an. `
+      + `Achtung: Groß-/Kleinschreibung zählt mit!`;
+  result.className = 'feedback ' + (correctCount === inputs.length ? 'ok' : 'bad');
+}
+
+// ---- Multiple choice quiz ----
+const questions = [
+  {
+    text: 'Können ___ mir bitte ___ Telefonnummer geben?',
+    options: [['sie','ihre'], ['Sie','Ihre'], ['sie','Ihre'], ['Sie','ihre']],
+    correct: 1,
+    explain: 'Höfliche Anrede (Sie-Form) → beide Wörter beziehen sich auf die angesprochene Person → groß.'
+  },
+  {
+    text: 'Lena sucht ___ Jacke. ___ hat ___ im Sportraum vergessen.',
+    options: [['ihre','Sie','sie'], ['Ihre','sie','Sie'], ['ihre','sie','sie'], ['Ihre','Sie','Sie']],
+    correct: 2,
+    explain: 'Hier ist von Lena (einer dritten Person) die Rede, nicht von einer gesiezten Person → alles klein.'
+  },
+  {
+    text: 'Ich schicke ___ den Brief morgen. Haben ___ vielen Dank dafür.',
+    options: [['ihnen','sie'], ['Ihnen','Sie'], ['ihnen','Sie'], ['Ihnen','sie']],
+    correct: 1,
+    explain: 'Höfliche Anrede an eine Person, die gesiezt wird → beide Wörter groß.'
+  },
+  {
+    text: 'Frau Kohl fragt, ob ___ ___ schon geantwortet hat.',
+    options: [['sie','dir'], ['Sie','Dir'], ['sie','Dir'], ['Sie','dir']],
+    correct: 0,
+    explain: '„sie“ meint hier Frau Kohl (dritte Person) und „dir“ ist die klein geschriebene du-Form → beides klein.'
+  },
+  {
+    text: 'Hast ___ ___ Hausaufgaben schon fertig?',
+    options: [['Du','Deine'], ['du','deine'], ['Du','deine'], ['du','Deine']],
+    correct: 1,
+    explain: 'Das ist die du-Form (informell) → immer klein, außer am Satzanfang.'
+  },
+  {
+    text: 'Wir laden ___ herzlich zu ___ Jubiläum ein.',
+    options: [['sie','ihrem'], ['Sie','Ihrem'], ['sie','Ihrem'], ['Sie','ihrem']],
+    correct: 1,
+    explain: 'Höfliche Anrede an eine gesiezte Person → beide Wörter groß.'
+  }
+];
+
+let current = 0, score = 0, answered = [];
+
+function renderQuiz(){
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+  questions.forEach((q, qi)=>{
+    const qcard = document.createElement('div');
+    qcard.className = 'qcard';
+    qcard.id = 'q'+qi;
+
+    const sentenceParts = q.text.split('___');
+    let sentenceHtml = sentenceParts[0];
+    for(let i=1;i<sentenceParts.length;i++){
+      sentenceHtml += `<span class="blank-fill" id="fill-${qi}-${i-1}">___</span>` + sentenceParts[i];
+    }
+
+    qcard.innerHTML = `
+      <div class="sentence">${qi+1}. ${sentenceHtml}</div>
+      <div class="choice-group" id="choices-${qi}"></div>
+      <div class="feedback" id="feedback-${qi}"></div>
+    `;
+    container.appendChild(qcard);
+
+    const cg = qcard.querySelector('#choices-'+qi);
+    q.options.forEach((opt, oi)=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = opt.join(' / ');
+      b.onclick = ()=> selectAnswer(qi, oi);
+      cg.appendChild(b);
+    });
+  });
+  updateProgress();
+}
+
+function selectAnswer(qi, oi){
+  if(answered[qi] !== undefined) return; // already answered
+  answered[qi] = oi;
+  const q = questions[qi];
+  const buttons = document.querySelectorAll(`#choices-${qi} .choice-btn`);
+  buttons.forEach((b, i)=>{
+    b.classList.add('selected');
+    if(i === q.correct) b.classList.add('correct');
+    else if(i === oi) b.classList.add('incorrect');
+    b.disabled = true;
+  });
+
+  // fill in blanks with chosen words
+  q.options[oi].forEach((word, wi)=>{
+    const span = document.getElementById(`fill-${qi}-${wi}`);
+    if(span) span.textContent = word;
+  });
+
+  const fb = document.getElementById('feedback-'+qi);
+  if(oi === q.correct){
+    score++;
+    fb.textContent = '✔ Richtig! ' + q.explain;
+    fb.className = 'feedback ok';
+  } else {
+    fb.textContent = '✘ Nicht ganz. ' + q.explain;
+    fb.className = 'feedback bad';
+  }
+  updateProgress();
+}
+
+function updateProgress(){
+  const answeredCount = answered.filter(a=>a!==undefined).length;
+  document.getElementById('scoreLine').textContent = `${score} / ${questions.length} richtig`;
+  document.getElementById('progressBar').style.width = (answeredCount/questions.length*100) + '%';
+}
+
+function resetQuiz(){
+  score = 0; answered = [];
+  renderQuiz();
+}
+
+renderQuiz();
+
+// ---- Übung: Zeilen den Bausteinen zuordnen ----
+const letterLines = [
+  {text:"Marburg, den 10. September 2026", cat:"ort"},
+  {text:"", cat:null},
+  {text:"Liebe Sophie,", cat:"anrede"},
+  {text:"", cat:null},
+  {text:"endlich habe ich Zeit, dir zu schreiben. Die ersten", cat:"einleitung"},
+  {text:"zwei Wochen an der neuen Schule waren ganz schön", cat:"einleitung"},
+  {text:"aufregend! Ich muss dir unbedingt davon erzählen.", cat:"einleitung"},
+  {text:"", cat:null},
+  {text:"In meiner Klasse sind 24 Kinder, und zum Glück ist", cat:"hauptteil"},
+  {text:"Jonas aus meiner alten Klasse auch hier gelandet.", cat:"hauptteil"},
+  {text:"Wir sitzen sogar nebeneinander. Unsere Klassenlehrerin", cat:"hauptteil"},
+  {text:"heißt Frau Nolte und unterrichtet Kunst, das ist jetzt", cat:"hauptteil"},
+  {text:"mein Lieblingsfach. Am meisten Spaß macht mir aber", cat:"hauptteil"},
+  {text:"die Theater-AG, die freitags stattfindet.", cat:"hauptteil"},
+  {text:"", cat:null},
+  {text:"Wie läuft es bei dir an der neuen Schule? Hast du", cat:"schluss"},
+  {text:"schon neue Freunde gefunden? Schreib mir bald zurück!", cat:"schluss"},
+  {text:"", cat:null},
+  {text:"Ganz liebe Grüße", cat:"gruss"},
+  {text:"deine Mia", cat:"unterschrift"},
+];
+const categories = [
+  {id:"ort", label:"Ort/Datum"},
+  {id:"anrede", label:"Anrede"},
+  {id:"einleitung", label:"Einleitung"},
+  {id:"hauptteil", label:"Hauptteil"},
+  {id:"schluss", label:"Schluss"},
+  {id:"gruss", label:"Grußformel"},
+  {id:"unterschrift", label:"Unterschrift"},
+];
+let activeCat = null;
+let lineAssignments = {};
+
+function renderCatBank(){
+  const bank = document.getElementById('catBank');
+  bank.innerHTML = '';
+  categories.forEach(c=>{
+    const b = document.createElement('button');
+    b.className = 'cat-chip';
+    b.textContent = c.label;
+    b.dataset.cat = c.id;
+    b.onclick = ()=>{
+      activeCat = c.id;
+      document.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+    };
+    bank.appendChild(b);
+  });
+}
+
+function renderLetterBox(){
+  const box = document.getElementById('letterBox');
+  box.innerHTML = '';
+  letterLines.forEach((line, i)=>{
+    const row = document.createElement('div');
+    row.className = 'letter-line';
+    row.dataset.index = i;
+    const num = document.createElement('span');
+    num.className = 'lnum';
+    num.textContent = i+1;
+    const txt = document.createElement('span');
+    txt.textContent = line.text || '\u00A0';
+    const badge = document.createElement('span');
+    badge.className = 'tag-badge';
+    badge.style.display = 'none';
+    row.appendChild(num);
+    row.appendChild(txt);
+    row.appendChild(badge);
+    row.onclick = ()=>{
+      if(!activeCat || !line.text) return;
+      lineAssignments[i] = activeCat;
+      const catObj = categories.find(c=>c.id===activeCat);
+      badge.textContent = catObj.label;
+      badge.style.display = 'inline-block';
+      row.classList.add('tagged');
+      row.classList.remove('correct','incorrect');
+    };
+    box.appendChild(row);
+  });
+}
+
+function checkLines(){
+  let correct = 0, total = 0;
+  letterLines.forEach((line, i)=>{
+    if(!line.text) return;
+    total++;
+    const row = document.querySelector(`.letter-line[data-index="${i}"]`);
+    row.classList.remove('correct','incorrect');
+    if(lineAssignments[i] === line.cat){
+      correct++;
+      row.classList.add('correct');
+    } else {
+      row.classList.add('incorrect');
+    }
+  });
+  const result = document.getElementById('lineResult');
+  result.textContent = `${correct} von ${total} Zeilen richtig zugeordnet.`;
+  result.className = 'feedback ' + (correct === total ? 'ok' : 'bad');
+}
+
+function resetLines(){
+  lineAssignments = {};
+  activeCat = null;
+  document.getElementById('lineResult').textContent = '';
+  renderLetterBox();
+}
+
+renderCatBank();
+renderLetterBox();
+
+// ---- Übung: Briefumschlag beschriften ----
+const envWords = [
+  {id:"absender", label:"Absender"},
+  {id:"empfaenger", label:"Empfänger"},
+  {id:"briefmarke", label:"Briefmarke"},
+];
+let activeWord = null;
+let envAssignments = {};
+
+function renderWordBank(){
+  const bank = document.getElementById('wordBank');
+  bank.innerHTML = '';
+  envWords.forEach(w=>{
+    const b = document.createElement('button');
+    b.className = 'word-chip';
+    b.textContent = w.label;
+    b.dataset.word = w.id;
+    b.onclick = ()=>{
+      activeWord = w.id;
+      document.querySelectorAll('.word-chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+    };
+    bank.appendChild(b);
+  });
+}
+
+function setupEnvelopeZones(){
+  document.querySelectorAll('#envelopeQuiz .env-zone').forEach(zone=>{
+    zone.onclick = ()=>{
+      if(!activeWord) return;
+      envAssignments[zone.dataset.zone] = activeWord;
+      const label = envWords.find(w=>w.id===activeWord).label;
+      zone.innerHTML = `<span class="zone-answer">${label}</span>`;
+      zone.classList.add('assigned');
+      zone.classList.remove('correct','incorrect');
+    };
+  });
+}
+
+function checkEnvelope(){
+  let correct = 0;
+  document.querySelectorAll('#envelopeQuiz .env-zone').forEach(zone=>{
+    const z = zone.dataset.zone;
+    zone.classList.remove('correct','incorrect');
+    if(envAssignments[z] === z){
+      zone.classList.add('correct');
+      correct++;
+    } else {
+      zone.classList.add('incorrect');
+    }
+  });
+  const result = document.getElementById('envResult');
+  result.textContent = `${correct} von 3 Stellen richtig beschriftet.`;
+  result.className = 'feedback ' + (correct === 3 ? 'ok' : 'bad');
+}
+
+function resetEnvelope(){
+  envAssignments = {};
+  activeWord = null;
+  document.getElementById('envResult').textContent = '';
+  document.querySelectorAll('#envelopeQuiz .env-zone').forEach(zone=>{
+    zone.innerHTML = '';
+    zone.classList.remove('assigned','correct','incorrect');
+  });
+}
+
+renderWordBank();
+setupEnvelopeZones();
+</script>
+</body>
+</html>

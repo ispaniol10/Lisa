@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomen-Training – Klasse 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF7EE;
+    --paper-line:#DCD3C0;
+    --margin:#D6495A;
+    --ink:#2B3A67;
+    --ink-soft:#5B6690;
+    --text:#33322E;
+    --highlight:#FFD766;
+    --correct:#4C9A6A;
+    --wrong:#D6495A;
+    --card-shadow: 0 2px 0 rgba(43,58,103,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: repeating-linear-gradient(var(--paper), var(--paper) 33px, var(--paper-line) 34px, var(--paper) 35px);
+    background-color: var(--paper);
+    font-family:'Nunito', sans-serif;
+    color:var(--text);
+    min-height:100vh;
+    padding-left:56px;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed; top:0; bottom:0; left:42px; width:2px;
+    background: var(--margin); opacity:0.55; z-index:0;
+  }
+  .wrap{max-width:840px; margin:0 auto; padding:28px 24px 60px 20px; position:relative; z-index:1;}
+
+  header.hero{margin-bottom:18px;}
+  .kicker{font-family:'Nunito'; font-weight:800; font-size:13px; letter-spacing:0.02em; color:var(--ink-soft);}
+  h1{
+    font-family:'Caveat', cursive; font-weight:700;
+    font-size:52px; color:var(--ink); margin:2px 0 4px 0; line-height:1;
+  }
+  .sub{color:var(--ink-soft); font-size:15.5px; max-width:60ch;}
+
+  nav.tabs{
+    display:flex; flex-wrap:wrap; gap:8px; margin:22px 0 20px 0;
+  }
+  nav.tabs button{
+    font-family:'Nunito'; font-weight:700; font-size:14.5px;
+    background:#fff; color:var(--ink-soft);
+    border:2px solid var(--paper-line); border-radius:10px 10px 3px 3px;
+    padding:9px 15px; cursor:pointer; transition:transform .12s ease, border-color .12s ease, color .12s ease;
+    box-shadow: var(--card-shadow);
+  }
+  nav.tabs button:hover{ transform: translateY(-2px); }
+  nav.tabs button.active{
+    color:#fff; background:var(--ink); border-color:var(--ink);
+  }
+
+  .panel{display:none; animation: fade .25s ease;}
+  .panel.active{display:block;}
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .card{
+    background:#fff; border:2px solid var(--paper-line); border-radius:4px 16px 4px 16px;
+    padding:20px 22px; margin-bottom:18px; box-shadow: var(--card-shadow);
+  }
+  .card h2{
+    font-family:'Caveat'; font-weight:700; color:var(--ink); font-size:30px; margin:0 0 10px 0;
+  }
+  .card h3{ font-family:'Nunito'; font-size:15px; color:var(--ink); margin:14px 0 6px 0;}
+  .card p{ line-height:1.55; font-size:15px; margin:6px 0;}
+  .card ul{ margin:6px 0; padding-left:20px; }
+  .card li{ line-height:1.6; font-size:15px; }
+  mark{ background: var(--highlight); padding:0 3px; border-radius:3px; }
+  code.tag{ background:#EEF0F8; color:var(--ink); border-radius:5px; padding:1px 7px; font-family:'Nunito'; font-weight:700; font-size:13.5px; }
+
+  table.kasus{ width:100%; border-collapse:collapse; margin-top:8px; font-size:14.5px; }
+  table.kasus th{ text-align:left; background:var(--ink); color:#fff; padding:7px 10px; font-weight:700;}
+  table.kasus td{ padding:7px 10px; border-bottom:1px solid var(--paper-line); }
+  table.kasus tr:nth-child(even) td{ background:#FAF6EC; }
+
+  .grid3{ display:grid; grid-template-columns: repeat(3,1fr); gap:12px; }
+  @media (max-width:680px){ .grid3{grid-template-columns:1fr;} }
+  .mini{ background:#FAF6EC; border:1.5px dashed var(--paper-line); border-radius:10px; padding:12px 14px; text-align:center;}
+  .mini .big{ font-family:'Caveat'; font-weight:700; font-size:26px; color:var(--ink); }
+  .mini .lbl{ font-size:12.5px; color:var(--ink-soft); font-weight:700;}
+
+  /* Quiz engine */
+  .progress-wrap{ height:8px; background:#EEE7D6; border-radius:6px; overflow:hidden; margin-bottom:16px;}
+  .progress-fill{ height:100%; background:var(--ink); width:0%; transition:width .3s ease;}
+  .qcount{ font-size:13px; color:var(--ink-soft); font-weight:700; margin-bottom:4px;}
+  .question{ font-family:'Nunito'; font-weight:800; font-size:17px; color:var(--ink); margin:6px 0 14px 0; line-height:1.4;}
+  .question .cue{ font-family:'Caveat'; font-weight:700; font-size:21px; color:var(--margin); }
+  .opts{ display:flex; flex-direction:column; gap:9px; }
+  .opt{
+    text-align:left; font-family:'Nunito'; font-size:15px; font-weight:700;
+    background:#fff; border:2px solid var(--paper-line); border-radius:9px;
+    padding:11px 14px; cursor:pointer; transition:border-color .12s, background .12s;
+  }
+  .opt:hover{ border-color: var(--ink-soft); }
+  .opt.correct{ border-color:var(--correct); background:#EAF6EF; color:#245C3B;}
+  .opt.wrong{ border-color:var(--wrong); background:#FBEAEC; color:#8C2A34;}
+  .opt[disabled]{ cursor:default; }
+  .feedback{ margin-top:12px; font-size:14px; padding:10px 13px; border-radius:9px; display:none; }
+  .feedback.show{ display:block; }
+  .feedback.ok{ background:#EAF6EF; color:#245C3B; }
+  .feedback.no{ background:#FBEAEC; color:#8C2A34; }
+  .quiz-actions{ margin-top:16px; display:flex; gap:10px; }
+  .btn{
+    font-family:'Nunito'; font-weight:800; font-size:14.5px; color:#fff; background:var(--ink);
+    border:none; border-radius:9px; padding:10px 18px; cursor:pointer;
+  }
+  .btn.secondary{ background:#fff; color:var(--ink); border:2px solid var(--ink); }
+  .btn:disabled{ opacity:0.4; cursor:default; }
+  .result{ text-align:center; padding:20px 10px; }
+  .result .score{ font-family:'Caveat'; font-weight:700; font-size:56px; color:var(--ink); }
+  .result .msg{ font-size:15.5px; color:var(--ink-soft); margin-top:4px;}
+
+  /* Nomen-finden */
+  .sentence{ font-size:19px; line-height:2.3; font-family:'Nunito'; font-weight:700; }
+  .word{
+    display:inline-block; margin:2px 3px; padding:2px 6px; border-radius:6px; cursor:pointer;
+    border:2px solid transparent; transition: all .1s ease;
+  }
+  .word:hover{ background:#F1EEE2; }
+  .word.picked{ background:var(--highlight); border-color:#E3B838; }
+  .word.correct{ background:#CDEBD8; border-color:var(--correct); }
+  .word.missed{ background:#fff; border:2px dashed var(--wrong); }
+  .word.wrongpick{ background:#F8D3D7; border-color:var(--wrong); }
+  .sent-counter{ font-size:13px; color:var(--ink-soft); font-weight:700; }
+
+  footer{ text-align:center; font-size:12.5px; color:var(--ink-soft); margin-top:30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Deutsch · Klasse 5</div>
+    <h1>Nomen-Training für Lisa</h1>
+    <div class="sub">Übe hier die vier Fälle, die Fachbegriffe und das Erkennen von Nomen – so bist du für den Test bereit.</div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="merk">📖 Spickzettel</button>
+    <button class="tab-btn" data-tab="fach">🏷️ Fachbegriffe</button>
+    <button class="tab-btn" data-tab="kasus">🧭 Die 4 Fälle</button>
+    <button class="tab-btn" data-tab="finden">🔍 Nomen finden</button>
+    <button class="tab-btn" data-tab="test">🎯 Gesamttest</button>
+  </nav>
+
+  <!-- ================= SPICKZETTEL ================= -->
+  <section class="panel active" id="panel-merk">
+    <div class="card">
+      <h2>Nomen erkennen</h2>
+      <p>Nomen werden immer <strong>großgeschrieben</strong>. Du erkennst sie an ihren <strong>Begleitern</strong>: Artikel (<em>der, eine</em>), Adjektive (<em>kleine</em>), Pronomen (<em>mein</em>) oder Präpositionen mit Artikel (<em>am, im</em>).</p>
+      <p><strong>Artikel-Adjektiv-Probe:</strong> Kannst du gedanklich einen Artikel und ein Adjektiv davorsetzen? → <mark>(das große) Glück</mark> = Nomen.</p>
+      <p>Typische Nomenendungen: <code class="tag">-heit</code> <code class="tag">-keit</code> <code class="tag">-ung</code> <code class="tag">-nis</code> <code class="tag">-schaft</code> <code class="tag">-tum</code> <code class="tag">-in</code></p>
+    </div>
+
+    <div class="card">
+      <h2>Genus &amp; Numerus</h2>
+      <div class="grid3">
+        <div class="mini"><div class="big">der Junge</div><div class="lbl">MASKULINUM</div></div>
+        <div class="mini"><div class="big">die Frau</div><div class="lbl">FEMININUM</div></div>
+        <div class="mini"><div class="big">das Kind</div><div class="lbl">NEUTRUM</div></div>
+      </div>
+      <p style="margin-top:14px;"><strong>Numerus</strong> ist die Anzahl: <mark>Singular</mark> (Einzahl, z. B. <em>der Stern</em>) oder <mark>Plural</mark> (Mehrzahl, z. B. <em>die Sterne</em>). Im Plural heißt der Artikel <strong>immer die</strong>.</p>
+    </div>
+
+    <div class="card">
+      <h2>Die vier Fälle (Kasus)</h2>
+      <table class="kasus">
+        <tr><th>Kasus</th><th>Frage</th><th>Beispiel</th></tr>
+        <tr><td>1. Nominativ</td><td>Wer oder was?</td><td><strong>Der Hund</strong> bellt.</td></tr>
+        <tr><td>2. Genitiv</td><td>Wessen?</td><td>Die Farbe <strong>des Hundes</strong>.</td></tr>
+        <tr><td>3. Dativ</td><td>Wem?</td><td>Ich gebe <strong>dem Hund</strong> ein Leckerli.</td></tr>
+        <tr><td>4. Akkusativ</td><td>Wen oder was?</td><td>Ich sehe <strong>den Hund</strong>.</td></tr>
+      </table>
+      <p style="margin-top:10px;">Tipp: Bilde die Frage mit dem <strong>Verb des Satzes</strong> und such die Antwort im Satz. „Ich sehe <u>wen oder was</u>?“ → den Hund → Akkusativ.</p>
+    </div>
+  </section>
+
+  <!-- ================= FACHBEGRIFFE QUIZ ================= -->
+  <section class="panel" id="panel-fach">
+    <div class="card" id="quiz-fach-card">
+      <h2>Fachbegriffe: Genus &amp; Numerus</h2>
+      <div id="quiz-fach-area"></div>
+    </div>
+  </section>
+
+  <!-- ================= KASUS QUIZ ================= -->
+  <section class="panel" id="panel-kasus">
+    <div class="card" id="quiz-kasus-card">
+      <h2>Die 4 Fälle erkennen</h2>
+      <div id="quiz-kasus-area"></div>
+    </div>
+  </section>
+
+  <!-- ================= NOMEN FINDEN ================= -->
+  <section class="panel" id="panel-finden">
+    <div class="card">
+      <h2>Klicke alle Nomen an</h2>
+      <p style="margin-top:-4px;">Tippe auf jedes Wort, das ein Nomen ist. Klicke dann auf „Prüfen“.</p>
+      <div class="sent-counter" id="finden-counter">Satz 1 / 5</div>
+      <div class="sentence" id="finden-sentence" style="margin-top:10px;"></div>
+      <div class="feedback" id="finden-feedback"></div>
+      <div class="quiz-actions">
+        <button class="btn" id="finden-check">Prüfen</button>
+        <button class="btn secondary" id="finden-next" disabled>Nächster Satz →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GESAMTTEST ================= -->
+  <section class="panel" id="panel-test">
+    <div class="card" id="quiz-test-card">
+      <h2>Gesamttest – 12 gemischte Fragen</h2>
+      <div id="quiz-test-area"></div>
+    </div>
+  </section>
+
+  <footer>Erstellt zum Üben für den Deutschtest · Klasse 5 · viel Erfolg, Lisa! 🍀</footer>
+</div>
+
+<script>
+/* ---------------- Tabs ---------------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]); }
+
+/* ---------------- Generic Quiz Engine ---------------- */
+function buildQuiz(containerId, questionPool, count, onFinishExtra){
+  const area = document.getElementById(containerId);
+  let questions = shuffle(questionPool).slice(0, count).map(q=>{
+    const optOrder = shuffle(q.opts.map((t,i)=>({t,correct:i===q.correct})));
+    return {q:q.q, cue:q.cue||null, expl:q.expl||null, opts:optOrder};
+  });
+  let idx = 0, score = 0, answered = false;
+
+  function render(){
+    if(idx >= questions.length){ renderResult(); return; }
+    const item = questions[idx];
+    area.innerHTML = `
+      <div class="progress-wrap"><div class="progress-fill" style="width:${(idx/questions.length)*100}%"></div></div>
+      <div class="qcount">Frage ${idx+1} / ${questions.length} · Punkte: ${score}</div>
+      <div class="question">${item.cue ? '<span class="cue">'+item.cue+'</span><br>':''}${item.q}</div>
+      <div class="opts" id="${containerId}-opts"></div>
+      <div class="feedback" id="${containerId}-fb"></div>
+      <div class="quiz-actions">
+        <button class="btn secondary" id="${containerId}-next" disabled>Weiter →</button>
+      </div>
+    `;
+    answered = false;
+    const optsWrap = document.getElementById(containerId+'-opts');
+    item.opts.forEach(o=>{
+      const b = document.createElement('button');
+      b.className = 'opt'; b.textContent = o.t;
+      b.addEventListener('click', ()=>{
+        if(answered) return;
+        answered = true;
+        document.querySelectorAll('#'+containerId+'-opts .opt').forEach(el=>el.disabled=true);
+        const fb = document.getElementById(containerId+'-fb');
+        if(o.correct){
+          b.classList.add('correct'); score++;
+          fb.className='feedback ok show'; fb.textContent = '✓ Richtig!' + (item.expl? ' '+item.expl : '');
+        } else {
+          b.classList.add('wrong');
+          document.querySelectorAll('#'+containerId+'-opts .opt').forEach(el=>{ if(el.textContent===item.opts.find(x=>x.correct).t) el.classList.add('correct'); });
+          fb.className='feedback no show'; fb.textContent = '✗ Nicht ganz.' + (item.expl? ' '+item.expl : '');
+        }
+        document.getElementById(containerId+'-next').disabled = false;
+      });
+      optsWrap.appendChild(b);
+    });
+    document.getElementById(containerId+'-next').addEventListener('click', ()=>{ idx++; render(); });
+  }
+
+  function renderResult(){
+    const pct = Math.round((score/questions.length)*100);
+    let msg = 'Weiter üben, du schaffst das!';
+    if(pct >= 90) msg = 'Fantastisch – fast alles richtig! 🌟';
+    else if(pct >= 70) msg = 'Sehr gut gemacht! 💪';
+    else if(pct >= 50) msg = 'Guter Start, ein bisschen üben und es klappt.';
+    area.innerHTML = `
+      <div class="result">
+        <div class="score">${score} / ${questions.length}</div>
+        <div class="msg">${msg}</div>
+        <div class="quiz-actions" style="justify-content:center; margin-top:18px;">
+          <button class="btn" id="${containerId}-retry">🔄 Nochmal üben</button>
+        </div>
+      </div>
+    `;
+    document.getElementById(containerId+'-retry').addEventListener('click', ()=>{
+      questions = shuffle(questionPool).slice(0, count).map(q=>{
+        const optOrder = shuffle(q.opts.map((t,i)=>({t,correct:i===q.correct})));
+        return {q:q.q, cue:q.cue||null, expl:q.expl||null, opts:optOrder};
+      });
+      idx=0; score=0; render();
+    });
+    if(onFinishExtra) onFinishExtra(score, questions.length);
+  }
+  render();
+}
+
+/* ---------------- Fragenpools ---------------- */
+const fachbegriffe = [
+  {q:"Wie nennt man das grammatische Geschlecht eines Nomens?", opts:["Genus","Numerus","Kasus","Plural"], correct:0, expl:"Genus = Maskulinum, Femininum oder Neutrum."},
+  {q:"Wie nennt man die Anzahl eines Nomens (Einzahl/Mehrzahl)?", opts:["Kasus","Genus","Numerus","Artikel"], correct:2, expl:"Numerus = Singular oder Plural."},
+  {q:"„der Junge“ – welches Genus?", opts:["Femininum","Maskulinum","Neutrum"], correct:1},
+  {q:"„die Blume“ – welches Genus?", opts:["Maskulinum","Neutrum","Femininum"], correct:2},
+  {q:"„das Fenster“ – welches Genus?", opts:["Neutrum","Femininum","Maskulinum"], correct:0},
+  {q:"Wie heißt das männliche Genus mit Fachbegriff?", opts:["Femininum","Maskulinum","Neutrum"], correct:1},
+  {q:"Wie heißt das weibliche Genus mit Fachbegriff?", opts:["Maskulinum","Femininum","Neutrum"], correct:1},
+  {q:"Wie heißt das sächliche Genus mit Fachbegriff?", opts:["Neutrum","Maskulinum","Femininum"], correct:0},
+  {q:"„die Sterne“ steht im ...", opts:["Singular","Plural"], correct:1},
+  {q:"„der Stern“ steht im ...", opts:["Plural","Singular"], correct:1},
+  {q:"Welcher Artikel steht bei jedem Nomen im Plural?", opts:["der","die","das","den"], correct:1, expl:"Im Plural heißt der Artikel immer die."},
+  {q:"Wie heißt die Fachbezeichnung für „Einzahl“?", opts:["Plural","Singular","Genus"], correct:1},
+  {q:"Wie heißt die Fachbezeichnung für „Mehrzahl“?", opts:["Singular","Numerus","Plural"], correct:2},
+  {q:"„das Mädchen“ – welches Genus (Achtung, Sonderfall)?", opts:["Femininum","Neutrum","Maskulinum"], correct:1, expl:"Grammatisches und natürliches Geschlecht stimmen hier nicht überein: das Mädchen ist Neutrum."},
+];
+
+const kasus = [
+  {q:"Mit welcher Frage findest du den Nominativ?", opts:["Wessen?","Wer oder was?","Wem?","Wen oder was?"], correct:1},
+  {q:"Mit welcher Frage findest du den Genitiv?", opts:["Wessen?","Wer oder was?","Wem?","Wen oder was?"], correct:0},
+  {q:"Mit welcher Frage findest du den Dativ?", opts:["Wen oder was?","Wessen?","Wem?","Wer oder was?"], correct:2},
+  {q:"Mit welcher Frage findest du den Akkusativ?", opts:["Wem?","Wer oder was?","Wessen?","Wen oder was?"], correct:3},
+  {cue:"„Der Hund bellt laut.“", q:"In welchem Fall steht der fett gedruckte Teil? → <strong>Der Hund</strong>", opts:["Nominativ","Genitiv","Dativ","Akkusativ"], correct:0},
+  {cue:"„Der Junge wirft den Ball.“", q:"In welchem Fall steht <strong>den Ball</strong>?", opts:["Nominativ","Genitiv","Dativ","Akkusativ"], correct:3},
+  {cue:"„Der Lehrer gibt dem Mädchen ein Buch.“", q:"In welchem Fall steht <strong>dem Mädchen</strong>?", opts:["Nominativ","Dativ","Genitiv","Akkusativ"], correct:1},
+  {cue:"„Die Mähne des Löwen ist dicht.“", q:"In welchem Fall steht <strong>des Löwen</strong>?", opts:["Nominativ","Akkusativ","Genitiv","Dativ"], correct:2},
+  {cue:"„Ich sehe die Katze.“", q:"In welchem Fall steht <strong>die Katze</strong>?", opts:["Nominativ","Dativ","Akkusativ","Genitiv"], correct:2},
+  {cue:"„Sie folgt dem Hund.“", q:"In welchem Fall steht <strong>dem Hund</strong>?", opts:["Genitiv","Dativ","Akkusativ","Nominativ"], correct:1},
+  {cue:"„Die Sonne scheint.“", q:"In welchem Fall steht <strong>die Sonne</strong>?", opts:["Nominativ","Akkusativ","Dativ","Genitiv"], correct:0},
+  {cue:"„Die Farbe des Autos ist rot.“", q:"In welchem Fall steht <strong>des Autos</strong>?", opts:["Dativ","Nominativ","Genitiv","Akkusativ"], correct:2},
+  {cue:"„Wir schenken der Oma Blumen.“", q:"In welchem Fall steht <strong>der Oma</strong>?", opts:["Nominativ","Dativ","Akkusativ","Genitiv"], correct:1},
+  {cue:"„Das Fahrrad meines Bruders ist neu.“", q:"In welchem Fall steht <strong>meines Bruders</strong>?", opts:["Genitiv","Dativ","Nominativ","Akkusativ"], correct:0},
+];
+
+buildQuiz('quiz-fach-area', fachbegriffe, 8);
+buildQuiz('quiz-kasus-area', kasus, 8);
+buildQuiz('quiz-test-area', fachbegriffe.concat(kasus), 12);
+
+/* ---------------- Nomen finden ---------------- */
+const findenSentences = [
+  {text:"Der kleine Hund läuft schnell über die Wiese.", nouns:["Hund","Wiese"]},
+  {text:"Meine Schwester liest ein spannendes Buch.", nouns:["Schwester","Buch"]},
+  {text:"Am Morgen isst das Kind ein frisches Brötchen.", nouns:["Morgen","Kind","Brötchen"]},
+  {text:"Der Lehrer erklärt den Schülern die Regel.", nouns:["Lehrer","Schülern","Regel"]},
+  {text:"Im Wald sammeln wir bunte Blätter und Pilze.", nouns:["Wald","Blätter","Pilze"]},
+];
+let fIdx = 0, fScoreTotal = 0, fMaxTotal = 0, fChecked=false;
+
+function cleanWord(w){ return w.replace(/[.,!?„“"]/g,''); }
+
+function renderFinden(){
+  const item = findenSentences[fIdx];
+  document.getElementById('finden-counter').textContent = `Satz ${fIdx+1} / ${findenSentences.length}`;
+  const sentEl = document.getElementById('finden-sentence');
+  sentEl.innerHTML = '';
+  item.text.split(' ').forEach((w,i)=>{
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.textContent = w;
+    span.dataset.clean = cleanWord(w);
+    span.addEventListener('click', ()=>{
+      if(fChecked) return;
+      span.classList.toggle('picked');
+    });
+    sentEl.appendChild(span);
+  });
+  document.getElementById('finden-feedback').className = 'feedback';
+  document.getElementById('finden-feedback').textContent = '';
+  document.getElementById('finden-next').disabled = true;
+  fChecked = false;
+}
+
+document.getElementById('finden-check').addEventListener('click', ()=>{
+  if(fChecked) return;
+  fChecked = true;
+  const item = findenSentences[fIdx];
+  const words = document.querySelectorAll('#finden-sentence .word');
+  let correctPicks = 0;
+  words.forEach(w=>{
+    const isNoun = item.nouns.includes(w.dataset.clean);
+    const isPicked = w.classList.contains('picked');
+    if(isNoun && isPicked){ w.classList.add('correct'); correctPicks++; }
+    else if(isNoun && !isPicked){ w.classList.add('missed'); }
+    else if(!isNoun && isPicked){ w.classList.add('wrongpick'); }
+  });
+  fScoreTotal += correctPicks;
+  fMaxTotal += item.nouns.length;
+  const fb = document.getElementById('finden-feedback');
+  const allCorrect = correctPicks === item.nouns.length && document.querySelectorAll('#finden-sentence .wrongpick').length===0;
+  fb.className = 'feedback show ' + (allCorrect ? 'ok':'no');
+  fb.textContent = allCorrect
+    ? '✓ Alle Nomen gefunden! Nomen in diesem Satz: ' + item.nouns.join(', ') + '.'
+    : 'Nomen in diesem Satz: ' + item.nouns.join(', ') + '. Grün = richtig erkannt, gestrichelt = übersehen, rot = kein Nomen.';
+  document.getElementById('finden-next').disabled = (fIdx === findenSentences.length-1);
+  if(fIdx === findenSentences.length-1){
+    fb.textContent += ` Gesamt: ${fScoreTotal} / ${fMaxTotal} Nomen richtig erkannt.`;
+  }
+});
+
+document.getElementById('finden-next').addEventListener('click', ()=>{
+  fIdx++;
+  renderFinden();
+});
+
+renderFinden();
+</script>
+</body>
+</html>
