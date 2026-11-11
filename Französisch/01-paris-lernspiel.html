@@ -1,0 +1,482 @@
+<title>Paris zum Spielen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* Layout: Kopfzeile oben, darunter Spielkarte (Hero mit Stadt-Panorama + Kacheln) oder ein Spiel im Panel */
+:root{--bg:#E6F1FA;--surface:#FFFFFF;--surface2:#F1F7FC;--ink:#1B2A4A;--muted:#566887;--line:#C9DAEA;--sun:#FFC93C;--sun-ink:#2E2200;--red:#E8454D;--teal:#12887B;--blue:#2457D6;--good:#17804A;--bad:#C93640;--art:#EAF4FB;--hero1:#BFE3F5;--hero2:#E6F1FA;--shadow:0 5px 0 rgba(27,42,74,.10);--disp:"Baloo 2","Nunito",system-ui,sans-serif;--body:"Nunito",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1526;--surface:#18223B;--surface2:#212D4D;--ink:#EEF3FF;--muted:#A3B3D6;--line:#2F3E66;--red:#FF7C83;--teal:#45D3C0;--blue:#7BA5FF;--good:#4BD890;--bad:#FF7C83;--hero1:#1E3263;--hero2:#0E1526;--shadow:0 5px 0 rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1526;--surface:#18223B;--surface2:#212D4D;--ink:#EEF3FF;--muted:#A3B3D6;--line:#2F3E66;--red:#FF7C83;--teal:#45D3C0;--blue:#7BA5FF;--good:#4BD890;--bad:#FF7C83;--hero1:#1E3263;--hero2:#0E1526;--shadow:0 5px 0 rgba(0,0,0,.35);color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:980px;margin:0 auto}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);display:flex;align-items:center;gap:12px;padding:10px 0}
+.top .logo{font-family:var(--disp);font-weight:800;font-size:1.25rem;letter-spacing:.01em;margin-right:auto}
+.top .logo b{color:var(--red)}
+.pill{background:var(--sun);color:var(--sun-ink);font-weight:800;border-radius:999px;padding:6px 14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+h1,h2,h3{font-family:var(--disp);line-height:1.1;margin:0;text-wrap:balance}
+.hero{position:relative;border-radius:26px;overflow:hidden;background:linear-gradient(var(--hero1),var(--hero2));padding:24px 22px 0;margin-bottom:26px}
+.hero h1{font-size:clamp(2.1rem,7vw,3.6rem);font-weight:800}
+.hero h1 span{background:linear-gradient(transparent 62%,var(--sun) 62%)}
+.hero p{margin:10px 0 0;max-width:34ch;color:var(--muted);font-weight:700}
+.hero-row{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.hero-row>div{min-width:0;flex:1 1 260px}
+.bubble{position:relative;background:var(--surface);border:2px solid var(--ink);border-radius:18px;padding:10px 14px;font-weight:800;max-width:260px}
+.pipo{display:flex;align-items:flex-end;gap:8px}
+.pipo svg{width:84px;height:auto;flex:none}
+.sky{display:block;width:100%;height:150px;margin-top:14px}
+.grp{display:flex;align-items:center;gap:10px;margin:28px 0 12px}
+.grp .tag{background:var(--sun);color:var(--sun-ink);font-family:var(--disp);font-weight:800;border-radius:10px 10px 10px 0;padding:2px 12px}
+.grp h2{font-size:1.2rem;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.tile{font:inherit;color:inherit;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:10px 10px 14px;cursor:pointer;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;transition:transform .12s}
+.tile:hover{transform:translateY(-3px)}
+.tile .ic{background:var(--art);border-radius:14px;height:112px;display:grid;place-items:center;overflow:hidden}
+.tile .ic svg{height:100px;width:auto;max-width:100%}
+.tile h3{font-size:1.15rem;padding:0 4px}
+.tile small{color:var(--muted);font-weight:700;padding:0 4px}
+.tile .st{padding:0 4px;color:var(--sun);font-size:1.25rem;letter-spacing:2px;text-shadow:0 0 0 var(--ink);-webkit-text-stroke:.6px var(--sun-ink)}
+.st{color:var(--sun);-webkit-text-stroke:.6px var(--sun-ink);letter-spacing:2px}
+.gbar{display:flex;align-items:center;gap:12px;margin:6px 0 14px;flex-wrap:wrap}
+.gbar h2{font-size:1.6rem}
+.back{font:inherit;font-weight:800;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:6px 12px;cursor:pointer}
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+.prog{height:12px;border-radius:99px;background:var(--surface2);border:2px solid var(--line);overflow:hidden}
+.prog span{display:block;height:100%;background:var(--teal);transition:width .3s}
+.pcount{color:var(--muted);font-weight:800;font-size:.9rem;margin:8px 0 12px}
+.qbody{margin-bottom:14px}
+.qart{display:grid;place-items:center;background:var(--art);border-radius:18px;padding:10px;margin-bottom:12px}
+.qart svg{width:min(210px,60%);height:auto}
+.avs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;background:var(--art);border-radius:18px;padding:10px;margin-bottom:12px;font-size:2rem}
+.avs svg{width:84px;height:84px}
+.ask{font-size:1.2rem;font-weight:800;margin:6px 0}
+.ask.big{font-family:var(--disp);font-size:1.8rem}
+.de{color:var(--muted);font-weight:700;font-size:1rem}
+.gap{display:inline-block;min-width:3.2ch;border-bottom:3px solid var(--ink);text-align:center}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.opt{font:inherit;font-weight:800;color:var(--ink);background:var(--surface2);border:2px solid var(--line);border-radius:14px;padding:12px;min-height:56px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;gap:8px;flex-direction:column}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt:disabled{cursor:default}
+.opt.ok{background:color-mix(in srgb,var(--good) 25%,var(--surface));border-color:var(--good)}
+.opt.no{background:color-mix(in srgb,var(--bad) 22%,var(--surface));border-color:var(--bad)}
+.opts.pic .opt{background:var(--art);padding:6px}
+.opts.pic .opt svg{width:100%;height:auto;max-height:110px}
+.opt .av{width:64px;height:64px}
+.fb{margin-top:14px;font-weight:800;min-height:1px}
+.fb .msg{padding:10px 14px;border-radius:14px;margin-bottom:10px}
+.fb .good{background:color-mix(in srgb,var(--good) 18%,var(--surface))}
+.fb .bad{background:color-mix(in srgb,var(--bad) 16%,var(--surface))}
+.btn{font:inherit;font-weight:800;background:var(--sun);color:var(--sun-ink);border:2px solid var(--sun-ink);border-radius:14px;padding:10px 20px;cursor:pointer;box-shadow:0 4px 0 var(--sun-ink)}
+.btn.alt{background:var(--surface2);color:var(--ink);border-color:var(--line);box-shadow:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.spk{font:inherit;display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--surface);color:var(--blue);cursor:pointer;vertical-align:middle;padding:0}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.seg{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.seg button{font:inherit;font-weight:800;border:2px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:999px;padding:6px 16px;cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.fcard{perspective:700px;cursor:pointer;min-height:150px;border:0;background:none;padding:0;font:inherit;color:inherit}
+.fin{position:relative;height:100%;min-height:150px;transition:transform .45s;transform-style:preserve-3d}
+.fcard.flipped .fin{transform:rotateY(180deg)}
+.ff{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;border:2px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;text-align:center}
+.ff.front{background:var(--art);color:#1B2A4A}
+.ff.front svg{width:80%;max-height:120px}
+.ff.back{transform:rotateY(180deg);background:var(--sun);color:var(--sun-ink);font-weight:800}
+.ff.back b{font-family:var(--disp);font-size:1.25rem}
+.fcard.txt .ff.front{background:var(--surface2);color:var(--ink);font-family:var(--disp);font-size:1.15rem;font-weight:800}
+.slots{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.slot{min-width:70px;min-height:48px;border-radius:12px;border:2px dashed var(--line);display:grid;place-items:center;font-weight:800;padding:0 10px}
+.slot.f{border-style:solid}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{font:inherit;font-weight:800;border:2px solid var(--ink);border-radius:12px;padding:10px 16px;cursor:pointer;color:#1B2A4A;font-size:1.1rem}
+.chip:disabled{opacity:.3;cursor:default}
+.c0{background:#FFD35A}.c1{background:#A9DB87}.c2{background:#FFB27A}.c3{background:#8EC9E8}
+.city{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:12px;background:linear-gradient(var(--art) 85%,#9FB0C8 85%);border-radius:18px;padding:12px 12px 16px}
+.bld{position:relative;font:inherit;background:transparent;border:2px solid transparent;border-radius:12px;padding:2px;cursor:pointer}
+.bld:hover:not(:disabled){border-color:var(--blue)}
+.bld svg{width:100%;height:auto}
+.bld .num{position:absolute;top:2px;left:4px;background:var(--red);color:#fff;font-weight:800;font-size:.8rem;border-radius:99px;min-width:22px;height:22px;display:grid;place-items:center}
+.bld.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 25%,transparent)}
+.sit{font-family:var(--disp);font-size:1.5rem;font-weight:800}
+.say-box{background:var(--surface2);border-radius:16px;padding:12px 16px;font-weight:800;display:grid;gap:4px}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (min-width:640px){.mgrid{grid-template-columns:repeat(4,1fr)}}
+.mc{font:inherit;min-height:78px;border-radius:14px;border:2px solid var(--ink);background:repeating-linear-gradient(45deg,var(--blue),var(--blue) 8px,var(--surface) 8px,var(--surface) 16px);color:transparent;cursor:pointer;padding:4px;font-weight:800;font-size:.95rem}
+.mc.up,.mc.done{color:var(--ink);background:var(--surface2);border-color:var(--line)}
+.mc.up.fr,.mc.done.fr{background:color-mix(in srgb,var(--blue) 22%,var(--surface))}
+.mc.up.de,.mc.done.de{background:color-mix(in srgb,var(--sun) 40%,var(--surface))}
+.mc.done{opacity:.55}
+.chat{display:grid;gap:8px;margin:10px 0}
+.msg-b{max-width:88%;padding:8px 14px;border-radius:16px;font-weight:800}
+.msg-b small{display:block;font-size:.75rem;opacity:.75}
+.msg-b.l{background:color-mix(in srgb,var(--blue) 22%,var(--surface));justify-self:start;border-bottom-left-radius:4px}
+.msg-b.r{background:color-mix(in srgb,var(--sun) 45%,var(--surface));justify-self:end;border-bottom-right-radius:4px}
+.tip{background:color-mix(in srgb,var(--sun) 28%,var(--surface));border-radius:14px;padding:10px 14px;font-weight:700;margin-bottom:14px}
+.big-stars{font-size:3rem;text-align:center}
+.res{text-align:center}
+.res h2{font-size:2rem}
+.res ul{text-align:left;max-width:420px;margin:12px auto;padding-left:20px;font-weight:700}
+details{margin-top:30px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 16px}
+summary{font-family:var(--disp);font-weight:800;font-size:1.2rem;cursor:pointer}
+.vl{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 20px;margin-top:10px}
+.vl div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding:5px 0;font-weight:700}
+.vl span{color:var(--muted);text-align:right}
+.av{border-radius:50%;display:block}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.confetti i{position:absolute;top:-14px;width:9px;height:14px;animation:fall 2.2s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+let P={stars:{},seen:{}};
+try{const s=localStorage.getItem("paris-lisa-1");if(s)P=Object.assign(P,JSON.parse(s))}catch(e){}
+const save=()=>{try{localStorage.setItem("paris-lisa-1",JSON.stringify(P))}catch(e){}};
+const award=(id,st)=>{if(st>(P.stars[id]||0)){P.stars[id]=st;save()}};
+const stars=n=>"★".repeat(n)+"☆".repeat(3-n);
+const say=t=>{try{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(t).replace(/…/g,"").replace(/\//g," "));u.lang="fr-FR";u.rate=.85;speechSynthesis.speak(u)}catch(e){}};
+const SPK='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const spk=t=>`<button class="spk" type="button" aria-label="Anhören" data-say="${t}">${SPK}</button>`;
+function confetti(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const cols=["#FFC93C","#F2545B","#1FA596","#2F6FED","#ffffff"];const box=document.createElement("div");box.className="confetti";for(let i=0;i<36;i++){const s=document.createElement("i");s.style.left=Math.random()*100+"%";s.style.background=cols[i%5];s.style.animationDelay=Math.random()*.4+"s";s.style.setProperty("--dx",(Math.random()*80-40)+"px");box.appendChild(s)}document.body.appendChild(box);setTimeout(()=>box.remove(),2800)}
+
+/* ---------- Daten ---------- */
+const PLACES=[
+{id:"hotel",fr:"l'hôtel",de:"das Hotel",n:1,syl:["l'hô","tel"]},
+{id:"cafe",fr:"le café",de:"das Café",n:2,syl:["le ca","fé"]},
+{id:"musee",fr:"le musée",de:"das Museum",n:3,syl:["le mu","sée"]},
+{id:"cinema",fr:"le cinéma",de:"das Kino",n:4,syl:["le ci","né","ma"]},
+{id:"theatre",fr:"le théâtre",de:"das Theater",n:5,syl:["le thé","â","tre"]},
+{id:"super",fr:"le supermarché",de:"der Supermarkt",n:6,syl:["le su","per","mar","ché"]},
+{id:"college",fr:"le collège",de:"das Collège (Schule)",n:7,syl:["le col","lè","ge"]},
+{id:"parc",fr:"le parc",de:"der Park",n:8},
+{id:"stade",fr:"le stade",de:"das Stadion",n:9},
+{id:"resto",fr:"le restaurant",de:"das Restaurant",n:10,syl:["le res","tau","rant"]},
+{id:"metro",fr:"le métro",de:"die U-Bahn",n:11,syl:["le mé","tro"]},
+{id:"tour",fr:"la tour",de:"der Turm",n:12}
+];
+PLACES.forEach(p=>{if(p.fr.startsWith("l'")){p.art="l'";p.noun=p.fr.slice(2)}else{const t=p.fr.split(" ");p.art=t[0];p.noun=t[1]}});
+const PL=Object.fromEntries(PLACES.map(p=>[p.id,p]));
+const PHRASES=[
+["Salut !","Hallo! / Tschüss!"],["Tu t'appelles comment ?","Wie heißt du?"],["Je m'appelle …","Ich heiße …"],["Et toi ?","Und du?"],
+["Moi, c'est …","Ich bin … / Ich heiße …"],["Voilà …","Da ist … / Da kommt …"],["C'est qui ?","Wer ist das?"],["C'est …","Das ist …"],
+["Ce sont …","Das sind …"],["mon ami","mein Freund"],["mon amie","meine Freundin"],["Il s'appelle …","Er heißt …"],
+["Elle s'appelle …","Sie heißt …"],["Je ne sais pas.","Ich weiß es nicht."],["D'accord !","Einverstanden! / Okay!"],["Cool !","Cool! / Klasse!"],
+["Alors …","Also … / Dann …"],["Bienvenue dans le quartier !","Willkommen im Viertel!"],["J'habite ici depuis samedi.","Ich wohne seit Samstag hier."],
+["Pardon, où est … ?","Entschuldigung, wo ist …?"],["C'est là.","Das ist dort."],["Merci !","Danke!"],["Ça va ?","Wie geht's?"],["Super !","Super! / Toll!"],
+["le garçon","der Junge"],["la fille","das Mädchen"],["les garçons","die Jungen"],["les filles","die Mädchen"],["le chien","der Hund"],
+["le quartier","das Viertel"],["l'ami","der Freund"],["l'amie","die Freundin"],["les amis","die Freunde"],["les amies","die Freundinnen"],
+["la tortue","die Schildkröte"],["avec","mit"],["de / d'","von"],["non","nein"],["ici","hier"],["dans","in"],["depuis","seit"],["Madame / Monsieur","Frau / Herr"]
+];
+const POOL=PHRASES.map(p=>({fr:p[0],de:p[1]})).concat(PLACES.map(p=>({fr:p.fr,de:p.de})));
+const NOUNS=PLACES.map(p=>({art:p.art,noun:p.noun,de:p.de})).concat([
+{art:"le",noun:"chien",de:"der Hund"},{art:"le",noun:"quartier",de:"das Viertel"},{art:"la",noun:"fille",de:"das Mädchen"},
+{art:"l'",noun:"ami",de:"der Freund"},{art:"l'",noun:"amie",de:"die Freundin"},{art:"le",noun:"garçon",de:"der Junge"},{art:"la",noun:"tortue",de:"die Schildkröte"}]);
+const SIT=[["Du brauchst ein Zimmer für die Nacht.","hotel"],["Du hast Hunger und willst essen gehen.","resto"],["Du willst dir alte Kunstwerke ansehen.","musee"],["Du hast Durst auf einen Tee.","cafe"],["Du willst im Grünen spazieren gehen.","parc"],["Du willst ein Fußballspiel sehen.","stade"],["Du willst einen neuen Film sehen.","cinema"],["Du suchst die nächste U-Bahn-Station.","metro"],["Du musst Lebensmittel einkaufen.","super"],["Du willst von ganz oben über die Stadt schauen.","tour"],["Du suchst die Schule.","college"],["Du willst ein Theaterstück sehen.","theatre"]];
+const DLG=[["Gabin","Salut !"],["Noé","Salut ! Tu t'appelles comment ?"],["Gabin","Je m'appelle Gabin. Et toi ?"],["Noé","Moi, c'est Noé."],["Gabin","Ah, voilà Idriss !"],["Noé","C'est qui ?"],["Gabin","C'est mon ami."],["Idriss","Salut, Noé ! Ça va ?"],["Noé","Super !"]];
+
+/* ---------- Grafiken ---------- */
+const INK="#1B2A4A";
+const T=(x,y,s,t,f="#fff")=>`<text x="${x}" y="${y}" font-size="${s}" text-anchor="middle" fill="${f}" stroke="none" font-family="Nunito,sans-serif" font-weight="800">${t}</text>`;
+const R=(x,y,w,h,f,e="")=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${f}" ${e}/>`;
+const C=(x,y,r,f,e="")=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" ${e}/>`;
+const NS='stroke="none"';
+const ART={
+hotel:()=>R(22,34,76,92,"#F3DDB5")+`<polygon points="16,34 60,10 104,34" fill="#6E7FA3"/>`+[0,1,2].map(i=>R(30+i*24,40,14,16,"#8EC9E8")+R(30+i*24,62,14,16,"#8EC9E8")).join("")+R(34,84,52,10,"#F2545B")+T(60,92,8,"HÔTEL")+R(50,100,20,26,"#2F4468")+R(28,100,12,14,"#8EC9E8")+R(80,100,12,14,"#8EC9E8"),
+cafe:()=>R(14,38,92,88,"#FFD3C2")+R(10,28,100,10,"#8A5A44")+R(40,42,40,12,"#fff")+T(60,52,9,"CAFÉ",INK)+R(22,58,20,16,"#8EC9E8")+R(78,58,20,16,"#8EC9E8")+[0,1,2,3,4,5].map(i=>R(14+i*15.33,80,15.33,12,i%2?"#fff":"#F2545B")).join("")+R(24,96,34,30,"#8EC9E8")+R(70,96,22,30,"#2F4468"),
+musee:()=>`<polygon points="8,124 60,22 112,124" fill="#BFE3F2"/><g stroke-width="1">`+[44,66,88,108].map(y=>{const h=(y-22)*52/102;return `<line x1="${60-h}" y1="${y}" x2="${60+h}" y2="${y}"/>`}).join("")+[30,45,75,90].map(x=>`<line x1="60" y1="22" x2="${x}" y2="124"/>`).join("")+`</g>`+R(0,124,120,3,"#9FB0D3"),
+cinema:()=>`<path d="M26 36 Q60 2 94 36Z" fill="#6E7FA3"/>`+R(26,36,68,90,"#3C4A6B")+R(30,48,60,18,"#FFC93C")+T(60,61,10,"CINÉMA",INK)+[0,1,2,3,4,5].map(i=>C(36+i*9.6,72,2,"#FFC93C",NS)).join("")+R(34,80,14,20,"#F2545B")+R(53,80,14,20,"#1FA596")+R(72,80,14,20,"#F4A62A")+R(48,104,24,22,"#E8F3FB"),
+theatre:()=>`<polygon points="12,44 60,14 108,44" fill="#E8D6A8"/>`+C(60,32,8,"#FFC93C")+`<path d="M55 34 Q60 39 65 34" fill="none" stroke-width="1.5"/>`+R(14,44,92,8,"#D9C48D")+R(18,52,84,60,"#8A3B55")+[0,1,2,3,4].map(i=>R(20+i*18,52,10,60,"#F6EDD3")).join("")+R(10,112,100,10,"#D9C48D")+R(6,122,108,4,"#BFAE80"),
+super:()=>R(6,52,108,74,"#fff")+R(6,38,108,16,"#F2545B")+T(60,50,10,"SUPERMARCHÉ")+R(12,62,36,40,"#BFE3F2")+R(72,62,36,40,"#BFE3F2")+R(50,74,20,52,"#8EC9E8")+C(22,92,4,"#F2545B")+C(32,92,4,"#FFC93C")+C(42,92,4,"#4FAE5B")+C(82,92,4,"#4FAE5B")+C(92,92,4,"#F4A62A")+C(102,92,4,"#F2545B"),
+college:()=>`<line x1="60" y1="8" x2="60" y2="40"/>`+R(60,9,6,9,"#2F6FED")+R(66,9,6,9,"#fff")+R(72,9,6,9,"#F2545B")+R(14,44,92,82,"#E3B88E")+R(10,38,100,8,"#6E7FA3")+[20,36,76,92].map(x=>R(x,52,12,14,"#8EC9E8")+R(x,70,12,14,"#8EC9E8")).join("")+R(42,87,36,9,"#fff")+T(60,94,6.5,"COLLÈGE",INK)+R(50,98,20,28,"#6A4A30"),
+parc:()=>R(30,80,8,44,"#7A5230")+C(34,60,22,"#4FAE5B")+C(18,74,13,"#4FAE5B")+C(50,74,13,"#4FAE5B")+R(84,86,7,38,"#7A5230")+C(88,68,17,"#6CC070")+C(74,80,10,"#6CC070")+R(0,108,120,3,"#2F4468",NS)+[...Array(13)].map((_,i)=>R(3+i*9.5,100,3,26,"#2F4468",NS)).join(""),
+stade:()=>`<line x1="12" y1="84" x2="12" y2="34"/><line x1="108" y1="84" x2="108" y2="34"/>`+R(5,26,14,9,"#FFC93C")+R(101,26,14,9,"#FFC93C")+`<ellipse cx="60" cy="92" rx="54" ry="30" fill="#C9D3E8"/><ellipse cx="60" cy="88" rx="40" ry="19" fill="#4FAE5B"/><line x1="60" y1="69" x2="60" y2="107" stroke="#fff" stroke-width="1.5"/><ellipse cx="60" cy="88" rx="7" ry="4" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M6 92 Q60 144 114 92 L114 100 Q60 150 6 100Z" fill="#9FB0D3"/>`,
+resto:()=>R(26,46,68,80,"#2F6B4F")+[0,1,2,3,4,5].map(i=>R(22+i*12.67,48,12.67,14,i%2?"#fff":"#F2545B")).join("")+R(32,28,56,16,"#fff")+T(60,40,8.5,"Restaurant",INK)+R(32,68,13,20,"#FFD27A")+R(75,68,13,20,"#FFD27A")+R(48,84,24,42,"#3A2A1A")+C(60,98,6,"#FFD27A"),
+metro:()=>R(27,80,66,46,"#2F4468",NS)+`<path d="M20 126 V72 Q60 18 100 72 V126" fill="none" stroke="${INK}" stroke-width="11"/><path d="M20 126 V72 Q60 18 100 72 V126" fill="none" stroke="#2E7D5B" stroke-width="7"/>`+R(40,52,40,16,"#fff")+T(60,64,9,"MÉTRO",INK)+C(14,70,6,"#F2545B")+C(106,70,6,"#F2545B")+`<line x1="27" y1="104" x2="93" y2="104" stroke="#8EC9E8" stroke-width="1.5"/><line x1="27" y1="114" x2="93" y2="114" stroke="#8EC9E8" stroke-width="1.5"/>`,
+tour:()=>R(20,64,18,62,"#6E7FA3")+R(82,76,18,50,"#6E7FA3")+R(38,8,44,118,"#2F4468")+[0,1,2].map(i=>[0,1,2,3,4,5,6,7].map(j=>R(43+i*13,14+j*14,8,8,(i*7+j*3)%4==0?"#FFC93C":"#8EC9E8",NS)).join("")).join("")+`<line x1="60" y1="8" x2="60" y2="1"/>`
+};
+const art=(id,cls="",label=true)=>`<svg class="art ${cls}" viewBox="0 0 120 130" ${label?`role="img" aria-label="${PL[id].fr}"`:'aria-hidden="true"'}><g stroke="${INK}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">${ART[id]()}</g></svg>`;
+const NAME={gabin:"Gabin",noe:"Noé",idriss:"Idriss",lilirose:"Lili-Rose",jeanne:"Jeanne",cotelette:"Côtelette"};
+const AV={
+gabin:{bg:"#CFE3F7",skin:"#F3C9A5",jk:"#8C95A6",hair:`<path d="M30 46 Q28 22 50 24 Q72 22 70 46 Q62 33 50 35 Q38 33 30 46Z" fill="#5B3A21"/>`},
+noe:{bg:"#D8F0E3",skin:"#F6D2B0",jk:"#2F6FED",hair:`<path d="M30 46 Q28 22 50 24 Q72 22 70 46 Q58 30 44 36 Q36 38 30 46Z" fill="#E7C46A"/>`},
+idriss:{bg:"#FFE3C9",skin:"#C58C62",jk:"#2B3550",hair:[[34,34],[42,26],[50,24],[58,26],[66,34]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="8" fill="#2A1A12"/>`).join("")},
+lilirose:{bg:"#F7D9E6",skin:"#8D5A3B",jk:"#F4A62A",hair:`<circle cx="50" cy="20" r="9" fill="#2A1A12"/><path d="M30 46 Q28 24 50 26 Q72 24 70 46 Q60 34 50 36 Q40 34 30 46Z" fill="#2A1A12"/>`},
+jeanne:{bg:"#E3DCF7",skin:"#F3C9A5",jk:"#24365E",back:`<path d="M26 52 Q22 18 50 20 Q78 18 74 52 L78 84 L22 84Z" fill="#9A4B2A"/>`,hair:`<path d="M30 46 Q50 24 70 46 Q50 36 30 46Z" fill="#9A4B2A"/>`}
+};
+function av(k,cls=""){
+ if(k==="cotelette")return `<svg class="av ${cls}" viewBox="0 0 100 100" role="img" aria-label="Côtelette"><circle cx="50" cy="50" r="50" fill="#FFE9B0"/><polygon points="24,38 30,10 48,28" fill="#D98A3D"/><polygon points="76,38 70,10 52,28" fill="#D98A3D"/><ellipse cx="50" cy="54" rx="28" ry="24" fill="#E9A04F"/><ellipse cx="50" cy="66" rx="15" ry="11" fill="#FFF3DC"/><circle cx="50" cy="60" r="3.5" fill="${INK}"/><circle cx="40" cy="48" r="2.6" fill="${INK}"/><circle cx="60" cy="48" r="2.6" fill="${INK}"/><path d="M50 63 v5 M44 70 Q50 74 56 70" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/></svg>`;
+ const a=AV[k];
+ return `<svg class="av ${cls}" viewBox="0 0 100 100" role="img" aria-label="${NAME[k]}" overflow="hidden"><circle cx="50" cy="50" r="50" fill="${a.bg}"/>${a.back||""}<path d="M14 100 Q18 70 50 68 Q82 70 86 100Z" fill="${a.jk}"/><circle cx="50" cy="48" r="20" fill="${a.skin}"/>${a.hair}<circle cx="43" cy="49" r="2.4" fill="${INK}"/><circle cx="57" cy="49" r="2.4" fill="${INK}"/><path d="M43 57 Q50 63 57 57" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/></svg>`;
+}
+const pipo=()=>`<svg viewBox="0 0 90 90" role="img" aria-label="Pipo, der kleine Vogel"><ellipse cx="45" cy="84" rx="20" ry="3" fill="#000" opacity=".12"/><g stroke="${INK}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><line x1="38" y1="78" x2="38" y2="84"/><line x1="52" y1="78" x2="52" y2="84"/><circle cx="45" cy="52" r="28" fill="#FFC93C"/><path d="M20 54 Q28 70 40 64 Q30 52 20 54Z" fill="#F4A62A"/><polygon points="62,48 78,53 62,58" fill="#F2545B"/><circle cx="55" cy="45" r="3.5" fill="${INK}" stroke="none"/><ellipse cx="42" cy="26" rx="22" ry="9" fill="#F2545B"/><circle cx="40" cy="17" r="3" fill="#F2545B"/></g></svg>`;
+
+/* ---------- Gerüst ---------- */
+
+const view=h=>{$("#app").innerHTML=h;window.scrollTo({top:0})};
+const bar=t=>`<div class="gbar"><button class="back" type="button" data-act="home">← Spielkarte</button><h2>${t}</h2></div>`;
+const total=()=>Object.values(P.stars).reduce((a,b)=>a+b,0);
+function updPill(){const e=$("#pill");if(e)e.textContent="★ "+total()+" / "+(GAMES.length*3)}
+document.addEventListener("click",e=>{
+ const s=e.target.closest("[data-say]");if(s){say(s.dataset.say);return}
+ const a=e.target.closest("[data-act='home']");if(a)home();
+});
+const shake=el=>{el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")};
+
+function result(c){ // {id,title,st,lines,again,retry}
+ if(!c.noAward)award(c.id,c.st);
+ updPill();
+ if(c.st>=2)confetti();
+ const msg=["Weiter üben lohnt sich – du schaffst das!","Gut gemacht! Noch ein Durchgang und du bist sicher.","Sehr gut!","Fantastisch! Magnifique !"][c.st];
+ view(`${bar(c.title)}<div class="panel res"><div class="pipo" style="justify-content:center">${pipo()}</div><h2>${msg}</h2><div class="big-stars st" aria-label="${c.st} von 3 Sternen">${stars(c.st)}</div><p class="ask">${c.summary||""}</p>${c.lines&&c.lines.length?`<p class="de">Das üben wir nochmal:</p><ul>${c.lines.map(l=>`<li>${l}</li>`).join("")}</ul>`:""}<div class="row" style="justify-content:center"><button class="btn" id="again">Nochmal spielen</button>${c.retry?`<button class="btn alt" id="retry">Nur die Fehler wiederholen</button>`:""}<button class="btn alt" data-act="home">Zur Spielkarte</button></div></div>`);
+ $("#again").onclick=c.again;
+ if(c.retry)$("#retry").onclick=c.retry;
+}
+
+/* ---------- Quiz-Motor ---------- */
+function runQuiz(cfg){
+ const qs=cfg.qs;let i=0,score=0,locked=false;const wrong=[];
+ function ask(){
+  const q=qs[i];locked=false;
+  const opts=shuffle(q.opts.map((h,k)=>({h,ok:k===q.a})));
+  view(`${bar(cfg.title)}${cfg.header||""}<div class="panel"><div class="pcount">Frage ${i+1} von ${qs.length}</div><div class="prog"><span style="width:${i/qs.length*100}%"></span></div><div class="qbody" style="margin-top:14px">${q.q}</div><div class="opts ${q.cls||""}">${opts.map((o,k)=>`<button class="opt" type="button" data-k="${k}">${o.h}</button>`).join("")}</div><div class="fb" id="fb" aria-live="polite"></div></div>`);
+  $$(".opt").forEach(b=>b.onclick=()=>{
+   if(locked)return;locked=true;
+   const o=opts[+b.dataset.k];
+   $$(".opt").forEach((x,k)=>{x.disabled=true;if(opts[k].ok)x.classList.add("ok")});
+   let m;
+   if(o.ok){score++;m=`<div class="msg good">${pick(["Richtig!","Très bien !","Genau!","Super!","Bravo !"],1)[0]} ${q.why||""}</div>`}
+   else{b.classList.add("no");wrong.push(q);m=`<div class="msg bad">Fast! ${q.why||"Schau dir die richtige Antwort an."}</div>`}
+   if(q.say)say(q.say);
+   $("#fb").innerHTML=m+`<button class="btn" id="nx">${i+1<qs.length?"Weiter →":"Ergebnis ansehen"}</button>`;
+   $("#nx").onclick=()=>{i++;i<qs.length?ask():end()};
+   $("#nx").focus();
+  });
+ }
+ function end(){
+  const pct=Math.round(score/qs.length*100);
+  const st=pct>=90?3:pct>=70?2:pct>=40?1:0;
+  result({id:cfg.id,title:cfg.title,st,noAward:cfg.noAward,summary:`${score} von ${qs.length} richtig (${pct} %)`,lines:wrong.map(q=>q.why).filter(Boolean),again:cfg.again,
+   retry:wrong.length?()=>runQuiz({...cfg,qs:shuffle(wrong),noAward:true,title:cfg.title+" – Fehler"}):null});
+ }
+ ask();
+}
+
+/* ---------- Frage-Generatoren ---------- */
+const distract=(pool,item,n,key)=>pick(pool.filter(x=>key(x)!==key(item)),n);
+const qPlacePic=p=>({q:`<div class="qart">${art(p.id,"",false)}</div><p class="ask">Wie heißt dieser Ort auf Französisch?</p>`,opts:[p.fr,...distract(PLACES,p,3,x=>x.id).map(d=>d.fr)],a:0,say:p.fr,why:`${p.fr} = ${p.de}`});
+const qPlaceWord=p=>({q:`<p class="ask big">${p.fr} ${spk(p.fr)}</p><p class="ask">Welches Bild passt?</p>`,opts:[art(p.id,"",false),...distract(PLACES,p,3,x=>x.id).map(d=>art(d.id,"",false))],a:0,cls:"pic",say:p.fr,why:`${p.fr} = ${p.de}`});
+const qTrans=(it,dir)=>{const ds=distract(POOL,it,3,x=>x.fr);return dir==="fd"?
+ {q:`<p class="ask">Was heißt das auf Deutsch?</p><p class="ask big">${it.fr} ${spk(it.fr)}</p>`,opts:[it.de,...ds.map(d=>d.de)],a:0,why:`${it.fr} = ${it.de}`}:
+ {q:`<p class="ask">Wie sagt man das auf Französisch?</p><p class="ask big">${it.de}</p>`,opts:[it.fr,...ds.map(d=>d.fr)],a:0,say:it.fr,why:`${it.de} = ${it.fr}`}};
+const sp=a=>a==="l'"?"":" ";
+const qArticle=n=>({q:`<p class="ask">Welcher Artikel passt?</p><p class="ask big"><span class="gap">&nbsp;&nbsp;</span> ${n.noun} <span class="de">(${n.de})</span></p>`,opts:["le","la","l'","les"],a:["le","la","l'","les"].indexOf(n.art),say:n.art+sp(n.art)+n.noun,why:n.art==="l'"?`l'${n.noun} – vor Vokal oder stummem h wird aus le/la ein l'.`:`${n.art} ${n.noun} = ${n.de}`});
+const qPlural=n=>{const s=n.art+sp(n.art)+n.noun;const pl="les "+n.noun+"s";return {q:`<p class="ask">Mach die Mehrzahl!</p><p class="ask big">${s} → ?</p>`,opts:[pl,s+"s","les "+n.noun],a:0,say:pl,why:`${s} → ${pl} (les + s am Ende)`}};
+const qNumber=n=>{const pl=Math.random()<.5;const f=pl?"les "+n.noun+"s":n.art+sp(n.art)+n.noun;return {q:`<p class="ask">Singular oder Plural?</p><p class="ask big">${f}</p>`,opts:["Singular (einer)","Plural (mehrere)"],a:pl?1:0,say:f,why:`${f}: ${pl?"les und das -s zeigen die Mehrzahl.":"le / la / l' zeigen: nur einer."}`}};
+const WHO=["gabin","noe","idriss","lilirose","jeanne","cotelette"];
+const avs=ks=>`<div class="avs">${ks.map(k=>av(k)).join("")}</div>`;
+const CEST=[
+{w:["gabin"],n:"Gabin",a:"C'est"},{w:["jeanne","lilirose"],n:"Jeanne et Lili-Rose",a:"Ce sont"},{w:["idriss"],n:"Idriss",a:"C'est"},
+{w:["gabin","noe"],n:"Gabin et Noé",a:"Ce sont"},{w:["cotelette"],n:"Côtelette",a:"C'est"},{w:["noe","idriss"],n:"Noé et Idriss",a:"Ce sont"},
+{w:["lilirose"],n:"Lili-Rose",a:"C'est"},{w:["noe"],n:"Noé",a:"C'est"},{w:["jeanne","gabin","idriss"],n:"Jeanne, Gabin et Idriss",a:"Ce sont"},
+{w:["noe"],x:"🐢",n:"Noé (avec la tortue)",a:"C'est"},{w:["gabin","idriss"],x:"🐢🐢",n:"Gabin et Idriss (avec les tortues)",a:"Ce sont"}];
+const MON=[
+{w:["idriss"],s:"Idriss, c'est mon ___.",o:["ami","amie"],a:0},{w:["jeanne"],s:"Jeanne, c'est mon ___.",o:["ami","amie"],a:1},
+{w:["lilirose"],s:"Lili-Rose, c'est l'___ de Jeanne.",o:["ami","amie"],a:1},{w:["cotelette"],s:"Côtelette, c'est le ___ de Madame Ménard.",o:["chien","garçon","fille"],a:0},
+{w:["jeanne","lilirose"],s:"Ce sont les ___.",o:["filles","garçons"],a:0},{w:["gabin","noe"],s:"Ce sont les ___.",o:["filles","garçons"],a:1}];
+const qCest=c=>({q:`${avs(c.w)}${c.x?`<p class="ask" style="text-align:center;font-size:2rem">${c.x}</p>`:""}<p class="ask big">Qui est-ce ? – <span class="gap">&nbsp;&nbsp;&nbsp;</span> ${c.n}.</p>`,opts:["C'est","Ce sont"],a:c.a==="C'est"?0:1,say:c.a+" "+c.n.replace(/\(.*\)/,""),why:`${c.a} ${c.n} – ${c.a==="C'est"?"eine Person: c'est":"mehrere Personen: ce sont"}.`});
+const qMon=m=>({q:`${avs(m.w)}<p class="ask big">${m.s.replace("___",'<span class="gap">&nbsp;&nbsp;&nbsp;&nbsp;</span>')}</p>`,opts:m.o,a:m.a,why:m.s.replace("___",m.o[m.a])});
+const WHOQ=[
+["C'est l'amie de Gabin et de Lili-Rose.","jeanne"],["C'est l'ami de Gabin.","idriss"],["C'est la fille avec le chien.","lilirose"],["C'est le chien de Madame Ménard.","cotelette"],["C'est l'ami de Jeanne.","gabin"]];
+
+/* ---------- Spiele ---------- */
+function gCards(){
+ let set="places";
+ const items=()=>set==="places"?PLACES.map(p=>({k:"p"+p.id,f:art(p.id,"",false),b:`<b>${p.fr}</b><span>${p.de}</span>`,s:p.fr,t:0})):PHRASES.map((p,i)=>({k:"w"+i,f:p[0],b:`<b>${p[1]}</b>`,s:p[0],t:1}));
+ const all=PLACES.length+PHRASES.length;
+ const seen=()=>Object.keys(P.seen).length;
+ function draw(){
+  const it=items();
+  view(`${bar("Lernkarten")}<div class="panel"><div class="seg"><button class="${set==="places"?"on":""}" data-s="places">La ville (${PLACES.length})</button><button class="${set==="words"?"on":""}" data-s="words">Wörter & Sätze (${PHRASES.length})</button></div><p class="tip">Tippe eine Karte an, dann dreht sie sich um und du hörst das Wort. Schau dir <b>alle</b> Karten an, um 3 Sterne zu holen. Angeschaut: <b id="cnt">${seen()}</b> von ${all}.</p><div class="cards">${it.map(x=>`<button class="fcard ${x.t?"txt":""}${P.seen[x.k]?" flipped":""}" data-k="${x.k}" data-s="${x.s}"><div class="fin"><div class="ff front">${x.f}</div><div class="ff back">${x.b}</div></div></button>`).join("")}</div></div>`);
+  $$(".seg button").forEach(b=>b.onclick=()=>{set=b.dataset.s;draw()});
+  $$(".fcard").forEach(c=>c.onclick=()=>{
+   c.classList.toggle("flipped");
+   if(c.classList.contains("flipped")){say(c.dataset.s);P.seen[c.dataset.k]=1;save();$("#cnt").textContent=seen();
+    const r=seen()/all;award("cards",r>=1?3:r>=.7?2:r>=.3?1:0);updPill();if(r>=1)confetti()}
+  });
+ }
+ draw();
+}
+function gPic(){
+ const qs=shuffle(PLACES).map((p,i)=>i%2?qPlaceWord(p):qPlacePic(p));
+ runQuiz({id:"pic",title:"Wo ist was ?",qs,again:gPic});
+}
+function gSyl(){
+ const words=shuffle(PLACES.filter(p=>p.syl));let wi=0,mist=0;
+ function word(){
+  const p=words[wi];const built=[];const chips=shuffle(p.syl.map((s,k)=>({s,k})));
+  view(`${bar("Silben-Puzzle")}<div class="panel"><div class="pcount">Wort ${wi+1} von ${words.length}</div><div class="prog"><span style="width:${wi/words.length*100}%"></span></div><div class="qart" style="margin-top:14px">${art(p.id,"",false)}</div><p class="ask">Setze das Wort aus den Silben zusammen. <span class="de">(${p.de})</span></p><div class="slots" id="slots">${p.syl.map(()=>`<div class="slot"></div>`).join("")}</div><div class="chips">${chips.map((c,j)=>`<button class="chip c${c.k}" type="button" data-j="${j}">${c.s}</button>`).join("")}</div><div class="fb" id="fb" aria-live="polite"></div></div>`);
+  $$(".chip").forEach(b=>b.onclick=()=>{
+   const c=chips[+b.dataset.j];
+   if(c.s===p.syl[built.length]){
+    b.disabled=true;const sl=$$(".slot")[built.length];sl.textContent=c.s;sl.classList.add("f");sl.style.background=getComputedStyle(b).backgroundColor;sl.style.color="#1B2A4A";built.push(c.s);
+    if(built.length===p.syl.length){say(p.fr);$("#fb").innerHTML=`<div class="msg good">✔ ${p.fr} ${spk(p.fr)}</div><button class="btn" id="nx">${wi+1<words.length?"Nächstes Wort →":"Weiter →"}</button>`;$("#nx").onclick=()=>{wi++;wi<words.length?word():missing()};$("#nx").focus()}
+   }else{mist++;shake(b)}
+  });
+ }
+ function missing(){
+  const sel=new Set();const miss=PLACES.filter(p=>!p.syl).map(p=>p.id).sort();
+  view(`${bar("Silben-Puzzle")}<div class="panel"><p class="ask">Welche Wörter vom Stadtbild kamen im Puzzle <u>nicht</u> vor?</p><p class="de">Wähle alle ${miss.length} fehlenden Wörter aus.</p><div class="opts" id="o" style="margin-top:12px">${PLACES.map(p=>`<button class="opt" type="button" data-id="${p.id}">${p.fr}</button>`).join("")}</div><div class="fb" id="fb" aria-live="polite"></div><div class="row"><button class="btn" id="ck">Prüfen</button></div></div>`);
+  $$(".opt").forEach(b=>b.onclick=()=>{const id=b.dataset.id;if(sel.has(id)){sel.delete(id);b.style.outline=""}else{sel.add(id);b.style.outline="3px solid var(--blue)"}});
+  $("#ck").onclick=()=>{
+   const s=[...sel].sort();
+   if(s.join()===miss.join()){const st=mist<=3?3:mist<=8?2:1;result({id:"syl",title:"Silben-Puzzle",st,summary:`Fehlende Wörter: ${miss.map(i=>PL[i].fr).join(", ")} – ${mist} Fehlversuche.`,again:gSyl})}
+   else{mist++;$("#fb").innerHTML=`<div class="msg bad">Noch nicht ganz. Tipp: Es sind genau ${miss.length} Wörter, die nicht in Stücke zerlegt waren.</div>`}
+  };
+ }
+ word();
+}
+function gMap(){
+ const sit=shuffle(SIT);let i=0,mist=0;
+ function next(){
+  const [txt,id]=sit[i];const p=PL[id];
+  view(`${bar("Pardon, où est … ?")}<div class="panel"><div class="pcount">Situation ${i+1} von ${sit.length}</div><div class="prog"><span style="width:${i/sit.length*100}%"></span></div><p class="sit" style="margin-top:14px">${txt}</p><p class="de">Wohin musst du? Tippe auf den passenden Ort in der Stadt.</p><div class="city">${PLACES.map(q=>`<button class="bld" type="button" data-id="${q.id}"><span class="num">${q.n}</span>${art(q.id,"",false)}</button>`).join("")}</div><div class="fb" id="fb" aria-live="polite"></div></div>`);
+  $$(".bld").forEach(b=>b.onclick=()=>{
+   if(b.dataset.id!==id){mist++;shake(b);$("#fb").innerHTML=`<div class="msg bad">Hmm, das passt nicht. Versuch einen anderen Ort!</div>`;return}
+   $$(".bld").forEach(x=>x.disabled=true);b.classList.add("ok");
+   const l1=`Pardon Monsieur, où est ${p.fr} ?`,l2=`${cap(p.fr)} ? C'est là.`,l3="Merci !";
+   say(l1+" "+l2+" "+l3);
+   $("#fb").innerHTML=`<div class="say-box"><span>– ${l1}</span><span>– ${l2}</span><span>– ${l3}</span><span>${spk(l1+" "+l2+" "+l3)}</span></div><div class="row"><button class="btn" id="nx">${i+1<sit.length?"Weiter →":"Fertig"}</button></div>`;
+   $("#nx").onclick=()=>{i++;i<sit.length?next():result({id:"map",title:"Pardon, où est … ?",st:mist<=3?3:mist<=8?2:1,summary:`Alle 12 Orte gefunden, ${mist} Fehlversuche.`,again:gMap})};
+  });
+ }
+ next();
+}
+function gWho(){
+ const header=`<div class="panel" style="margin-bottom:14px"><p class="de" style="margin:0 0 6px">Die Personen aus Volet 1:</p><div class="avs" style="margin:0">${WHO.map(k=>`<div style="text-align:center;font-size:.85rem;font-weight:800;font-size:.85rem">${av(k)}${NAME[k]}</div>`).join("")}</div></div>`;
+ const qs=WHOQ.map(([s,k])=>({q:`<p class="ask big">${s}</p><p class="ask">Wer ist das?</p>`,opts:[av(k)+NAME[k],...pick(WHO.filter(x=>x!==k),3).map(x=>av(x)+NAME[x])],a:0,say:s,why:`${s} → ${NAME[k]}`}));
+ qs.push({q:`<p class="ask">Die Sätze 1–5 beschreiben fünf der sechs Figuren. Wer fehlt?</p>`,opts:[av("noe")+"Noé",av("gabin")+"Gabin",av("jeanne")+"Jeanne",av("cotelette")+"Côtelette"],a:0,why:"Noé fehlt. Satz 6 könnte lauten: « C'est Noé. Il habite ici depuis samedi. »",say:"C'est Noé. Il habite ici depuis samedi."});
+ runQuiz({id:"who",title:"Qui est-ce ?",qs,header,again:gWho});
+}
+
+function gMemory(){
+ function start(){
+  view(`${bar("Memory")}<div class="panel"><p class="ask">Finde die Paare: Französisch ↔ Deutsch.</p><p class="tip">Blaue Karten sind Französisch, gelbe Deutsch. Mit 3 Sternen belohnt wird, wer wenig daneben tippt.</p><div class="row"><button class="btn" data-m="places">La ville (${PLACES.length} Paare)</button><button class="btn" data-m="words">Wörter & Sätze (${PHRASES.length} Paare)</button></div></div>`);
+  $$("[data-m]").forEach(b=>b.onclick=()=>play(b.dataset.m));
+ }
+ function play(mode){
+  const src=mode==="places"?PLACES.map(p=>({fr:p.fr,de:p.de})):PHRASES.map(p=>({fr:p[0],de:p[1]}));
+  const sh=shuffle(src);const rounds=[];for(let i=0;i<sh.length;i+=6)rounds.push(sh.slice(i,i+6));
+  let r=0,mist=0;
+  function round(){
+   const pairs=rounds[r];
+   const cards=shuffle(pairs.flatMap((p,i)=>[{id:i,t:p.fr,l:"fr"},{id:i,t:p.de,l:"de"}]));
+   let first=null,lock=false,done=0;
+   view(`${bar("Memory")}<div class="panel"><div class="pcount">Runde ${r+1} von ${rounds.length}</div><div class="prog"><span style="width:${r/rounds.length*100}%"></span></div><div class="mgrid" style="margin-top:14px">${cards.map((c,k)=>`<button class="mc ${c.l}" type="button" data-k="${k}" aria-label="Karte ${k+1}">${c.t}</button>`).join("")}</div><div class="fb" id="fb" aria-live="polite"></div></div>`);
+   const els=$$(".mc");
+   els.forEach((el,k)=>el.onclick=()=>{
+    if(lock||el.classList.contains("up")||el.classList.contains("done"))return;
+    el.classList.add("up");const c=cards[k];if(c.l==="fr")say(c.t);
+    if(!first){first={el,c};return}
+    const a=first;first=null;
+    if(a.c.id===c.id&&a.c.l!==c.l){a.el.classList.replace("up","done");el.classList.replace("up","done");done++;
+     if(done===pairs.length){$("#fb").innerHTML=`<div class="msg good">Alle Paare gefunden!</div><button class="btn" id="nx">${r+1<rounds.length?"Nächste Runde →":"Ergebnis ansehen"}</button>`;$("#nx").onclick=()=>{r++;r<rounds.length?round():fin()}}}
+    else{mist++;lock=true;setTimeout(()=>{a.el.classList.remove("up");el.classList.remove("up");lock=false},900)}
+   });
+  }
+  function fin(){const avg=mist/rounds.length;let st=avg<=5?3:avg<=8?2:1;if(mode==="places")st=Math.min(st,1);
+   result({id:"memory",title:"Memory",st,summary:`${mist} Fehlversuche in ${rounds.length} Runden.`+(mode==="places"?" Für mehr Sterne spiele „Wörter & Sätze“.":""),again:gMemory})}
+  round();
+ }
+ start();
+}
+function gTrans(){
+ function start(){
+  view(`${bar("Übersetzer-Duell")}<div class="panel"><p class="ask">Französisch → Deutsch und Deutsch → Französisch.</p><p class="tip">Im großen Test kommen <b>alle ${POOL.length} Vokabeln</b> der Lektion dran.</p><div class="row"><button class="btn" data-m="q">Schnelle Runde (12)</button><button class="btn" data-m="all">Großer Test (alle ${POOL.length})</button></div></div>`);
+  $$("[data-m]").forEach(b=>b.onclick=()=>go(b.dataset.m));
+ }
+ function go(m){
+  const items=m==="all"?shuffle(POOL):pick(POOL,12);
+  const qs=items.map(it=>qTrans(it,Math.random()<.5?"fd":"df"));
+  runQuiz({id:"trans",title:"Übersetzer-Duell",qs,again:start});
+ }
+ start();
+}
+function gDlg(){
+ let mist=0;
+ const order=shuffle(DLG.map((d,i)=>({who:d[0],t:d[1],i})));
+ let nx=0;
+ function draw(){
+  const built=DLG.slice(0,nx);
+  view(`${bar("Dialog-Baukasten")}<div class="panel"><p class="ask">Gabin trifft Noé. Bringe das Gespräch in die richtige Reihenfolge.</p><p class="de">Tippe immer die Zeile an, die als Nächstes gesagt wird.</p><div class="chat">${built.map(d=>`<div class="msg-b ${d[0]==="Noé"?"r":"l"}"><small>${d[0]}</small>${d[1]}</div>`).join("")}</div><div class="opts" id="o">${order.filter(o=>o.i>=nx).map(o=>`<button class="opt" type="button" data-i="${o.i}"><small class="de">${o.who}</small>${o.t}</button>`).join("")}</div><div class="fb" id="fb" aria-live="polite"></div></div>`);
+  $$("#o .opt").forEach(b=>b.onclick=()=>{
+   if(+b.dataset.i===nx){say(DLG[nx][1]);nx++;if(nx===DLG.length)fin();else draw()}
+   else{mist++;shake(b)}
+  });
+ }
+ function fin(){
+  const st=mist<=2?3:mist<=5?2:1;award("dlg",st);updPill();confetti();
+  view(`${bar("Dialog-Baukasten")}<div class="panel"><div class="chat">${DLG.map(d=>`<div class="msg-b ${d[0]==="Noé"?"r":"l"}"><small>${d[0]}</small>${d[1]}</div>`).join("")}</div><div class="row">${spk(DLG.map(d=>d[1]).join(" "))}<span class="de" style="align-self:center">Ganzen Dialog anhören</span></div><p class="big-stars st">${stars(st)}</p><p class="tip">Mini-tâche: Schreibe jetzt einen eigenen Dialog. Zwei Kinder treffen sich auf dem Schulhof, fragen nach dem Namen, ein drittes Kind kommt dazu, am Ende fragt ihr „Ça va ?“. Spielt ihn mit jemandem vor!</p><div class="row"><button class="btn" id="again">Nochmal</button><button class="btn alt" data-act="home">Zur Spielkarte</button></div></div>`);
+  $("#again").onclick=gDlg;
+ }
+ draw();
+}
+const ARTICLE_TIP=`<div class="tip"><b>Merke:</b> le = männlich, la = weiblich, l' vor Vokal oder stummem h, les = Mehrzahl. Aussprache: <i>le</i> klingt wie „lö“, <i>les</i> wie „lee“.</div>`;
+function gArt(){runQuiz({id:"art",title:"le, la, l' ou les ?",qs:pick(NOUNS,14).map(qArticle),header:ARTICLE_TIP,again:gArt})}
+function gPlu(){
+ const ns=pick(NOUNS,12);
+ const qs=ns.map((n,i)=>i%3===2?qNumber(n):qPlural(n));
+ runQuiz({id:"plu",title:"Ein oder mehrere ?",qs,header:`<div class="tip"><b>Merke:</b> Aus <i>le / la / l'</i> wird <i>les</i>, und hinten kommt meist ein <b>-s</b> dazu (gesprochen wird es nicht!). Beispiel: la fille → les filles.</div>`,again:gPlu});
+}
+function gCest(){
+ const qs=shuffle(pick(CEST,9).map(qCest).concat(pick(MON,4).map(qMon)));
+ runQuiz({id:"cest",title:"C'est ou ce sont ?",qs,header:`<div class="tip"><b>Merke:</b> Eine Person oder ein Ding: <i>c'est</i>. Mehrere: <i>ce sont</i>.</div>`,again:gCest});
+}
+function gFinal(){
+ const q=[];
+ pick(PLACES,5).forEach((p,i)=>q.push(i%2?qPlaceWord(p):qPlacePic(p)));
+ pick(POOL,6).forEach((it,i)=>q.push(qTrans(it,i%2?"fd":"df")));
+ pick(NOUNS,3).forEach(n=>q.push(qArticle(n)));
+ pick(NOUNS,2).forEach(n=>q.push(qPlural(n)));
+ pick(NOUNS,1).forEach(n=>q.push(qNumber(n)));
+ pick(CEST,2).forEach(c=>q.push(qCest(c)));
+ pick(MON,1).forEach(m=>q.push(qMon(m)));
+ runQuiz({id:"final",title:"Le grand défi",qs:shuffle(q),again:gFinal});
+}
+
+/* ---------- Startseite ---------- */
+const GAMES=[
+{id:"cards",g:0,t:"Lernkarten",s:"Alle Wörter ansehen und anhören",ic:()=>art("cafe","",false),go:gCards},
+{id:"pic",g:0,t:"Wo ist was ?",s:"Bild und Wort zuordnen",ic:()=>art("musee","",false),go:gPic},
+{id:"syl",g:0,t:"Silben-Puzzle",s:"Aufgabe 3 · Wörter bauen",ic:()=>art("cinema","",false),go:gSyl},
+{id:"map",g:0,t:"Pardon, où est … ?",s:"Aufgabe 4 · Nach dem Weg fragen",ic:()=>art("metro","",false),go:gMap},
+{id:"who",g:1,t:"Qui est-ce ?",s:"Aufgabe 2 · Wer ist wer?",ic:()=>av("gabin"),go:gWho},
+{id:"memory",g:1,t:"Memory",s:"Französisch trifft Deutsch",ic:()=>art("theatre","",false),go:gMemory},
+{id:"trans",g:1,t:"Übersetzer-Duell",s:"Alle Vokabeln abgefragt",ic:()=>art("hotel","",false),go:gTrans},
+{id:"dlg",g:1,t:"Dialog-Baukasten",s:"Mini-tâche · Gespräch ordnen",ic:()=>pipo(),go:gDlg},
+{id:"art",g:2,t:"le, la, l' ou les ?",s:"Artikel trainieren",ic:()=>art("resto","",false),go:gArt},
+{id:"plu",g:2,t:"Ein oder mehrere ?",s:"Singular und Plural",ic:()=>art("college","",false),go:gPlu},
+{id:"cest",g:2,t:"C'est ou ce sont ?",s:"Personen vorstellen",ic:()=>av("jeanne"),go:gCest},
+{id:"final",g:3,t:"Le grand défi",s:"20 Fragen aus allem",ic:()=>art("tour","",false),go:gFinal}
+];
+const GROUPS=[["Vocabulaire","La ville"],["Volet 1","Les amis de Gabin"],["Grammaire","Artikel und c'est / ce sont"],["Défi","Zeig, was du kannst"]];
+function home(){
+ try{speechSynthesis.cancel()}catch(e){}
+ const sky=`<svg class="sky" viewBox="0 0 1440 140" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><circle cx="1280" cy="38" r="22" fill="#FFC93C"/><ellipse cx="260" cy="30" rx="46" ry="12" fill="#fff" opacity=".8"/><ellipse cx="760" cy="20" rx="56" ry="13" fill="#fff" opacity=".7"/><rect x="0" y="126" width="1440" height="14" fill="#6E7FA3"/>${PLACES.map((p,i)=>`<g transform="translate(${i*120},0)"><g stroke="${INK}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">${ART[p.id]()}</g></g>`).join("")}</svg>`;
+ view(`<div class="hero"><div class="hero-row"><div><h1>Bienvenue<br>à <span>Paris</span> !</h1><p>Unité 1 · Vocabulaire und Volet 1. Zwölf Spiele, in denen alle Vokabeln drankommen.</p></div><div class="pipo">${pipo()}<div class="bubble">Salut Lisa ! Sammle ★ in jedem Spiel.</div></div></div>${sky}</div>`+
+ GROUPS.map((g,gi)=>`<div class="grp"><span class="tag">${g[0]}</span><h2>${g[1]}</h2></div><div class="tiles">${GAMES.filter(x=>x.g===gi).map(x=>`<button class="tile" type="button" data-id="${x.id}"><div class="ic">${x.ic()}</div><h3>${x.t}</h3><small>${x.s}</small><div class="st" aria-label="${P.stars[x.id]||0} von 3 Sternen">${stars(P.stars[x.id]||0)}</div></button>`).join("")}</div>`).join("")+
+ `<details><summary>Alle Vokabeln auf einen Blick (${POOL.length})</summary><div class="vl">${PLACES.concat([]).map(p=>`<div><b>${p.fr}</b><span>${p.de}</span></div>`).join("")}${PHRASES.map(p=>`<div><b>${p[0]}</b><span>${p[1]}</span></div>`).join("")}</div></details>`);
+ $$(".tile").forEach(t=>t.onclick=()=>GAMES.find(g=>g.id===t.dataset.id).go());
+ updPill();
+}
+function boot(){document.body.insertAdjacentHTML("afterbegin",`<div class="wrap"><div class="top"><div class="logo">Paris <b>zum Spielen</b></div><div class="pill" id="pill"></div></div><main id="app"></main></div>`);home()}
+if(document.body)boot();else document.addEventListener("DOMContentLoaded",boot);
+})();
+</script>
