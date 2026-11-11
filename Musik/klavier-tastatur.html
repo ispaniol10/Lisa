@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Das Klavier – Tasten entdecken</title>
+<style>
+  :root{
+    --bg:#16213e; --card:#1f2d52; --gold:#f5c542; --text:#f3f0e6;
+    --g2:#4fc3f7; --g3:#ff8a65; --ok:#66bb6a; --bad:#ef5350;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);
+       min-height:100vh;padding:16px;-webkit-user-select:none;user-select:none}
+  h1{margin:0 0 4px;font-size:1.7rem;color:var(--gold)}
+  .sub{margin:0 0 14px;opacity:.8}
+  .card{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+  .controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+  label.chk{display:flex;gap:6px;align-items:center;cursor:pointer}
+  button{font:inherit;background:var(--gold);color:#1a1a1a;border:0;border-radius:8px;padding:7px 13px;cursor:pointer;font-weight:600}
+  button.sec{background:#38497a;color:var(--text)}
+  button:active{transform:scale(.97)}
+  .status{margin-top:10px;min-height:1.6em;font-size:1.1rem}
+  .status b{color:var(--gold)}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+
+  .wrap{overflow-x:auto;padding-bottom:6px}
+  .piano{position:relative;height:260px;min-width:760px;display:flex;border-radius:0 0 10px 10px;
+         background:#000;padding:0 2px 2px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .white{flex:1;position:relative;background:linear-gradient(#fff,#e9e6dc);border:1px solid #888;
+         border-top:none;border-radius:0 0 7px 7px;margin:0 1px;display:flex;flex-direction:column;
+         justify-content:flex-end;align-items:center;padding-bottom:8px;touch-action:none;transition:background .05s}
+  .white.on{background:linear-gradient(#ffe48a,#f1c24a)}
+  .white.hint{background:linear-gradient(#c8f7c5,#7ee07a);animation:pulse .9s infinite}
+  .white.cmark::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--bad);position:absolute;bottom:62px}
+  .black{position:absolute;top:0;height:60%;background:linear-gradient(#444,#000);border:1px solid #000;
+         border-radius:0 0 6px 6px;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;
+         align-items:center;padding-bottom:6px;touch-action:none;transition:background .05s}
+  .black.on{background:linear-gradient(#e0a800,#8a6a00)}
+  .black.hint{background:linear-gradient(#3fa83a,#1d6b1a);animation:pulse .9s infinite}
+  .black.g2{border-bottom:5px solid var(--g2)} .black.g3{border-bottom:5px solid var(--g3)}
+  .nm{font-size:.95rem;font-weight:700;color:#222;pointer-events:none}
+  .black .nm{color:#ddd;font-size:.62rem;text-align:center;line-height:1.1}
+  .kb{font-size:.7rem;opacity:.55;color:#222;pointer-events:none;margin-top:2px}
+  .black .kb{color:#fff}
+  .hidden{display:none!important}
+  .notes{margin-top:10px}
+  .nrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+  .chip{min-width:34px;text-align:center;padding:5px 8px;border-radius:8px;background:#38497a;font-weight:700}
+  .chip.done{background:var(--ok);color:#102010;opacity:.75}
+  .chip.cur{background:var(--gold);color:#1a1a1a;transform:scale(1.15);box-shadow:0 0 0 3px rgba(245,197,66,.4)}
+  .lyr{margin-left:8px;opacity:.75;font-style:italic}
+
+  /* Übungen */
+  .white.found{background:linear-gradient(#a5e8a0,#5cc65a)}
+  .black.found{background:linear-gradient(#3fa83a,#1d6b1a)}
+  .ask{outline:5px solid var(--g2);outline-offset:-6px;animation:pulse .9s infinite}
+  .mark{outline:5px solid var(--gold);outline-offset:-6px}
+  #answers{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  button.ans{background:#f3f0e6;color:#1a1a1a;min-width:64px;font-size:1.05rem}
+  #exList{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .stars{font-weight:700;color:var(--gold);margin-left:auto;font-size:1.1rem}
+
+  /* Lernpfad */
+  .step{border-left:6px solid var(--gold);padding:6px 0 6px 14px;margin:18px 0}
+  .step h3{margin:0 0 4px;color:var(--gold);font-size:1.3rem}
+  .step p{margin:6px 0;line-height:1.65;font-size:1.05rem}
+  .step .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .z{color:var(--g2);font-weight:700} .d{color:var(--g3);font-weight:700} .y{color:var(--gold);font-weight:700}
+  .small{font-size:.9rem;opacity:.8}
+  .mini{position:relative;height:110px;max-width:440px;margin:10px 0;background:#000;border-radius:0 0 8px 8px}
+  .mw{position:absolute;top:0;bottom:0;background:#fff;border:1px solid #777;border-top:none;border-radius:0 0 5px 5px;
+      box-sizing:border-box;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;
+      color:#222;font-weight:700;font-size:.85rem}
+  .mw.m{background:#ffe48a}
+  .mb{position:absolute;top:0;height:60%;background:#111;border-radius:0 0 4px 4px;z-index:2;color:#eee;
+      display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px;font-size:.6rem;font-weight:700;
+      text-align:center;line-height:1.1;box-sizing:border-box}
+  .mb.g2{border-bottom:5px solid var(--g2)} .mb.g3{border-bottom:5px solid var(--g3)}
+  .mb.m{background:#c99a00}
+  .rules{display:grid;gap:10px;margin:12px 0}
+  .rule{background:#26396b;border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:34px 1fr;gap:2px 10px}
+  .rule .rn{grid-row:span 3;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#1a1a1a;
+            font-weight:800;display:flex;align-items:center;justify-content:center}
+  .rule .rt{line-height:1.5;font-size:1.05rem}
+  .rule .mini{max-width:330px;height:96px;margin:6px 0 2px}
+  .gt{color:#8be08e;font-weight:800} .ht{color:var(--g3);font-weight:800} .kt{color:var(--g2);font-weight:800}
+  .strip{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:10px 0}
+  .strip .k{background:#f3f0e6;color:#1a1a1a;border-radius:6px;padding:4px 9px;font-weight:700}
+  .strip .s{font-size:.9rem;font-weight:800;padding:2px 8px;border-radius:10px}
+  .strip .s.g{background:var(--ok);color:#102010} .strip .s.h{background:var(--g3);color:#1a1a1a}
+  @keyframes pulse{50%{filter:brightness(1.15)}}
+
+  .legend{display:none;gap:16px;flex-wrap:wrap;margin-top:10px}
+  .legend.show{display:flex}
+  .dot{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:5px}
+  .tip{margin-top:8px;opacity:.9;line-height:1.5}
+  footer{opacity:.55;font-size:.8rem;margin-top:8px}
+</style>
+</head>
+<body>
+<h1>🎹 Das Klavier – Tasten entdecken</h1>
+<p class="sub">Klicke oder tippe auf die Tasten – oder spiele mit der Computer-Tastatur (Buchstaben stehen auf den Tasten).</p>
+
+<div class="card">
+  <div class="controls">
+    <label class="chk"><input type="checkbox" id="optNames" checked> Notennamen zeigen</label>
+    <label class="chk"><input type="checkbox" id="optPattern"> Muster-Hilfe (2er- &amp; 3er-Gruppen)</label>
+    <label class="chk"><input type="checkbox" id="optKeys" checked> Computer-Tasten zeigen</label>
+    <label class="chk">Klang:
+      <select id="optSound">
+        <option value="piano">Klavier</option>
+        <option value="organ">Orgel</option>
+        <option value="synth">Synthesizer</option>
+        <option value="bell">Glocke</option>
+      </select>
+    </label>
+    <span>Oktave: <button class="sec" id="oct-" type="button">−</button>
+      <b id="octLabel">0</b>
+      <button class="sec" id="oct+" type="button">+</button></span>
+  </div>
+  <div class="legend" id="legend">
+    <span><span class="dot" style="background:var(--g2)"></span>2er-Gruppe schwarzer Tasten</span>
+    <span><span class="dot" style="background:var(--g3)"></span>3er-Gruppe schwarzer Tasten</span>
+    <span><span class="dot" style="background:var(--bad);border-radius:50%"></span>C = links vor der 2er-Gruppe</span>
+  </div>
+  <div class="tip" id="tip"></div>
+</div>
+
+<div class="card" id="exCard">
+  <div class="controls">
+    <button id="btnQuiz" type="button">🎯 Finde die Taste</button>
+    <button id="btnSong" type="button">🎵 Alle meine Entchen</button>
+    <button id="btnTwinkle" type="button">⭐ Twinkle, Twinkle, Little Star</button>
+    <button id="btnStop" class="sec" type="button">Stopp</button>
+    <button id="btnTip" class="sec" type="button">💡 Tipp</button>
+    <span class="stars" id="stars">⭐ 0</span>
+  </div>
+  <div style="margin-top:12px"><b>Übungen zur Tastenanordnung:</b><div id="exList"></div></div>
+  <div class="status" id="status">Wähle oben eine Übung – oder spiel einfach drauflos!</div>
+  <div id="answers"></div>
+  <div class="notes" id="notes"></div>
+</div>
+
+<div class="wrap"><div class="piano" id="piano"></div></div>
+
+<div class="card" style="margin-top:14px">
+  <h2 style="margin:0;color:var(--gold)">📖 Dein Lernpfad: So findest du dich auf dem Klavier zurecht</h2>
+  <p class="small">Lies die Schritte der Reihe nach. Bei jedem Schritt kannst du direkt eine Übung starten – die Übung erscheint dann oben, direkt über dem Klavier.</p>
+
+  <div class="step">
+    <h3>① Weiße und schwarze Tasten</h3>
+    <p>Ein Klavier hat zwei Sorten von Tasten: <b>weiße</b> und <b>schwarze</b>. Die weißen sind breit und liegen vorne. Die schwarzen sind schmaler und liegen etwas höher und weiter hinten.</p>
+    <p>Wichtig: Wenn du auf dem Klavier von <b>links nach rechts</b> gehst, werden die Töne immer <b>höher</b>. Ganz links klingt es tief wie ein brummender Bär, ganz rechts hoch wie ein kleiner Vogel.</p>
+    <div class="btns"><button data-ex="black" type="button">▶ Übung: Tippe alle schwarzen Tasten an</button></div>
+  </div>
+
+  <div class="step">
+    <h3>② Zwillinge und Drillinge</h3>
+    <p>Die schwarzen Tasten stehen nicht einzeln da, sondern in Gruppen. Erst kommen <b>zwei</b> nebeneinander – das sind die <span class="z">Zwillinge</span> (blau). Dann kommen <b>drei</b> nebeneinander – das sind die <span class="d">Drillinge</span> (orange).</p>
+    <p>Danach geht es wieder von vorn los: Zwillinge, Drillinge, Zwillinge, Drillinge … Dieses Muster ist wie eine Hausnummer: Es verrät dir immer, wo du gerade bist.</p>
+    <div data-mini='{"groups":true}'></div>
+    <div class="btns">
+      <button data-ex="twins" type="button">▶ Übung: Alle Zwillinge finden</button>
+      <button data-ex="triplets" type="button">▶ Übung: Alle Drillinge finden</button>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>③ Das C und das F finden</h3>
+    <p>Jetzt bekommen die weißen Tasten ihre Namen. Es gibt sieben davon: <b>C D E F G A H</b>. (Ja, es fängt mit C an und nicht mit A – das haben sich die Musiker früher so ausgedacht.)</p>
+    <p>Zwei Merksätze helfen dir sofort:<br>
+      👉 <b>C wohnt links vom Zwillingspaar.</b><br>
+      👉 <b>F wohnt links vom Drillingstrio.</b></p>
+    <p class="small">Im Bild unten sind C und F gelb markiert.</p>
+    <div data-mini='{"groups":true,"names":true,"mark":[0,5]}'></div>
+    <div class="btns">
+      <button data-ex="allC" type="button">▶ Übung: Alle C finden</button>
+      <button data-ex="allF" type="button">▶ Übung: Alle F finden</button>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>④ Alle Tastennamen</h3>
+    <p>Von C aus nach rechts heißen die weißen Tasten: <b>C – D – E – F – G – A – H</b>. Nach dem H fängt alles wieder bei C an. Von einem C bis zum nächsten C sind es 8 Töne. Das nennt man eine <b>Oktave</b> (<i>okto</i> = acht).</p>
+    <p>So findest du die Namen mit Hilfe der schwarzen Tasten:<br>
+      • <b>D</b> sitzt genau zwischen den beiden Zwillingen.<br>
+      • <b>G</b> sitzt zwischen der 1. und 2. Taste der Drillinge.<br>
+      • <b>A</b> sitzt zwischen der 2. und 3. Taste der Drillinge.</p>
+    <div data-mini='{"groups":true,"names":true}'></div>
+    <div class="btns">
+      <button data-ex="name" type="button">▶ Übung: Wie heißt die Taste?</button>
+      <button data-ex="near" type="button">▶ Übung: Davor &amp; danach</button>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>⑤ Wo ist keine schwarze Taste?</h3>
+    <p>Zwischen fast allen weißen Tasten steckt eine schwarze. Aber nicht überall! <b>Zwischen E und F</b> und <b>zwischen H und C</b> liegen zwei weiße Tasten direkt nebeneinander – ohne schwarze dazwischen. Im Bild sind diese Stellen gelb markiert.</p>
+    <p>Du erkennst sie am Muster: Die Lücke liegt immer genau hinter den Zwillingen (E–F) und hinter den Drillingen (H–C).</p>
+    <div data-mini='{"groups":true,"names":true,"mark":[4,5,11,12]}'></div>
+    <div class="btns"><button data-ex="count" type="button">▶ Übung: Schwarze Tasten zählen</button></div>
+  </div>
+
+  <div class="step">
+    <h3>⑥ Schwarze Tasten haben zwei Namen</h3>
+    <p>Eine schwarze Taste hat keinen eigenen Buchstaben. Sie wird nach ihrer weißen Nachbartaste benannt:</p>
+    <p>• Die schwarze Taste <b>rechts</b> neben C ist ein bisschen <b>höher</b>. Sie heißt <b>Cis</b> (<i>-is</i> = höher, Zeichen ♯).<br>
+       • Die schwarze Taste <b>links</b> neben D ist ein bisschen <b>tiefer</b>. Sie heißt <b>Des</b> (<i>-es</i> = tiefer, Zeichen ♭).</p>
+    <p>Das ist <b>dieselbe Taste</b> mit zwei Namen – so wie Ben zu Hause „Ben“ und in der Schule „Benjamin“ heißt.</p>
+    <p class="small">Kleine Ausnahmen, die Musiker so festgelegt haben: Es heißt Es und As (nicht „Ees“ und „Aes“) und die Taste links vom H heißt B.</p>
+    <div data-mini='{"names":true,"blackNames":true}'></div>
+    <div class="btns"><button data-ex="nameBlack" type="button">▶ Übung: Schwarze Tasten benennen</button></div>
+  </div>
+
+  <div class="step">
+    <h3>⑦ Wie weit ist es von Taste zu Taste? Die 6 Regeln</h3>
+    <p>Musiker messen den Abstand zwischen zwei Tönen in <b>Halbtönen</b> und <b>Ganztönen</b> (man sagt auch: halber und ganzer Tonschritt).</p>
+    <p>👉 <span class="ht">Halbton (½)</span> = der kleinste Schritt auf dem Klavier: von einer Taste zur <b>direkt nächsten Taste</b> – egal ob weiß oder schwarz.<br>
+       👉 <span class="gt">Ganzton (1)</span> = <b>zwei Halbtöne</b>. Du überspringst dabei genau eine Taste.</p>
+    <p class="small">Stell dir eine Treppe vor: Jede Taste ist eine Stufe. Eine Stufe = Halbton, zwei Stufen = Ganzton. In den Bildern sind die beiden Tasten gelb markiert, zwischen denen gemessen wird (immer von links nach rechts).</p>
+
+    <div class="rules">
+      <div class="rule"><div class="rn">1</div>
+        <div class="rt"><b>Weiß → weiß, mit einer schwarzen Taste dazwischen</b> = <span class="gt">Ganzton (1)</span><br>
+          <span class="small">Beispiele: C–D, D–E, F–G, G–A, A–H</span></div>
+        <div data-mini='{"groups":true,"names":true,"blackNames":true,"mark":[0,2]}'></div></div>
+      <div class="rule"><div class="rn">2</div>
+        <div class="rt"><b>Weiß → weiß, ohne schwarze Taste dazwischen</b> = <span class="ht">Halbton (½)</span><br>
+          <span class="small">Das gibt es nur an zwei Stellen: E–F und H–C</span></div>
+        <div data-mini='{"groups":true,"names":true,"blackNames":true,"mark":[4,5]}'></div></div>
+      <div class="rule"><div class="rn">3</div>
+        <div class="rt"><b>Weiß → schwarz, direkt daneben</b> = <span class="ht">Halbton (½)</span><br>
+          <span class="small">Beispiele: C–Cis, F–Fis, A–Ais</span></div>
+        <div data-mini='{"groups":true,"names":true,"blackNames":true,"mark":[5,6]}'></div></div>
+      <div class="rule"><div class="rn">4</div>
+        <div class="rt"><b>Schwarz → weiß, direkt daneben</b> = <span class="ht">Halbton (½)</span><br>
+          <span class="small">Beispiele: Cis–D, Fis–G, Ais–H</span></div>
+        <div data-mini='{"groups":true,"names":true,"blackNames":true,"mark":[6,7]}'></div></div>
+      <div class="rule"><div class="rn">5</div>
+        <div class="rt"><b>Schwarz → schwarz, nebeneinander in einer Gruppe</b> = <span class="gt">Ganzton (1)</span><br>
+          <span class="small">Beispiele: Cis–Dis, Fis–Gis, Gis–Ais</span></div>
+        <div data-mini='{"groups":true,"names":true,"blackNames":true,"mark":[1,3]}'></div></div>
+      <div class="rule"><div class="rn">6</div>
+        <div class="rt"><b>Schwarz → schwarz, über die Lücke</b> = <span class="kt">1½ Töne</span> (= Ganzton + Halbton = 3 Halbtöne)<br>
+          <span class="small">Von den Zwillingen zu den Drillingen: Dis–Fis. Von den Drillingen zu den nächsten Zwillingen: Ais–Cis.</span></div>
+        <div data-mini='{"groups":true,"names":true,"blackNames":true,"mark":[3,6]}'></div></div>
+    </div>
+
+    <p><b>Faustregel:</b> Gleiche Farbe nebeneinander in der Reihe (weiß–weiß oder schwarz–schwarz) = <span class="gt">Ganzton</span>. Verschiedene Farben nebeneinander (weiß–schwarz) = <span class="ht">Halbton</span>. Die Ausnahmen merkst du dir mit dem Muster: <b>E–F</b> und <b>H–C</b> sind nur ein Halbton, <b>Dis–Fis</b> und <b>Ais–Cis</b> sind 1½ Töne.</p>
+    <p>Und wenn du nur die <b>weißen</b> Tasten von C bis C spielst, sieht das so aus – ein Muster, das du bestimmt schon aus dem Musikunterricht kennst (die Tonleiter C-Dur):</p>
+    <div class="strip" id="strip"></div>
+    <p class="small">Ganz – Ganz – Halb – Ganz – Ganz – Ganz – Halb. Alle zwölf Halbtöne zusammen ergeben genau eine <b>Oktave</b> (von C bis zum nächsten C).</p>
+    <div class="btns">
+      <button data-ex="step" type="button">▶ Übung: Abstand bestimmen</button>
+      <button data-ex="stepplay" type="button">▶ Übung: Halbton / Ganzton spielen</button>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>⑧ Mit der Computer-Tastatur spielen</h3>
+    <p>Du kannst das Klavier auch mit den Buchstaben auf deiner Computer-Tastatur spielen. Die Buchstaben stehen im Bild auf den Tasten. Die <b>untere Reihe</b> (A S D F G H J K) sind die weißen Tasten, die <b>obere Reihe</b> (W E T Z U) sind die schwarzen. Auch hier fehlt zwischen E und T eine Taste – genau wie zwischen den Zwillingen und den Drillingen!</p>
+    <div data-mini='{"groups":true,"keys":true}'></div>
+    <div class="btns"><button data-song="entchen" type="button">▶ Spiele „Alle meine Entchen“</button></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <b>Merke dir:</b>
+  <div class="tip">
+    • Die weißen Tasten heißen <b>C D E F G A H</b> – danach geht es wieder von vorn mit C (neue Oktave).<br>
+    • Die schwarzen Tasten sind immer in Gruppen: erst <b>2</b> schwarze, dann <b>3</b> schwarze, dann wieder 2, dann 3 …<br>
+    • <b>C</b> liegt immer direkt links von der 2er-Gruppe. <b>F</b> liegt immer direkt links von der 3er-Gruppe.<br>
+    • Zwischen <b>E und F</b> sowie <b>H und C</b> gibt es keine schwarze Taste.<br>
+    • Eine schwarze Taste hat zwei Namen: rechts neben C ist <b>Cis</b> (♯ = höher) oder <b>Des</b> (♭ = tiefer).<br>
+    • <b>Halbton</b> = zur direkt nächsten Taste (egal welche Farbe). <b>Ganzton</b> = zwei Halbtöne (eine Taste überspringen). Ausnahmen: E–F und H–C sind nur ein Halbton, Dis–Fis und Ais–Cis sind 1½ Töne. 12 Halbtöne = 1 Oktave.
+  </div>
+</div>
+<footer>Ton-Simulation mit Web Audio · funktioniert ohne Internet</footer>
+
+<script>
+const NAMES_SHARP=['C','Cis','D','Dis','E','F','Fis','G','Gis','A','Ais','H'];
+const NAMES_FLAT =['C','Des','D','Es','E','F','Ges','G','As','A','B','H'];
+const IS_BLACK=[0,1,0,1,0,0,1,0,1,0,1,0];
+// Computer-Tastatur: Halbtonschritt ab C  → Taste
+const KEYMAP='a w s e d f t g z h u j k o l p ö ä'.split(' ');
+const NUM_SEMI=25;      // C bis C (zwei Oktaven + hohes C)
+const BASE_MIDI=60;     // eingestrichenes C
+let octShift=0;
+
+const piano=document.getElementById('piano');
+const keyEls=[];        // index = Halbton ab C
+let ctx=null, master=null;
+const active={};        // Halbton -> Stimme
+
+/* ---------- Tastatur aufbauen ---------- */
+function build(){
+  piano.innerHTML=''; keyEls.length=0;
+  const whites=[]; for(let i=0;i<NUM_SEMI;i++) if(!IS_BLACK[i%12]) whites.push(i);
+  const wPct=100/whites.length;
+  let wi=0;
+  for(let i=0;i<NUM_SEMI;i++){
+    const pc=i%12, el=document.createElement('div');
+    el.dataset.i=i;
+    const kb=KEYMAP[i]?`<span class="kb">${KEYMAP[i].toUpperCase()}</span>`:'';
+    if(!IS_BLACK[pc]){
+      el.className='white'+(pc===0?' cmark':'');
+      el.innerHTML=`<span class="nm">${NAMES_SHARP[pc]}</span>${kb}`;
+      wi++;
+    }else{
+      el.className='black '+((pc===1||pc===3)?'g2':'g3');
+      el.style.width=(wPct*0.6)+'%';
+      el.style.left=`calc(${wi*wPct}% - ${wPct*0.3}% + 2px)`;
+      el.innerHTML=`<span class="nm">${NAMES_SHARP[pc]}<br>${NAMES_FLAT[pc]}</span>${kb}`;
+    }
+    piano.appendChild(el); keyEls[i]=el;
+  }
+  applyOptions();
+}
+function applyOptions(){
+  const names=optNames.checked, pat=optPattern.checked, ks=optKeys.checked;
+  keyEls.forEach(el=>{
+    el.querySelector('.nm').classList.toggle('hidden',!names);
+    const k=el.querySelector('.kb'); if(k)k.classList.toggle('hidden',!ks);
+    if(el.classList.contains('white'))
+      el.classList.toggle('cmark',pat&&(+el.dataset.i%12===0));
+    else{
+      // Gruppenfarben nur bei Muster-Hilfe
+      el.style.borderBottom=pat?'':'1px solid #000';
+      el.classList.toggle('g2',pat&&[1,3].includes(+el.dataset.i%12));
+      el.classList.toggle('g3',pat&&[6,8,10].includes(+el.dataset.i%12));
+    }
+  });
+  legend.classList.toggle('show',pat);
+  tip.textContent=pat?'Siehst du es? Blau = 2 schwarze Tasten, orange = 3 schwarze Tasten. Der rote Punkt zeigt alle C.':'';
+}
+
+/* ---------- Klang ---------- */
+function ensureAudio(){
+  if(!ctx){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    master=ctx.createGain(); master.gain.value=.6;
+    const comp=ctx.createDynamicsCompressor();
+    master.connect(comp); comp.connect(ctx.destination);
+  }
+  if(ctx.state==='suspended') ctx.resume();
+}
+const freq=i=>440*Math.pow(2,(BASE_MIDI+octShift*12+i-69)/12);
+
+function startNote(i){
+  if(active[i]) return;
+  ensureAudio();
+  const f=freq(i), t=ctx.currentTime, type=optSound.value;
+  const g=ctx.createGain(), filt=ctx.createBiquadFilter();
+  filt.type='lowpass'; filt.frequency.value=Math.min(f*8,9000);
+  g.connect(filt); filt.connect(master);
+  const oscs=[];
+  const add=(wave,mult,vol)=>{
+    const o=ctx.createOscillator(), og=ctx.createGain();
+    o.type=wave; o.frequency.value=f*mult; og.gain.value=vol;
+    o.connect(og); og.connect(g); o.start(t); oscs.push(o);
+  };
+  let peak=.5, decayTo=.0001, decayT=2.2, sustain=false;
+  if(type==='piano'){ add('triangle',1,.7); add('sine',2,.25); add('sine',3,.1); add('sine',4,.05); decayT=2.5; }
+  else if(type==='organ'){ add('sine',1,.5); add('sine',2,.3); add('sine',4,.2); peak=.35; sustain=true; }
+  else if(type==='synth'){ add('sawtooth',1,.35); add('sawtooth',1.005,.35); filt.frequency.value=2200; peak=.3; sustain=true; }
+  else { add('sine',1,.6); add('sine',2.76,.25); add('sine',5.4,.1); decayT=3; }
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(peak,t+.012);
+  if(sustain) g.gain.setTargetAtTime(peak*.8,t+.05,.3);
+  else g.gain.exponentialRampToValueAtTime(peak*.18,t+.35), g.gain.exponentialRampToValueAtTime(decayTo,t+decayT);
+  active[i]={g,oscs};
+  keyEls[i].classList.add('on');
+  onPlayed(i);
+}
+function stopNote(i){
+  const v=active[i]; if(!v) return;
+  delete active[i];
+  const t=ctx.currentTime;
+  v.g.gain.cancelScheduledValues(t);
+  v.g.gain.setValueAtTime(Math.max(v.g.gain.value,.0001),t);
+  v.g.gain.exponentialRampToValueAtTime(.0001,t+.25);
+  v.oscs.forEach(o=>o.stop(t+.3));
+  keyEls[i].classList.remove('on');
+}
+
+/* ---------- Eingabe: Maus / Touch ---------- */
+const pointers={};
+function keyAt(x,y){
+  const el=document.elementFromPoint(x,y);
+  const k=el&&el.closest&&el.closest('.white,.black');
+  return k?+k.dataset.i:null;
+}
+piano.addEventListener('pointerdown',e=>{
+  const i=keyAt(e.clientX,e.clientY); if(i===null)return;
+  e.preventDefault(); pointers[e.pointerId]=i; startNote(i);
+});
+piano.addEventListener('pointermove',e=>{
+  if(!(e.pointerId in pointers))return;
+  const i=keyAt(e.clientX,e.clientY), old=pointers[e.pointerId];
+  if(i!==null&&i!==old){ stopNote(old); pointers[e.pointerId]=i; startNote(i); }
+});
+const up=e=>{ if(e.pointerId in pointers){ stopNote(pointers[e.pointerId]); delete pointers[e.pointerId]; } };
+window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
+
+/* ---------- Eingabe: Computer-Tastatur ---------- */
+window.addEventListener('keydown',e=>{
+  if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.target.tagName==='SELECT')return;
+  const i=KEYMAP.indexOf(e.key.toLowerCase());
+  if(i>=0&&i<NUM_SEMI){ startNote(i); }
+});
+window.addEventListener('keyup',e=>{
+  const i=KEYMAP.indexOf(e.key.toLowerCase());
+  if(i>=0) stopNote(i);
+});
+
+/* ---------- Übungen ---------- */
+const status_=document.getElementById('status');
+let mode=null, target=null, songPos=0, score=0, tries=0;
+const WHITE_PC=[0,2,4,5,7,9,11], WHITE_NAME={0:'C',2:'D',4:'E',5:'F',7:'G',9:'A',11:'H'};
+// Lieder: n = Halbtöne ab C (0=C, 2=D, 4=E, 5=F, 7=G, 9=A)
+const SONGS={
+  entchen:{title:'Alle meine Entchen',lines:[
+    {t:'Alle meine Entchen',n:[0,2,4,5,7,7]},
+    {t:'schwimmen auf dem See,',n:[9,9,9,9,7]},
+    {t:'schwimmen auf dem See,',n:[9,9,9,9,7]},
+    {t:'Köpfchen in das Wasser,',n:[5,5,5,5,4,4]},
+    {t:'Schwänzchen in die Höh.',n:[2,2,2,2,0]}]},
+  twinkle:{title:'Twinkle, Twinkle, Little Star',lines:[
+    {t:'Twinkle, twinkle, little star,',n:[0,0,7,7,9,9,7]},
+    {t:'how I wonder what you are.',n:[5,5,4,4,2,2,0]},
+    {t:'Up above the world so high,',n:[7,7,5,5,4,4,2]},
+    {t:'like a diamond in the sky.',n:[7,7,5,5,4,4,2]},
+    {t:'Twinkle, twinkle, little star,',n:[0,0,7,7,9,9,7]},
+    {t:'how I wonder what you are.',n:[5,5,4,4,2,2,0]}]}
+};
+let SONG=[], curSong=null;
+const notesBox=document.getElementById('notes');
+
+function renderNotes(){
+  notesBox.innerHTML=''; let idx=0;
+  curSong.lines.forEach(l=>{
+    const row=document.createElement('div'); row.className='nrow';
+    l.n.forEach(s=>{
+      const c=document.createElement('span'); c.className='chip'; c.dataset.idx=idx++;
+      c.textContent=WHITE_NAME[s%12]; row.appendChild(c);
+    });
+    const txt=document.createElement('span'); txt.className='lyr'; txt.textContent=l.t; row.appendChild(txt);
+    notesBox.appendChild(row);
+  });
+}
+function markChips(){
+  notesBox.querySelectorAll('.chip').forEach(c=>{
+    const k=+c.dataset.idx;
+    c.classList.toggle('done',k<songPos);
+    c.classList.toggle('cur',mode==='song'&&k===songPos);
+  });
+}
+function startSong(key){
+  curSong=SONGS[key]; SONG=curSong.lines.flatMap(l=>l.n);
+  clearEx(); mode='song'; songPos=0; renderNotes(); nextSong();
+  exCard.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function clearHint(){ keyEls.forEach(k=>k.classList.remove('hint')); }
+function stopMode(){ mode=null; target=null; clearHint(); clearEx(); notesBox.innerHTML=''; status_.textContent='Wähle oben eine Übung – oder spiel einfach drauflos!'; }
+
+function nextQuiz(){
+  clearHint();
+  const pc=WHITE_PC[Math.floor(Math.random()*7)];
+  const choices=[]; for(let i=0;i<NUM_SEMI;i++) if(i%12===pc) choices.push(i);
+  target=choices[Math.floor(Math.random()*choices.length)];
+  status_.innerHTML=`Finde die Taste <b>${WHITE_NAME[pc]}</b> und spiele sie! <span style="opacity:.7">(Punkte: ${score}/${tries})</span>`;
+}
+function nextSong(){
+  clearHint();
+  if(songPos>=SONG.length){ status_.innerHTML='<span class="ok">🎉 Geschafft! Das ganze Lied gespielt!</span>'; mode=null; markChips(); return; }
+  target=SONG[songPos];
+  keyEls[target].classList.add('hint');
+  status_.innerHTML=`<b>${curSong.title}</b> – spiele die grüne Taste: <b>${WHITE_NAME[target%12]}</b> (Ton ${songPos+1} von ${SONG.length})`;
+  markChips();
+}
+function onPlayed(i){
+  if(mode==='quiz'){
+    tries++;
+    if(i===target){ score++; status_.innerHTML='<span class="ok">✔ Richtig!</span>'; setTimeout(()=>mode==='quiz'&&nextQuiz(),700); target=-1; }
+    else if(target!==-1){
+      const n=IS_BLACK[i%12]?`${NAMES_SHARP[i%12]}/${NAMES_FLAT[i%12]}`:NAMES_SHARP[i%12];
+      status_.innerHTML=`<span class="bad">✘ Das war ${n}.</span> Suche weiter! <span style="opacity:.7">(Punkte: ${score}/${tries})</span>`;
+    }
+  } else if(mode==='song'){
+    if(i===target){ songPos++; nextSong(); }
+  } else if(mode==='ex'){
+    exOnPlay(i);
+  }
+}
+btnQuiz.onclick=()=>{ clearEx(); notesBox.innerHTML=''; mode='quiz'; score=0; tries=0; nextQuiz(); };
+btnSong.onclick=()=>startSong('entchen');
+btnTwinkle.onclick=()=>startSong('twinkle');
+btnStop.onclick=stopMode;
+
+/* ---------- Übungen zur Tastenanordnung ---------- */
+const answers=document.getElementById('answers');
+const exList=document.getElementById('exList');
+const starsEl=document.getElementById('stars');
+const exCard=document.getElementById('exCard');
+let ex=null, stars=0;
+const SEQ=['C','D','E','F','G','A','H'];
+const idxWhere=f=>{const a=[];for(let i=0;i<NUM_SEMI;i++)if(f(i%12))a.push(i);return a;};
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const pcName=pc=>IS_BLACK[pc]?`${NAMES_SHARP[pc]} / ${NAMES_FLAT[pc]}`:NAMES_SHARP[pc];
+
+const EXS={
+  black:{label:'Alle schwarzen Tasten',type:'all',what:'schwarzen Tasten',pcs:[1,3,6,8,10],tip:'Schwarze Tasten sind schmaler und liegen höher als die weißen.'},
+  twins:{label:'Alle Zwillinge',type:'all',what:'Zwillinge (2 schwarze Tasten nebeneinander)',pcs:[1,3],tip:'Zwillinge sind die schwarzen Tasten, die zu zweit nebeneinander stehen.'},
+  triplets:{label:'Alle Drillinge',type:'all',what:'Drillinge (3 schwarze Tasten nebeneinander)',pcs:[6,8,10],tip:'Drillinge sind die schwarzen Tasten, die zu dritt nebeneinander stehen.'},
+  allC:{label:'Alle C',type:'all',what:'C-Tasten',pcs:[0],tip:'C wohnt links vom Zwillingspaar.'},
+  allF:{label:'Alle F',type:'all',what:'F-Tasten',pcs:[5],tip:'F wohnt links vom Drillingstrio.'},
+  name:{label:'Wie heißt die Taste?',type:'name',black:false},
+  nameBlack:{label:'Schwarze Tasten benennen',type:'name',black:true},
+  near:{label:'Davor & danach',type:'near'},
+  count:{label:'Schwarze Tasten zählen',type:'count'},
+  step:{label:'Abstand bestimmen',type:'step'},
+  stepplay:{label:'Halbton / Ganzton spielen',type:'stepplay'}
+};
+
+function addStar(){ stars++; starsEl.textContent='⭐ '+stars; }
+function addBtn(label,fn,cls){ const b=document.createElement('button'); b.type='button'; b.textContent=label; if(cls)b.className=cls; b.onclick=fn; answers.appendChild(b); return b; }
+function clearEx(){
+  keyEls.forEach(k=>k.classList.remove('found','ask','mark'));
+  answers.innerHTML=''; ex=null;
+}
+const scoreTxt=()=>`<span style="opacity:.7">(Richtig: ${ex.ok}, Fehler: ${ex.bad})</span>`;
+const nextKey=k=>{const ks=Object.keys(EXS);return ks[(ks.indexOf(k)+1)%ks.length];};
+
+function startEx(key){
+  clearHint(); clearEx(); notesBox.innerHTML='';
+  mode='ex';
+  optNames.checked=false; optPattern.checked=false; applyOptions();
+  const c=EXS[key]; ex={key,...c,ok:0,bad:0,done:false,locked:false};
+  if(c.type==='all'){ ex.targets=idxWhere(pc=>c.pcs.includes(pc)); ex.found=new Set(); allMsg(); }
+  else nextQ();
+  exCard.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function allMsg(){ status_.innerHTML=`Tippe alle <b>${ex.what}</b> an! Gefunden: <b>${ex.found.size}</b> von ${ex.targets.length}`; }
+
+function nextQ(){
+  keyEls.forEach(k=>k.classList.remove('ask','mark','found'));
+  answers.innerHTML=''; ex.locked=false;
+  if(ex.type==='name'){
+    const pool=idxWhere(pc=>!!IS_BLACK[pc]===ex.black);
+    let t; do{ t=rnd(pool); }while(t===ex.target&&pool.length>1);
+    ex.target=t; keyEls[t].classList.add('ask');
+    status_.innerHTML=`Wie heißt die Taste mit dem <b style="color:var(--g2)">blauen Rahmen</b>? ${scoreTxt()}`;
+    const pcs=ex.black?[1,3,6,8,10]:[0,2,4,5,7,9,11];
+    pcs.forEach(pc=>addBtn(pcName(pc),()=>judge(pc===t%12,
+      `Richtig! Das ist ${pcName(t%12)}.`,
+      ex.black?'Nicht ganz. Die schwarze Taste heißt nach ihrer weißen Nachbartaste: rechts daneben = „-is“ (z. B. Cis), links daneben = „-es“ (z. B. Des). Schau auch, ob es Zwilling oder Drilling ist!'
+              :'Nicht ganz. Suche das C (links vom Zwillingspaar) und zähle nach rechts: C D E F G A H.'),'ans'));
+  } else if(ex.type==='near'){
+    const k=Math.floor(Math.random()*7), t=Math.floor(Math.random()*3);
+    let q,ans,extra='';
+    if(t===0){ q=`Welcher Ton kommt direkt <b>nach</b> ${SEQ[k]}?`; ans=SEQ[(k+1)%7]; if(SEQ[k]==='H')extra=' Nach dem H beginnt alles wieder bei C.'; }
+    else if(t===1){ q=`Welcher Ton kommt direkt <b>vor</b> ${SEQ[k]}?`; ans=SEQ[(k+6)%7]; if(SEQ[k]==='C')extra=' Vor dem C kommt das H.'; }
+    else { q=`Welcher Ton liegt <b>zwischen</b> ${SEQ[k]} und ${SEQ[(k+2)%7]}?`; ans=SEQ[(k+1)%7]; }
+    ex.ans=ans;
+    status_.innerHTML=`${q} <span style="opacity:.7">Antworte mit den Knöpfen oder spiele die Taste. ${scoreTxt()}</span>`;
+    SEQ.forEach(n=>addBtn(n,()=>judge(n===ans,`Richtig: ${ans}!${extra}`,'Nicht ganz. Sag dir die Reihe auf: C D E F G A H – und dann wieder C.'),'ans'));
+  } else if(ex.type==='step'){
+    const [a,b,d]=pickPair(3);
+    keyEls[a].classList.add('mark'); keyEls[b].classList.add('mark');
+    status_.innerHTML=`Wie groß ist der Abstand zwischen den beiden <b style="color:var(--gold)">gelben Rahmen</b>? ${scoreTxt()}`;
+    [[1,'Halbton (½)'],[2,'Ganzton (1)'],[3,'1½ Töne']].forEach(([v,l])=>addBtn(l,()=>judge(v===d,
+      `Richtig: ${stepName(d)}. ${stepRule(a,b)}`,
+      'Nicht ganz. Prüfe: Sind es zwei weiße Tasten – und liegt eine schwarze dazwischen? Oder weiß und schwarz nebeneinander? Oder zwei schwarze (in einer Gruppe oder über die Lücke)?'),'ans'));
+  } else if(ex.type==='stepplay'){
+    let a,t,d;
+    do{ d=Math.random()<.5?1:2; a=Math.floor(Math.random()*(NUM_SEMI-d)); t=a+d; }
+    while(d===2&&IS_BLACK[a%12]!==IS_BLACK[t%12]);
+    ex.A=a; ex.target=t; ex.d=d;
+    keyEls[a].classList.add('mark');
+    status_.innerHTML=`Spiele die Taste, die einen <b>${d===1?'Halbton':'Ganzton'}</b> <b>höher</b> liegt als die <b style="color:var(--gold)">gelb gerahmte</b> Taste! ${scoreTxt()}`;
+  } else if(ex.type==='count'){
+    const wh=idxWhere(pc=>!IS_BLACK[pc]).filter(i=>i<=12);
+    const a=Math.floor(Math.random()*(wh.length-1));
+    const gap=1+Math.floor(Math.random()*Math.min(4,wh.length-1-a));
+    const A=wh[a], B=wh[a+gap]; let n=0; for(let i=A+1;i<B;i++) if(IS_BLACK[i%12]) n++;
+    keyEls[A].classList.add('mark'); keyEls[B].classList.add('mark');
+    status_.innerHTML=`Wie viele <b>schwarze</b> Tasten stehen zwischen den beiden <b style="color:var(--gold)">gelben Rahmen</b>? ${scoreTxt()}`;
+    for(let c=0;c<=4;c++) addBtn(String(c),()=>judge(c===n,
+      `Richtig: ${n}. Zwischen ${NAMES_SHARP[A%12]} und ${NAMES_SHARP[B%12]} stehen ${n} schwarze Tasten.`+(n===0?' Zwischen E–F und H–C gibt es keine schwarze Taste!':''),
+      'Nicht ganz. Zähle nur die schwarzen Tasten, die zwischen den beiden Rahmen liegen – die Rahmen selbst zählen nicht.'),'ans');
+  }
+}
+function judge(ok,okMsg,badMsg){
+  if(!ex||ex.locked) return;
+  if(ok){
+    ex.ok++; ex.locked=true; addStar();
+    status_.innerHTML=`<span class="ok">✔ ${okMsg}</span> ${scoreTxt()}`;
+    const me=ex; setTimeout(()=>{ if(mode==='ex'&&ex===me) nextQ(); },1800);
+  } else {
+    ex.bad++; status_.innerHTML=`<span class="bad">✘ ${badMsg}</span>`;
+  }
+}
+function exOnPlay(i){
+  if(!ex) return;
+  if(ex.type==='all'){
+    if(ex.done) return;
+    if(ex.targets.includes(i)){
+      if(ex.found.has(i)) return;
+      ex.found.add(i); keyEls[i].classList.add('found');
+      if(ex.found.size===ex.targets.length){
+        ex.done=true; addStar();
+        status_.innerHTML=`<span class="ok">🎉 Alle gefunden!</span> Fehler: ${ex.bad}`;
+        answers.innerHTML='';
+        addBtn('Nochmal',()=>startEx(ex.key),'ans');
+        addBtn('Nächste Übung ▶',()=>startEx(nextKey(ex.key)),'ans');
+      } else allMsg();
+    } else {
+      ex.bad++;
+      status_.innerHTML=`<span class="bad">✘ Das gehört nicht dazu.</span> ${ex.tip} Gefunden: ${ex.found.size} von ${ex.targets.length}`;
+    }
+  } else if(ex.type==='near' && !IS_BLACK[i%12]){
+    if(NAMES_SHARP[i%12]===ex.ans) judge(true,`Richtig: ${ex.ans}!`);
+  } else if(ex.type==='stepplay'){
+    if(ex.locked||i===ex.A) return;
+    const d=i-ex.A;
+    judge(i===ex.target,`Richtig! ${stepRule(ex.A,ex.target)}`,
+      d<=0 ? 'Du musst nach rechts gehen – dort werden die Töne höher.'
+           : `Das war ${d===1?'ein Halbton':d===2?'ein Ganzton':d===3?'1½ Töne':d+' Halbtöne'}. Gesucht ist ${ex.d===1?'ein Halbton: die direkt nächste Taste':'ein Ganzton: eine Taste überspringen'}.`);
+  }
+}
+Object.entries(EXS).forEach(([k,c])=>{
+  const b=document.createElement('button'); b.type='button'; b.className='sec'; b.textContent=c.label;
+  b.onclick=()=>startEx(k); exList.appendChild(b);
+});
+btnTip.onclick=()=>{ optPattern.checked=!optPattern.checked; applyOptions(); };
+
+/* Abstände: Halbton / Ganzton */
+const stepName=d=>d===1?'Halbton':d===2?'Ganzton':'1½ Töne';
+function stepRule(a,b){
+  const d=b-a, ba=IS_BLACK[a%12], bb=IS_BLACK[b%12];
+  if(d===1) return (!ba&&!bb)
+    ? 'Zwei weiße Tasten ohne schwarze dazwischen (E–F oder H–C): nur ein Halbton.'
+    : 'Weiße und schwarze Taste direkt nebeneinander: ein Halbton.';
+  if(d===2) return (!ba&&!bb)
+    ? 'Zwischen den weißen Tasten liegt eine schwarze: ein Ganzton (= 2 Halbtöne).'
+    : 'Zwei schwarze Tasten nebeneinander in einer Gruppe: ein Ganzton (= 2 Halbtöne).';
+  return 'Schwarz über die Lücke zur nächsten schwarzen Taste: 1½ Töne (= 3 Halbtöne).';
+}
+function pickPair(maxD){
+  for(;;){
+    const d=1+Math.floor(Math.random()*maxD), a=Math.floor(Math.random()*(NUM_SEMI-d)), b=a+d;
+    const ba=IS_BLACK[a%12], bb=IS_BLACK[b%12];
+    if(d===2&&ba!==bb) continue;
+    if(d===3&&!(ba&&bb)) continue;
+    return [a,b,d];
+  }
+}
+(function(){
+  const w=[0,2,4,5,7,9,11,12]; let h='';
+  w.forEach((p,k)=>{
+    h+=`<span class="k">${p===12?'C':NAMES_SHARP[p]}</span>`;
+    if(k<w.length-1){ const d=w[k+1]-p; h+=`<span class="s ${d===2?'g':'h'}">${d===2?'1':'½'}</span>`; }
+  });
+  document.getElementById('strip').innerHTML=h;
+})();
+
+/* kleine Bilder in den Erklärungen */
+function mini({names=false,groups=false,mark=[],blackNames=false,keys=false}={}){
+  const wp=100/8; let h='<div class="mini">', wi=0;
+  for(let i=0;i<=12;i++){
+    const pc=i%12; if(IS_BLACK[pc]) continue;
+    const lbl=keys?(KEYMAP[i]||'').toUpperCase():(names?NAMES_SHARP[pc]:'');
+    h+=`<div class="mw${mark.includes(i)?' m':''}" style="left:${wi*wp}%;width:${wp}%">${lbl}</div>`; wi++;
+  }
+  wi=0;
+  for(let i=0;i<=12;i++){
+    const pc=i%12;
+    if(!IS_BLACK[pc]){ wi++; continue; }
+    const g=groups?((pc===1||pc===3)?' g2':' g3'):'';
+    const lbl=keys?(KEYMAP[i]||'').toUpperCase():(blackNames?`${NAMES_SHARP[pc]}<br>${NAMES_FLAT[pc]}`:'');
+    h+=`<div class="mb${g}${mark.includes(i)?' m':''}" style="left:${wi*wp-wp*0.3}%;width:${wp*0.6}%">${lbl}</div>`;
+  }
+  return h+'</div>';
+}
+document.querySelectorAll('[data-mini]').forEach(el=>{ el.innerHTML=mini(JSON.parse(el.dataset.mini)); });
+document.querySelectorAll('[data-ex]').forEach(b=>b.addEventListener('click',()=>startEx(b.dataset.ex)));
+document.querySelectorAll('[data-song]').forEach(b=>b.addEventListener('click',()=>startSong(b.dataset.song)));
+
+/* ---------- Optionen ---------- */
+[optNames,optPattern,optKeys].forEach(c=>c.addEventListener('change',applyOptions));
+document.getElementById('oct-').onclick=()=>{ if(octShift>-2){octShift--; octLabel.textContent=octShift;} };
+document.getElementById('oct+').onclick=()=>{ if(octShift<2){octShift++; octLabel.textContent=octShift;} };
+build();
+</script>
+</body>
+</html>
