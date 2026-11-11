@@ -1,0 +1,1444 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Entdecke die Erde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: ruhige Lernseite, eine Spalte mit Info-Karten und Aufgaben-Karten; Weltkarte als Herzstück. */
+:root{
+  --bg:#eef4f8; --surface:#ffffff; --surface-2:#e2ecf3; --ink:#112437; --muted:#4a5f73; --line:#c8d7e3;
+  --sea:#cfe5f4; --accent:#1d6aa5; --accent-ink:#ffffff; --gold:#e8a82c; --on-gold:#14202c;
+  --ok:#1b8548; --bad:#c43d2c; --grid:rgba(17,36,55,.2);
+  --c-na:#8e6bbf; --c-sa:#2f9a89; --c-eu:#6b9f4e; --c-af:#dca43a; --c-as:#d4684b; --c-au:#e585ad; --c-an:#f4f8fb;
+  --f-display:'Fredoka','Trebuchet MS',system-ui,sans-serif; --f-body:'Lexend',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b1826; --surface:#132a40; --surface-2:#1b3650; --ink:#e8f0f7; --muted:#9bb2c5; --line:#2b4a66;
+    --sea:#0e3a5c; --accent:#62b3ee; --accent-ink:#06121d; --gold:#f0b93f; --on-gold:#14202c;
+    --ok:#4cc17f; --bad:#ff7b68; --grid:rgba(232,240,247,.22);
+    --c-na:#a384d2; --c-sa:#3fb5a2; --c-eu:#7fb862; --c-af:#e6b24c; --c-as:#e2805f; --c-au:#ee9dc0; --c-an:#dfe9f1;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b1826; --surface:#132a40; --surface-2:#1b3650; --ink:#e8f0f7; --muted:#9bb2c5; --line:#2b4a66;
+  --sea:#0e3a5c; --accent:#62b3ee; --accent-ink:#06121d; --gold:#f0b93f; --on-gold:#14202c;
+  --ok:#4cc17f; --bad:#ff7b68; --grid:rgba(232,240,247,.22);
+  --c-na:#a384d2; --c-sa:#3fb5a2; --c-eu:#7fb862; --c-af:#e6b24c; --c-as:#e2805f; --c-au:#ee9dc0; --c-an:#dfe9f1;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 1rem/1.65 var(--f-body);padding-inline:16px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1040px;margin-inline:auto}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.top nav{max-width:1040px;margin-inline:auto;display:flex;gap:.4rem;overflow-x:auto;padding-block:.55rem;scrollbar-width:thin}
+.top a{white-space:nowrap;text-decoration:none;color:var(--ink);font-weight:500;font-size:.92rem;padding:.35rem .8rem;border-radius:99px;border:1px solid var(--line);background:var(--surface)}
+.top a:hover{border-color:var(--accent);color:var(--accent)}
+section{padding-block:2.6rem 1rem;scroll-margin-top:4rem}
+.hero{padding-block:2.4rem 1rem}
+.hero h1{font-size:clamp(2.3rem,7vw,3.8rem);letter-spacing:-.01em}
+.hero .lead{font-size:1.12rem;max-width:42rem;margin-top:.9rem;color:var(--muted)}
+.byline{font-size:.85rem;color:var(--muted);margin-top:1rem}
+.wl{display:flex;margin-top:1.4rem;max-width:42rem;border-radius:10px;overflow:hidden;font-weight:600;font-size:.9rem;border:1px solid var(--line)}
+.wl span{padding:.55rem .8rem;white-space:nowrap}
+.wl .w{flex:71;background:var(--sea);color:var(--ink)}
+.wl .l{flex:29;background:var(--c-eu);color:#0c1a0a}
+.cap{font-size:.88rem;color:var(--muted);margin-top:.4rem}
+h2{font-size:clamp(1.7rem,4.5vw,2.3rem)}
+h3{font-size:1.25rem}
+.intro{max-width:44rem;margin-top:.7rem;color:var(--muted)}
+.stack{display:grid;gap:1.2rem;margin-top:1.4rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;min-width:0}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1.2rem;align-items:start}
+.two>*{min-width:0}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;min-width:0}
+.tl{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;background:var(--gold);color:var(--on-gold);padding:.15rem .6rem;border-radius:6px;margin-bottom:.55rem}
+.task h3{margin-bottom:.35rem}
+.task .how{color:var(--muted);font-size:.95rem;margin-bottom:.9rem}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-block:.6rem .9rem}
+.chip{font:500 .9rem var(--f-body);color:var(--ink);background:var(--surface-2);border:1.5px solid transparent;border-radius:99px;padding:.35rem .85rem;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.btn{font:600 .93rem var(--f-body);background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:.6rem 1.05rem;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{border-color:var(--accent);filter:none}
+.btn[disabled]{opacity:.45;cursor:default}
+.bar{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:1rem}
+.score{font-weight:600;min-height:1.6em}
+select{font:inherit;font-size:.95rem;padding:.3rem .5rem;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%}
+.rows{list-style:none;margin:0;padding:0;display:grid;gap:.55rem}
+.rows li{display:flex;flex-wrap:wrap;gap:.4rem .6rem;align-items:center;padding:.55rem .7rem;border-radius:10px;border:1.5px solid var(--line)}
+.rows li .rt{flex:1 1 16rem;min-width:0}
+.rows li .mark{font-weight:600;min-width:1.4em}
+.rows li.ok{border-color:var(--ok)} .rows li.ok .mark{color:var(--ok)}
+.rows li.bad{border-color:var(--bad)} .rows li.bad .mark{color:var(--bad)}
+.rows .why{flex-basis:100%;font-size:.9rem;color:var(--muted)}
+.rows .nr{display:inline-grid;place-items:center;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--gold);color:var(--on-gold);font-weight:700;font-size:.85rem;margin-right:.5rem}
+.tfb{display:flex;gap:.4rem}
+.tfb .btn{padding:.4rem .8rem}
+.mapwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--sea)}
+.wmap{display:block;min-width:660px;width:100%;height:auto;cursor:crosshair;touch-action:manipulation}
+.sea{fill:var(--sea)}
+.land{stroke:var(--surface);stroke-width:.35;stroke-linejoin:round}
+.land[data-c=na]{fill:var(--c-na)} .land[data-c=sa]{fill:var(--c-sa)} .land[data-c=eu]{fill:var(--c-eu)}
+.land[data-c=af]{fill:var(--c-af)} .land[data-c=as]{fill:var(--c-as)} .land[data-c=au]{fill:var(--c-au)} .land[data-c=an]{fill:var(--c-an)}
+.land.sel,.land.hit{stroke:var(--ink);stroke-width:1.2}
+.lake{fill:var(--sea);stroke:var(--surface);stroke-width:.3}
+.grid{stroke:var(--grid);stroke-width:.3;fill:none;pointer-events:none}
+.grid.eq{stroke:var(--gold);stroke-width:.8;stroke-dasharray:2.2 1.4}
+.grid.pm{stroke:var(--gold);stroke-width:.8}
+.lbl{font:600 4.1px var(--f-body);fill:var(--ink);text-anchor:middle;paint-order:stroke;stroke:var(--surface);stroke-width:.9px;pointer-events:none}
+.olbl{font:500 italic 4.1px var(--f-body);fill:var(--accent);text-anchor:middle;letter-spacing:.25px;paint-order:stroke;stroke:var(--sea);stroke-width:.9px;pointer-events:none}
+.glbl{font:500 3px var(--f-body);fill:var(--on-gold);text-anchor:start;paint-order:stroke;stroke:var(--gold);stroke-width:.6px;pointer-events:none}
+.mk{pointer-events:none}
+.mk circle{fill:var(--gold);stroke:var(--ink);stroke-width:.9}
+.mk text{font:700 6.4px var(--f-body);fill:var(--on-gold);text-anchor:middle}
+.mk.ok circle{fill:var(--ok)} .mk.ok text{fill:#fff}
+.mk.bad circle{fill:var(--bad)} .mk.bad text{fill:#fff}
+.ping{fill:none;stroke-width:1.5;transform-box:fill-box;transform-origin:center;animation:ping .9s ease-out forwards;pointer-events:none}
+.ping.ok{stroke:var(--ok)} .ping.bad{stroke:var(--bad)} .ping.show{stroke:var(--gold);stroke-width:2}
+@keyframes ping{from{transform:scale(.4);opacity:1}to{transform:scale(1.6);opacity:.2}}
+@media (prefers-reduced-motion:reduce){.ping{animation:none}}
+.mapnote{font-size:.85rem;color:var(--muted);margin-top:.5rem}
+.pill{display:inline-block;font-size:.8rem;font-weight:600;padding:.1rem .6rem;border-radius:99px;background:var(--surface-2);color:var(--muted)}
+.facts{margin-top:.5rem}
+.facts .big{font-family:var(--f-display);font-size:1.7rem;font-weight:600;font-variant-numeric:tabular-nums}
+.bars{list-style:none;margin:.6rem 0 0;padding:0;display:grid;gap:.45rem}
+.bars li{display:grid;grid-template-columns:7.2rem 1fr 3.4rem;gap:.6rem;align-items:center;font-size:.92rem}
+.bars .bt{height:1.05rem;background:var(--surface-2);border-radius:6px;overflow:hidden}
+.bars .bt i{display:block;height:100%;border-radius:6px}
+.bars .bv{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.bars .bn{min-width:0;overflow-wrap:anywhere}
+.cardhd{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.4rem}
+.dot{width:.9rem;height:.9rem;border-radius:50%;display:inline-block}
+.globewrap{display:grid;place-items:center}
+#globe{width:100%;max-width:400px;height:auto;display:block}
+.g-sphere{fill:var(--sea);stroke:var(--ink);stroke-width:1.5}
+.g-line{fill:none;stroke:var(--ink);stroke-opacity:.45;stroke-width:1.2;cursor:pointer}
+.g-back{fill:none;stroke:var(--ink);stroke-opacity:.25;stroke-width:1.2;stroke-dasharray:4 4}
+.g-eq{fill:none;stroke:var(--gold);stroke-width:3;cursor:pointer}
+.g-axis{stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;cursor:pointer}
+.g-pole{fill:var(--bad);stroke:var(--surface);stroke-width:2;cursor:pointer}
+.g-pm{fill:none;stroke:var(--accent);stroke-width:3;cursor:pointer}
+.g-half{fill:var(--accent);fill-opacity:0;cursor:pointer}
+#globe[data-active] [data-p]{opacity:.25}
+#globe[data-active] [data-p].on{opacity:1}
+#globe .g-half.on{fill-opacity:.32}
+#globe .g-line.on,#globe .g-eq.on,#globe .g-pm.on{stroke-width:4.5}
+.gt{font:600 13px var(--f-body);fill:var(--ink);paint-order:stroke;stroke:var(--sea);stroke-width:3px;pointer-events:none}
+.gt.o{stroke:var(--bg)}
+.lead-line{stroke:var(--muted);stroke-width:1;fill:none}
+.q{font-weight:600;margin-bottom:.7rem}
+.opts{display:grid;gap:.5rem}
+.opt{font:500 1rem var(--f-body);text-align:left;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:.65rem .9rem;cursor:pointer}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--surface))}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+.fb{margin-top:.8rem;font-weight:500;min-height:1.6em}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.progress{font-size:.85rem;color:var(--muted);margin-bottom:.4rem}
+.result{font-family:var(--f-display);font-size:1.6rem;font-weight:600}
+.pick{display:flex;flex-wrap:wrap;gap:.45rem}
+.sizeout{margin:.4rem 0 .2rem;padding-left:1.4rem}
+.sizeout li{margin-block:.15rem}
+.sizeout .ok{color:var(--ok);font-weight:600} .sizeout .bad{color:var(--bad);font-weight:600}
+footer{padding-block:2.5rem 3rem;color:var(--muted);font-size:.85rem}
+@media (max-width:520px){.bars li{grid-template-columns:5.6rem 1fr 3rem;font-size:.85rem}}
+</style>
+
+<style>
+/* Erweiterung: Infos aus Lisas Heft */
+ul.plain{margin:.4rem 0 0;padding-left:1.2rem}
+ul.plain li{margin-block:.3rem}
+.sys{display:block;width:100%;height:auto;border-radius:12px}
+.sys .hit{fill:transparent;cursor:pointer}
+.sys .ring{fill:none;stroke:var(--gold);stroke-width:3;opacity:0}
+.sys .pl.on .ring{opacity:1}
+.sys .pn{font:600 13px var(--f-body);fill:#fff;text-anchor:middle;pointer-events:none}
+.sys .pl:focus-visible .ring{opacity:1}
+.merk mark{background:var(--gold);color:var(--on-gold);padding:0 .3rem;border-radius:5px;font-weight:600}
+.gridt{border-collapse:separate;border-spacing:4px;margin-inline:auto}
+.gridt th{font:600 .95rem var(--f-display);color:var(--muted);width:2.6rem;height:2rem;text-align:center}
+.gcell{display:block;width:2.8rem;height:2.8rem;border-radius:8px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--on-gold);font:700 1.1rem var(--f-body);cursor:pointer;padding:0;text-align:center;line-height:2.6rem}
+span.gcell{cursor:default}
+button.gcell:hover{border-color:var(--accent)}
+.gcell.ex,.gcell.hint{background:var(--gold);border-color:var(--ink)}
+.gcell.ok{background:var(--ok);border-color:var(--ok)}
+.gcell.bad{background:var(--bad);border-color:var(--bad)}
+.compass{display:block;width:100%;max-width:340px;height:auto;margin-inline:auto}
+.c-ring{fill:var(--surface-2);stroke:var(--line);stroke-width:2}
+.c-tip{fill:var(--ink);stroke:var(--surface);stroke-width:1;opacity:.85}
+.c-tip.d{fill:var(--muted)}
+.c-tip.n{fill:var(--bad)}
+.c-tip[data-k]{cursor:pointer}
+.c-tip.on{opacity:1;stroke:var(--gold);stroke-width:3}
+.c-lbl{font:600 15px var(--f-body);fill:var(--ink);text-anchor:middle;cursor:pointer}
+.c-lbl.d{font-size:12px;fill:var(--muted)}
+.c-lbl.on{fill:var(--accent)}
+.cmk{pointer-events:none}
+.cmk circle{fill:var(--gold);stroke:var(--ink);stroke-width:1.5}
+.cmk text{font:700 13px var(--f-body);fill:var(--on-gold);text-anchor:middle}
+.cmk.ok circle{fill:var(--ok)} .cmk.ok text{fill:#fff}
+.cmk.bad circle{fill:var(--bad)} .cmk.bad text{fill:#fff}
+.town{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);margin-top:.4rem}
+.town[data-mode="lb"] .kt{display:none}
+.town[data-mode="kt"] .lb{display:none}
+.legendbox{margin-top:.8rem;background:var(--surface-2);border-radius:12px;padding:.8rem 1rem}
+.legend{list-style:none;margin:0;padding:0;display:grid;gap:.4rem}
+.legend li{display:flex;gap:.6rem;align-items:center}
+.legend .sw{display:inline-block;width:1.5rem;height:1rem;border-radius:3px;border:1px solid var(--ink);flex:none}
+.legend .sl{display:inline-block;width:1.5rem;height:.4rem;border-radius:3px;border:1px solid var(--ink);flex:none}
+.legend .symb{display:inline-grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:50%;background:#fff;border:2px solid #d62828;color:#d62828;font-weight:700;flex:none;line-height:1}
+.warn{margin-top:.7rem;padding:.6rem .8rem;border-radius:10px;border:1.5px solid var(--gold);background:var(--surface-2);font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><nav aria-label="Bereiche">
+  <a href="#start">Start</a><a href="#fach">Erdkunde</a><a href="#weltall">Weltall</a><a href="#globus">Der Globus</a><a href="#atlas">Der Atlas</a><a href="#richtung">Himmelsrichtungen</a><a href="#kontinente">Die 7 Kontinente</a><a href="#ozeane">Die Ozeane</a><a href="#karten">Karten</a><a href="#test">Abschlusstest</a>
+</nav></header>
+
+<main>
+<section class="hero" id="start">
+  <h1>Entdecke die Erde</h1>
+  <p class="lead">Hier lernst du, was Erdkunde ist, wo die Erde im Weltall liegt und wie Globus, Atlas und Karten funktionieren. Du übst die Himmelsrichtungen und lernst die sieben Kontinente und die großen Ozeane kennen. Lies die Infos, tippe auf die Karten und löse die Aufgaben. Du kannst alles beliebig oft wiederholen.</p>
+  <div class="wl" role="img" aria-label="71 Prozent der Erdoberfläche sind Wasser, 29 Prozent sind Land"><span class="w">Wasser 71 %</span><span class="l">Land 29 %</span></div>
+  <p class="cap">Fast drei Viertel der Erdoberfläche sind mit Wasser bedeckt. Darum sieht die Erde aus dem Weltraum blau aus.</p>
+  <p class="byline">Erdkunde · Klasse 5 · Gymnasium Wendalinum · erstellt von Ingo Spaniol</p>
+</section>
+
+<!-- ERDKUNDE -->
+<section id="fach">
+  <h2>Erdkunde – unser neues Fach</h2>
+  <p class="intro">Erdkunde heißt auch Geografie. Das Wort kommt aus dem Griechischen: <em>geos</em> bedeutet „Erde“ und <em>graphein</em> bedeutet „beschreiben“. Die Abbildung zeigt die Themenbereiche und die wichtigsten Arbeitsmittel unseres Faches.</p>
+  <div class="stack">
+    <div class="card">
+      <h3>Die vier Themenbereiche</h3>
+      <p class="intro" style="margin-top:.3rem">Tippe auf einen Bereich und lies nach.</p>
+      <div class="chips" id="fChips" role="group" aria-label="Themenbereiche"></div>
+      <div id="fInfo" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <h3>Unsere Arbeitsmittel</h3>
+      <p class="intro" style="margin-top:.3rem">Damit arbeiten wir im Fach Erdkunde.</p>
+      <div class="chips" id="aChips" role="group" aria-label="Arbeitsmittel"></div>
+      <div id="aInfo" aria-live="polite"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Themenbereiche zuordnen</h3>
+      <p class="how">Wähle in jeder Lücke das passende Wort aus.</p>
+      <div id="t-fach-bereiche"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Arbeitsmittel zuordnen</h3>
+      <p class="how">Welches Arbeitsmittel passt in die Lücke?</p>
+      <div id="t-fach-mittel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- WELTALL -->
+<section id="weltall">
+  <h2>Die Erde im Weltall</h2>
+  <p class="intro">Die Erde gehört zu den 8 Planeten unseres Sonnensystems. Im Mittelpunkt unseres Sonnensystems steht die Sonne. Unser Sonnensystem ist Teil der Milchstraße, einer von sehr vielen Galaxien im Weltall.</p>
+  <div class="stack">
+    <div class="card">
+      <h3>Das Sonnensystem</h3>
+      <p class="intro" style="margin-top:.3rem">Tippe auf einen Planeten oder auf seinen Namen. Die Zahl unter dem Planeten zeigt die Reihenfolge von der Sonne aus.</p>
+      <div id="planetSvg" style="margin-top:.8rem"></div>
+      <div class="chips" id="planetChips" role="group" aria-label="Planeten"></div>
+      <div id="planetInfo" aria-live="polite"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Planeten in der richtigen Reihenfolge</h3>
+      <p class="how">Tippe die Planeten nacheinander an. Beginne bei dem Planeten, der der Sonne am nächsten ist.</p>
+      <div id="t-pl-order"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Planeten nach Nummer</h3>
+      <p class="how">Welcher Planet steht an dieser Stelle? Schau dir die Zahlen im Bild an.</p>
+      <div id="t-pl-drop"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Der Merkspruch</h3>
+      <p class="how">„Mein Vater erklärt mir jeden Sonntag unseren Nachthimmel.“ Jedes Wort beginnt wie ein Planet. Welcher Planet gehört zu welchem Wort?</p>
+      <div id="t-pl-merk"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Richtig oder falsch?</h3>
+      <p class="how">Lies jede Aussage und entscheide.</p>
+      <div id="t-pl-tf"></div>
+    </div>
+  </div>
+</section>
+
+<!-- GLOBUS -->
+<section id="globus">
+  <h2>Der Globus</h2>
+  <p class="intro">Das Wort Globus kommt aus dem Lateinischen und bedeutet „Kugel“. Ein Globus ist ein verkleinertes, vereinfachtes Modell der Erde. Er ist wie die Erde rund und zeigt Länder und Meere in ihrer richtigen Form. Eine Karte auf Papier ist flach und kann die runde Erde nie ganz genau zeigen.</p>
+  <div class="stack">
+    <div class="card">
+      <h3>Wie ist der Globus aufgebaut?</h3>
+      <p class="intro" style="margin-top:.3rem">Tippe auf einen Begriff oder direkt auf den Globus. Dann leuchtet der Teil auf und du liest, was er bedeutet.</p>
+      <div class="two" style="margin-top:.8rem">
+        <div class="globewrap">
+          <svg id="globe" viewBox="0 0 400 400" role="img" aria-label="Globus mit Erdachse, Polen, Äquator, Breitenkreisen und Längenkreisen">
+            <defs><clipPath id="gclip"><circle r="130"/></clipPath></defs>
+            <g transform="translate(200 200) rotate(23.5)">
+              <circle class="g-sphere" r="130"/>
+              <g clip-path="url(#gclip)">
+                <rect class="g-half" data-p="halb-n" x="-130" y="-130" width="260" height="130"/>
+                <rect class="g-half" data-p="halb-s" x="-130" y="0" width="260" height="130"/>
+              </g>
+              <path class="g-line" data-p="laengen" d="M0 -130 A90 130 0 0 0 0 130"/>
+              <path class="g-line" data-p="laengen" d="M0 -130 A45 130 0 0 0 0 130"/>
+              <path class="g-line" data-p="laengen" d="M0 -130 L0 130"/>
+              <path class="g-line" data-p="laengen" d="M0 -130 A90 130 0 0 1 0 130"/>
+              <path class="g-pm" data-p="nullm laengen" d="M0 -130 A45 130 0 0 1 0 130"/>
+              <path class="g-back" d="M-91.9 -91.9 A91.9 21.1 0 0 1 91.9 -91.9"/>
+              <path class="g-back" d="M-91.9 91.9 A91.9 21.1 0 0 1 91.9 91.9"/>
+              <path class="g-back" d="M-130 0 A130 30 0 0 1 130 0"/>
+              <path class="g-line" data-p="breiten" d="M-91.9 -91.9 A91.9 21.1 0 0 0 91.9 -91.9"/>
+              <path class="g-line" data-p="breiten" d="M-91.9 91.9 A91.9 21.1 0 0 0 91.9 91.9"/>
+              <path class="g-eq" data-p="aequator" d="M-130 0 A130 30 0 0 0 130 0"/>
+              <line class="g-axis" data-p="achse" x1="0" y1="-168" x2="0" y2="168"/>
+              <circle class="g-pole" data-p="nordpol" cx="0" cy="-130" r="7"/>
+              <circle class="g-pole" data-p="suedpol" cx="0" cy="130" r="7"/>
+            </g>
+            <line class="lead-line" x1="246" y1="220" x2="282" y2="296"/>
+            <text class="gt" x="286" y="302">Nullmeridian</text>
+            <text class="gt" x="264" y="88">Nordpol</text>
+            <text class="gt" x="276" y="46">Erdachse</text>
+            <text class="gt" x="138" y="330" text-anchor="end">Südpol</text>
+            <text class="gt" x="326" y="262">Äquator</text>
+            <text class="gt o" x="196" y="140" text-anchor="middle" style="stroke:var(--sea)">Nordhalbkugel</text>
+            <text class="gt o" x="146" y="262" text-anchor="middle" style="stroke:var(--sea)">Südhalbkugel</text>
+          </svg>
+        </div>
+        <div>
+          <div class="chips" id="gChips" role="group" aria-label="Teile des Globus"></div>
+          <div id="gInfo" aria-live="polite"></div>
+          <p class="mapnote">Die Erde dreht sich einmal in etwa 24 Stunden um die Erdachse. So entstehen Tag und Nacht.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Lückentext zum Globus</h3>
+      <p class="how">Wähle in jeder Lücke das passende Wort aus. Nicht jedes Wort wird gebraucht.</p>
+      <div id="t-globus-gaps"></div>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Richtig oder falsch?</h3>
+      <p class="how">Lies jede Aussage und entscheide. Danach siehst du die Erklärung.</p>
+      <div id="t-globus-tf"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ATLAS -->
+<section id="atlas">
+  <h2>Unser Atlas</h2>
+  <p class="intro">Der Atlas ist das wichtigste Nachschlagewerk der Geografie (Erdkunde). Er hat drei Teile: den vorderen Teil, den Hauptteil und den hinteren Teil.</p>
+  <div class="stack">
+    <div class="card">
+      <h3>Wie ist der Atlas aufgebaut?</h3>
+      <p class="intro" style="margin-top:.3rem">Tippe auf einen Teil des Atlas.</p>
+      <div class="chips" id="atChips" role="group" aria-label="Teile des Atlas"></div>
+      <div id="atInfo" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <h3>So funktioniert das Planquadrat</h3>
+      <p class="intro" style="margin-top:.3rem">Im Register steht zum Beispiel „Sankt Wendel 22, C4“. Das heißt: Seite 22, Planquadrat C4. Suche den Buchstaben oben, die Zahl links, und gehe in der Karte zum Kästchen, wo sich beide treffen.</p>
+      <div id="gridDemo" style="margin-top:.8rem"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Atlas-Begriffe</h3>
+      <p class="how">Wähle in jeder Lücke den passenden Begriff aus.</p>
+      <div id="t-at-drop"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Finde das Planquadrat</h3>
+      <p class="how">Tippe auf das gesuchte Planquadrat. Du hast pro Frage zwei Versuche.</p>
+      <div id="t-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ORIENTIERUNG -->
+<section id="richtung">
+  <h2>Orientierung: Himmelsrichtungen</h2>
+  <p class="intro">Mit den Himmelsrichtungen findest du dich auf der Erde und auf Karten zurecht. Die vier Hauptrichtungen sind Norden, Osten, Süden und Westen. Dazwischen liegen Nordosten, Südosten, Südwesten und Nordwesten.</p>
+  <div class="stack">
+    <div class="card">
+      <h3>Die Windrose</h3>
+      <p class="intro" style="margin-top:.3rem">Tippe auf eine Himmelsrichtung, entweder auf der Windrose oder in der Liste.</p>
+      <div class="two" style="margin-top:.8rem">
+        <div id="compassHost"></div>
+        <div>
+          <div class="chips" id="cChips" role="group" aria-label="Himmelsrichtungen"></div>
+          <div id="cInfo" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Windrose beschriften</h3>
+      <p class="how">Welche Himmelsrichtung steckt hinter jeder Zahl?</p>
+      <div id="t-compass"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Der Merkvers zur Sonne</h3>
+      <p class="how">Ergänze den Merkvers.</p>
+      <div id="t-merkvers"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Stimmt die Richtung?</h3>
+      <p class="how">Ergänze die Lücken so, dass wahre Aussagen entstehen. Die Entdecker-Karte bei den Kontinenten hilft dir.</p>
+      <div id="t-dir-words"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Welcher Kontinent liegt dort?</h3>
+      <p class="how">Wähle den passenden Kontinent. Auch hier hilft dir die Entdecker-Karte.</p>
+      <div id="t-dir-conts"></div>
+    </div>
+  </div>
+</section>
+
+<!-- KONTINENTE -->
+<section id="kontinente">
+  <h2>Die 7 Kontinente</h2>
+  <p class="intro">Kontinente sind die riesigen Landmassen der Erde. Es gibt sieben: Afrika, Antarktika, Asien, Australien, Europa, Nordamerika und Südamerika. Die gestrichelte goldene Linie auf den Karten ist der Äquator, die durchgezogene der Nullmeridian.</p>
+  <div class="stack">
+    <div class="card">
+      <h3>Entdecker-Karte</h3>
+      <p class="intro" style="margin-top:.3rem">Tippe auf einen Kontinent oder einen Ozean und lies nach.</p>
+      <div class="mapwrap" style="margin-top:.8rem"><div id="m-explore"></div></div>
+      <p class="mapnote">Die Karte ist vereinfacht. Auf dem Handy kannst du sie seitlich verschieben.</p>
+      <div id="exCard" class="card" style="margin-top:.9rem;background:var(--surface-2)" aria-live="polite"></div>
+    </div>
+
+    <div class="card">
+      <h3>Wie groß sind die Kontinente?</h3>
+      <p class="intro" style="margin-top:.3rem">Fläche in Millionen Quadratkilometern (gerundet).</p>
+      <ul class="bars" id="barsCont"></ul>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Wer bin ich?</h3>
+      <p class="how">Welcher Kontinent wird beschrieben? Wähle aus der Liste.</p>
+      <div id="t-cont-who"></div>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Kontinente beschriften</h3>
+      <p class="how">Jede Zahl auf der Karte steht für einen Kontinent. Schreibe den richtigen Namen dazu.</p>
+      <div id="t-cont-label"></div>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Finde den Kontinent</h3>
+      <p class="how">Tippe auf der Karte auf den gesuchten Kontinent. Du hast pro Frage zwei Versuche.</p>
+      <div id="t-cont-find"></div>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Nach Größe ordnen</h3>
+      <p class="how">Tippe die Kontinente nacheinander an, beginne mit dem größten und höre beim kleinsten auf.</p>
+      <div id="t-cont-size"></div>
+    </div>
+  </div>
+</section>
+
+<!-- OZEANE -->
+<section id="ozeane">
+  <h2>Die Ozeane</h2>
+  <p class="intro">Ozeane (Weltmeere) sind die riesigen Wasserflächen zwischen den Kontinenten. Sie hängen alle miteinander zusammen. Die drei großen sind der Pazifische, der Atlantische und der Indische Ozean. Dazu kommen die beiden Polarmeere rund um die Pole.</p>
+  <div class="stack">
+    <div class="card">
+      <h3>Wie groß sind die Ozeane?</h3>
+      <p class="intro" style="margin-top:.3rem">Fläche in Millionen Quadratkilometern (gerundet). Tippe auf der Entdecker-Karte oben auf einen Ozean, um mehr zu erfahren.</p>
+      <ul class="bars" id="barsOcean"></ul>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Wer bin ich? Ozeane</h3>
+      <p class="how">Welcher Ozean wird beschrieben?</p>
+      <label class="bar" style="margin:0 0 .8rem"><input type="checkbox" id="polarWho"> <span>Zusatzaufgabe: auch die Polarmeere</span></label>
+      <div id="t-ocean-who"></div>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Ozeane beschriften</h3>
+      <p class="how">Welcher Ozean steckt hinter jeder Zahl?</p>
+      <label class="bar" style="margin:0 0 .8rem"><input type="checkbox" id="polarLabel"> <span>Zusatzaufgabe: auch die Polarmeere</span></label>
+      <div id="t-ocean-label"></div>
+    </div>
+
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Finde den Ozean</h3>
+      <p class="how">Tippe auf der Karte ins Wasser, wo der gesuchte Ozean liegt. Land zählt nicht.</p>
+      <label class="bar" style="margin:0 0 .8rem"><input type="checkbox" id="polarFind"> <span>Zusatzaufgabe: auch die Polarmeere</span></label>
+      <div id="t-ocean-find"></div>
+    </div>
+  </div>
+</section>
+
+<!-- KARTEN -->
+<section id="karten">
+  <h2>Karten lesen: Vom Luftbild zur Karte</h2>
+  <p class="intro">Eine Karte ist eine verkleinerte, vereinfachte und verallgemeinerte Darstellung der Erdoberfläche oder eines Teils davon. Schau selbst, wie aus einem Luftbild eine Karte wird.</p>
+  <div class="stack">
+    <div class="card">
+      <h3>Luftbild oder Karte?</h3>
+      <p class="intro" style="margin-top:.3rem">Wechsle zwischen Luftbild und Karte. Es ist immer derselbe Ort.</p>
+      <div class="chips" id="townChips" role="group" aria-label="Darstellung wählen">
+        <button type="button" class="chip" data-m="lb" aria-pressed="true">Luftbild</button>
+        <button type="button" class="chip" data-m="kt" aria-pressed="false">Karte</button>
+      </div>
+      <div id="townHost"></div>
+      <div id="townLegend" class="legendbox" hidden>
+        <p class="q" style="margin-bottom:.4rem">Legende</p>
+        <ul class="legend">
+          <li><i class="sw" style="background:#e0577d"></i><span><b>Flächen</b> z. B. rosa/rot = Bebauung</span></li>
+          <li><i class="sw" style="background:#a9d98f"></i><span><b>Flächen</b> z. B. grün = Wiese und Park</span></li>
+          <li><i class="sl" style="background:#f2c94c"></i><span><b>Linien</b> z. B. gelb = Hauptstraße</span></li>
+          <li><span class="symb">+</span><span><b>Symbole</b> z. B. rotes Kreuz = Krankenhaus</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="two">
+      <div class="card">
+        <h3>Das erkennt man auf dem Luftbild</h3>
+        <ul class="plain">
+          <li>Dachfarben, Gebäudehöhe, Fenster, Fassadenfarben</li>
+          <li>Straßenbelag, Straßenmarkierung, Autos, Schienen</li>
+          <li>Felder (und ihren jahreszeitlichen Zustand), Bäume, Wiesen, Gartenanlagen</li>
+        </ul>
+        <p class="mapnote">Man unterscheidet Senkrechtluftbilder (von oben) und Schrägluftbilder (schräg von der Seite). Beide sind sehr detailliert und zeigen die Wirklichkeit.</p>
+      </div>
+      <div class="card">
+        <h3>So zeigt es die Karte</h3>
+        <ul class="plain">
+          <li>Gebäude als Grundriss der Häuser, meist in Rot</li>
+          <li>Straßen und Verkehrswege: verschiedene Straßen (z. B. Hauptstraßen) in unterschiedlichen Farben, dazu Straßennamen</li>
+          <li>Pflanzen: Darstellung mit Farben (meistens grün) und Symbolen</li>
+          <li>Die Erklärung der Farben und Symbole steht in der Legende</li>
+        </ul>
+        <p class="mapnote">Die Karte verallgemeinert die Informationen. So kannst du dich besser orientieren.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Kartentypen und Legende</h3>
+      <p class="intro" style="margin-top:.3rem">Tippe auf einen Begriff.</p>
+      <div class="chips" id="kChips" role="group" aria-label="Kartentypen"></div>
+      <div id="kInfo" aria-live="polite"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Luftbild oder Karte?</h3>
+      <p class="how">Zu welcher Darstellung passt die Aussage?</p>
+      <div id="t-k-luft"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Lückentext zur Karte</h3>
+      <p class="how">Wähle in jeder Lücke das passende Wort aus.</p>
+      <div id="t-k-gaps"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Physische oder thematische Karte?</h3>
+      <p class="how">Welcher Kartentyp passt?</p>
+      <div id="t-k-typ"></div>
+    </div>
+    <div class="task">
+      <span class="tl">Aufgabe</span>
+      <h3>Richtig oder falsch?</h3>
+      <p class="how">Lies jede Aussage und entscheide. Danach siehst du die Erklärung.</p>
+      <div id="t-k-tf"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEST -->
+<section id="test">
+  <h2>Abschlusstest</h2>
+  <p class="intro">Zwölf Fragen zu allem, was du gelernt hast. Sie werden bei jedem Durchgang neu gemischt. Zeig, was du kannst.</p>
+  <div class="stack"><div class="task"><span class="tl">Test</span><div id="quiz"></div></div></div>
+</section>
+</main>
+
+<footer>Erdkunde Klasse 5 · Gymnasium Wendalinum · Ingo Spaniol. Flächenangaben sind gerundet, die Karte ist stark vereinfacht.</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function fmt(n){return String(n).replace('.',',')}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+
+/* ---------- Daten ---------- */
+var CONT={na:'Nordamerika',sa:'Südamerika',eu:'Europa',af:'Afrika',as:'Asien',au:'Australien',an:'Antarktika'};
+var OCEAN={pa:'Pazifischer Ozean',at:'Atlantischer Ozean',in:'Indischer Ozean',sp:'Südpolarmeer',np:'Nordpolarmeer'};
+var CD={
+ as:{n:'Asien',a:44.6,t:'Der größte Kontinent der Erde. Hier leben mehr als die Hälfte aller Menschen. Der Mount Everest (8.849 m) ist der höchste Berg der Erde.'},
+ af:{n:'Afrika',a:30.3,t:'Der zweitgrößte Kontinent. Der Äquator verläuft quer durch seine Mitte. Im Norden liegt die Sahara, die größte Trockenwüste der Erde.'},
+ na:{n:'Nordamerika',a:24.7,t:'Zu Nordamerika gehören Kanada, die USA, Mexiko, Mittelamerika und die riesige Insel Grönland.'},
+ sa:{n:'Südamerika',a:17.8,t:'Hier fließt der Amazonas durch den größten Regenwald der Erde. Im Westen ragt das Gebirge der Anden auf.'},
+ an:{n:'Antarktika',a:14.2,t:'Der kälteste Kontinent, fast ganz von dickem Eis bedeckt. Hier liegt der Südpol. Es gibt keine festen Einwohner, nur Forschende.'},
+ eu:{n:'Europa',a:10.2,t:'Das ist unser Kontinent. Europa liegt auf der Nordhalbkugel. Mit Asien bildet es eine gemeinsame Landmasse, die Eurasien heißt. Deutschland liegt in der Mitte Europas.'},
+ au:{n:'Australien (Ozeanien)',a:8.5,t:'Der kleinste Kontinent. Er besteht aus Australien, Neuseeland und vielen Inseln im Pazifik, die man Ozeanien nennt. Er liegt auf der Südhalbkugel.'}
+};
+var OD={
+ pa:{a:181,t:'Der größte und tiefste Ozean. Er ist größer als alle Landflächen der Erde zusammen. Im Marianengraben ist er rund 11.000 m tief.'},
+ at:{a:106,t:'Der zweitgrößte Ozean. Er liegt zwischen Amerika im Westen sowie Europa und Afrika im Osten. Die Nordsee ist ein Randmeer des Atlantiks.'},
+ in:{a:75,t:'Der drittgrößte Ozean, benannt nach Indien. Er liegt zwischen Afrika, Asien und Australien. Die Insel Madagaskar liegt in ihm.'},
+ sp:{a:20,t:'Das Meer rund um Antarktika. Man nennt es auch Südlicher Ozean. Es ist sehr kalt und stürmisch.'},
+ np:{a:14,t:'Das Meer rund um den Nordpol. Man nennt es auch Arktischer Ozean. Große Teile sind das ganze Jahr von Eis bedeckt.'}
+};
+var LAND=[
+['na',[[-168,65],[-166,68.5],[-156,71.3],[-141,69.6],[-128,70],[-115,68.5],[-100,68],[-95,71],[-85,69],[-82,66],[-88,64],[-94,60],[-93,57],[-85,55],[-80,52],[-78,57],[-77,62],[-72,62],[-65,60],[-62,57],[-56,52],[-60,48],[-66,45],[-70,43],[-70,41.5],[-74,40],[-76,35],[-81,31],[-80,26],[-82,26],[-84,30],[-89,30],[-94,29.5],[-97,26],[-97.5,22],[-95,18.5],[-91,18.5],[-90,21],[-87,21],[-88,16],[-84,15.5],[-83,11],[-79.5,9.5],[-77.5,8.5],[-79,7.5],[-83,8],[-86,11],[-88,13],[-92,14.5],[-96,16],[-101,17.5],[-105,20],[-106,23],[-110,27],[-113,31],[-114.5,30],[-112,26],[-110,23],[-112,24.5],[-115,28],[-117,32.5],[-120.5,34.5],[-124,40],[-124.5,46],[-123,48.5],[-127,51],[-130,55],[-135,58],[-140,60],[-148,60.5],[-152,58.5],[-158,56.5],[-163,55],[-158,58],[-162,60],[-165,62],[-168,65]]],
+['na',[[-73,78],[-60,82],[-30,83.5],[-20,80],[-18,75],[-22,70],[-32,68],[-42,60],[-50,62],[-54,67],[-58,75],[-73,78]]],
+['na',[[-80,73],[-68,70],[-62,66],[-65,62.5],[-72,64],[-78,65],[-90,70],[-80,73]]],
+['na',[[-118,73],[-105,73],[-100,69],[-115,69],[-118,73]]],
+['na',[[-90,80],[-65,83],[-62,81],[-80,76],[-90,77],[-90,80]]],
+['na',[[-85,22],[-80,23],[-74,20],[-77,19.8],[-82,22],[-85,22]]],
+['sa',[[-77.5,8.5],[-72,12],[-64,10.5],[-60,8.5],[-52,5],[-50,0],[-45,-1.5],[-38,-4],[-35,-7],[-37,-12],[-39,-17],[-41,-22],[-48,-26],[-49,-29],[-53,-34],[-57,-35],[-58,-38.5],[-62,-39],[-65,-42],[-64.5,-47],[-68,-50],[-69,-52.5],[-68,-55],[-72,-54],[-75,-50],[-74,-43],[-73,-37],[-71.5,-30],[-70,-18.5],[-76,-14],[-81,-6],[-80,-2],[-80,1],[-78,2.5],[-77.5,7],[-77.5,8.5]]],
+['eu',[[-9,37],[-9,43],[-2,43.5],[-1.5,46],[-4.5,48],[-1.5,49.5],[2,51],[4,52],[5,53.4],[8,53.7],[8.5,55.5],[8.5,57],[10.5,57.7],[10.5,56],[9.8,55],[10.5,54],[13,54.3],[16,54.5],[19,54.5],[21,55.5],[21,57],[24,57.5],[23.5,59.2],[28,59.5],[30,60],[30,69.5],[33,69.5],[41,67],[44,68.5],[50,68],[58,68.5],[60,69],[60,51.5],[56,50.5],[53,47],[50,46],[48,44],[46,43],[40,43.5],[38,45],[36,45],[34,44.5],[32,46],[30,46],[28.5,44],[28,42],[26,40.8],[23,40.3],[24,38],[22,36.5],[21,38],[19.5,40.5],[19,42],[13.5,45.5],[12.3,44.5],[16,41.5],[18.5,40.2],[16,38],[15.5,40],[12,42],[10.5,43.5],[8.5,44.5],[6,43.2],[3,43.3],[3,42],[0,40],[0,38.7],[-1,37.5],[-2.5,36.7],[-5.5,36],[-7,37],[-9,37]]],
+['eu',[[5,58.5],[5,62],[10,64],[14,67],[18,69.5],[25,71],[30,70],[30,61],[28,60.3],[23,59.8],[21.5,61],[21.5,63],[23,64.5],[25,65.3],[22,65.7],[19,63.5],[17.5,61],[18.5,60],[16.5,57.5],[16,56],[13,55.5],[12,56.5],[11,59],[8,58],[5,58.5]]],
+['eu',[[-5.5,50],[1.5,51],[1.8,52.7],[0,53.5],[-1.5,55],[-2,57.5],[-3.5,58.6],[-5,58.5],[-6,56.5],[-5,55],[-3,54.8],[-3,53.4],[-4.5,53],[-5,51.7],[-3.5,51.2],[-5.5,50]]],
+['eu',[[-10,52],[-6,52.2],[-6,54.5],[-8,55.2],[-10,54],[-10,52]]],
+['eu',[[-24,65.5],[-22,66.4],[-16,66.5],[-13.5,65],[-18,63.5],[-22,63.8],[-24,65.5]]],
+['eu',[[12.5,38],[15.5,38.2],[15,36.8],[12.5,38]]],
+['af',[[-17,21],[-16,24],[-13,27.5],[-10,30],[-9.5,32.5],[-6,35.8],[-2,35.2],[3,36.8],[10,37.2],[11,33.5],[15,32.3],[20,32],[20,30.5],[25,31.7],[32,31.3],[34,28],[35.5,24],[37.5,18.5],[39,15.5],[43,12.7],[44,10.5],[51,11.8],[51,10],[48,5],[42,-1],[40,-4],[39,-8],[40.5,-11],[40.5,-15],[35,-19.5],[35.5,-24],[33,-26],[32.5,-29],[27,-33.5],[22,-34.2],[18.5,-34.2],[16.5,-28.5],[15,-26],[12,-17],[13.5,-12],[12,-6],[9,-1],[9.5,3.5],[6,4.3],[2,6.2],[-4,5.2],[-8,4.4],[-12,7.2],[-15,11],[-17,14.5],[-16.5,19],[-17,21]]],
+['af',[[44,-25],[47,-25],[50,-15.5],[49.5,-12.5],[47,-15],[44,-20],[44,-25]]],
+['as',[[60,69],[68,69],[73,72.5],[80,73],[87,75],[100,77.5],[105,77],[113,74],[125,73],[140,72.5],[150,71],[160,69.5],[170,70],[180,68.5],[180,65.5],[178,64.5],[172,61],[166,60],[163,57],[162,54],[158,52],[156,51],[155.8,56],[156,57.5],[160,61.5],[155,59.5],[150,59.5],[143,59],[139,54.5],[141,52.5],[140,48],[135,43.5],[131,42.5],[129.5,40],[127.5,39.5],[129.5,36],[129,35],[126.5,34.5],[126,37.5],[124.5,39.8],[121.5,39],[122,40.5],[118,39],[119,37.5],[122.5,37],[120.5,36],[119,34.5],[121.5,32],[122,30],[121,28],[119,25.5],[117,23.5],[113,22],[110,21],[109.5,19],[108,21.5],[106,19.5],[109,15],[109,12],[106.5,9.5],[105,8.7],[104,10.3],[102,12.5],[100.5,13.5],[100,12],[99.5,10],[100,7],[102,6],[103.5,4],[104,1.5],[103,1.3],[101,3],[100.5,5],[98.5,8],[98,11],[97.5,16.5],[94.5,16],[94,19],[92.5,21],[91,22.5],[89,21.8],[87,21],[85,19.5],[82,16.5],[80,15],[80,12.5],[79.5,10],[78,8.5],[77,8.2],[75.5,11.5],[74,15],[73,18],[72.8,21],[70,21],[68.5,23.5],[66.5,25.5],[61.5,25],[57,25.8],[56.5,27],[54,26.7],[51,28],[50,30],[48,30],[50.5,26],[51.5,24.5],[54,24],[56,26],[56.5,24.5],[59.5,22.5],[58.5,20],[57,18.5],[55,17],[52,16],[49,14.2],[45,12.8],[43.5,13],[42.7,15.5],[41,19],[39,22],[37,26],[35,28],[34.8,29.5],[34,31],[35,33],[36,35],[36,36.6],[34,36.2],[32,36.2],[29.5,36.5],[27,37],[26.5,39],[26.2,40.2],[29,41.2],[31,41.2],[35,42],[38,41],[41.5,41.8],[40,43.5],[46,43],[48,44],[50,46],[53,47],[56,50.5],[60,51.5]]],
+['as',[[130,31],[132,33.8],[135,34],[137,34.6],[140,35],[141,38],[142,40],[141,41.5],[140,40],[139.5,38],[137,37],[136,36],[132,35.5],[130,33.5],[130,31]]],
+['as',[[140,42],[142,45.5],[145,43.5],[143,42],[140,42]]],
+['as',[[80,9.5],[81.8,7.5],[81,6],[80,6],[79.8,8],[80,9.5]]],
+['as',[[95,5.5],[98,4],[104,-1.5],[106,-4],[105,-5.8],[102,-4],[98,0],[95,5.5]]],
+['as',[[109,1.5],[111,2.5],[116,7],[119,5],[118,1],[116.5,-3],[114,-3.5],[110,-3],[109,1.5]]],
+['as',[[105.5,-6.5],[108,-6.3],[111,-6.5],[114.5,-7.8],[110,-8.3],[106,-7.5],[105.5,-6.5]]],
+['as',[[120,18.5],[122,18.3],[122,14],[124,13],[121,13.5],[120,16],[120,18.5]]],
+['as',[[122,7],[125.5,9.5],[126.5,7],[125.5,5.8],[123.5,7.5],[122,7]]],
+['au',[[114,-22],[114,-26],[115,-34],[118,-35],[123,-34],[126,-32.2],[131,-31.5],[135,-34.8],[137,-35],[138,-33],[140,-37.5],[144,-38.5],[147,-38],[150,-37.5],[152,-32],[153.5,-28],[153,-25],[150,-22],[146,-19],[145.5,-15],[143.5,-14],[142.5,-10.8],[141.5,-13],[141,-17],[139,-17.5],[136,-15],[137,-12],[135,-12],[132,-11.3],[130,-12.5],[129.5,-15],[126,-14],[122.5,-17.5],[121,-19.5],[117,-20.5],[114,-22]]],
+['au',[[144.5,-40.7],[148,-40.8],[147.5,-43.2],[145.5,-42.8],[144.5,-40.7]]],
+['au',[[131,-1],[135,-3.3],[138,-1.8],[144,-3.5],[147.5,-6],[147.5,-8],[150.5,-10.5],[146,-8.5],[143,-9],[141,-9],[138,-8.3],[137.5,-5],[134,-4],[131,-1]]],
+['au',[[172.7,-34.5],[175,-37],[178,-37.7],[176.5,-40],[175,-41.5],[174.5,-39.5],[173,-35.5],[172.7,-34.5]]],
+['au',[[172.7,-40.5],[174,-41.5],[174.3,-41.8],[172.5,-43.8],[170.5,-46],[166.5,-46],[168,-44],[171,-42.5],[172.7,-40.5]]],
+['an',[[-180,-90],[180,-90],[180,-77],[168,-78],[160,-76.5],[165,-71],[155,-69],[145,-67.5],[130,-66],[115,-66],[100,-66.5],[90,-67],[75,-68],[65,-67.5],[50,-66.5],[40,-68.5],[25,-70],[10,-70.5],[0,-70],[-15,-71.5],[-25,-73],[-35,-77],[-45,-78.5],[-60,-79],[-60,-75],[-65,-72],[-62,-68],[-58,-64],[-65,-66],[-70,-70],[-78,-73],[-90,-73.5],[-105,-74],[-125,-74.5],[-140,-76],[-155,-78],[-170,-78],[-180,-78]]]
+];
+var CASPIAN=[[47,44],[50,46],[53,45],[53.5,41],[54,37.5],[51,36.7],[49,38.5],[49.5,40.5],[47.5,42],[47,44]];
+var ANCH=[['pa',-135,-5],['pa',-160,40],['pa',165,10],['pa',-130,-40],['pa',165,-40],['pa',125,15],['at',-35,35],['at',-80,22],['at',-15,-25],['at',-30,55],['at',10,38],['in',75,-20],['in',60,15],['in',115,-25]];
+var OMARK={pa:[-140,-5],at:[-32,25],'in':[80,-20],sp:[30,-62],np:[100,82]};
+var CMARK={na:[-100,45],sa:[-60,-12],eu:[15,50],af:[20,5],as:[90,48],au:[134,-25],an:[30,-80]};
+
+/* ---------- Geometrie ---------- */
+function pip(x,y,p){var c=false;for(var i=0,j=p.length-1;i<p.length;j=i++){var xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
+function where(lon,lat){
+  if(pip(lon,lat,CASPIAN))return {t:'lake'};
+  for(var i=0;i<LAND.length;i++){if(pip(lon,lat,LAND[i][1]))return {t:'land',id:LAND[i][0]}}
+  if(lat<-60)return {t:'sea',id:'sp'};
+  if(lat>72||(lat>68&&(lon>100||lon<-130)))return {t:'sea',id:'np'};
+  var best=null,bd=1e9;
+  for(var k=0;k<ANCH.length;k++){var dx=Math.abs(lon-ANCH[k][1]);if(dx>180)dx=360-dx;var dy=lat-ANCH[k][2];var d=dx*dx+dy*dy;if(d<bd){bd=d;best=ANCH[k][0]}}
+  return {t:'sea',id:best};
+}
+function lonlat(svg,e){var r=svg.getBoundingClientRect();return [(e.clientX-r.left)/r.width*360-180,90-(e.clientY-r.top)/r.height*180]}
+function dpath(p){return 'M'+p.map(function(q){return (q[0]+180)+' '+(90-q[1])}).join('L')+'Z'}
+
+/* ---------- Karte ---------- */
+function mapHTML(o){
+  o=o||{};
+  var s='<svg class="wmap" viewBox="0 0 360 180" role="img" aria-label="Weltkarte">';
+  s+='<rect class="sea" width="360" height="180"/>';
+  LAND.forEach(function(l){s+='<path class="land" data-c="'+l[0]+'" d="'+dpath(l[1])+'"/>'});
+  s+='<path class="lake" d="'+dpath(CASPIAN)+'"/>';
+  var g='';
+  for(var lo=-150;lo<=150;lo+=30){if(lo!==0)g+='<line class="grid" x1="'+(lo+180)+'" y1="0" x2="'+(lo+180)+'" y2="180"/>'}
+  for(var la=-60;la<=60;la+=30){if(la!==0)g+='<line class="grid" x1="0" y1="'+(90-la)+'" x2="360" y2="'+(90-la)+'"/>'}
+  g+='<line class="grid eq" x1="0" y1="90" x2="360" y2="90"/><line class="grid pm" x1="180" y1="0" x2="180" y2="180"/>';
+  s+=g;
+  if(o.labels){
+    s+='<text class="glbl" x="2" y="88">Äquator</text><text class="glbl" x="181.5" y="6">Nullmeridian</text>';
+    var cl={na:[-100,45],sa:[-60,-12],eu:[22,52],af:[20,5],as:[90,48],au:[134,-25],an:[30,-80]};
+    for(var c in cl){s+='<text class="lbl" x="'+(cl[c][0]+180)+'" y="'+(90-cl[c][1])+'">'+CONT[c]+'</text>'}
+    var ol=[['Pazifischer Ozean',-145,0],['Atlantischer Ozean',-32,22],['Indischer Ozean',78,-18],['Südpolarmeer',-100,-65],['Nordpolarmeer',100,83]];
+    ol.forEach(function(x){s+='<text class="olbl" x="'+(x[1]+180)+'" y="'+(90-x[2])+'">'+x[0]+'</text>'});
+  }
+  (o.markers||[]).forEach(function(m,i){
+    s+='<g class="mk" data-id="'+m.id+'" transform="translate('+(m.lon+180)+' '+(90-m.lat)+')"><circle r="6.5"/><text y="2.4">'+(i+1)+'</text></g>';
+  });
+  s+='</svg>';
+  return s;
+}
+function ping(svg,lon,lat,cls){
+  var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('class','ping '+cls);c.setAttribute('cx',lon+180);c.setAttribute('cy',90-lat);c.setAttribute('r',5);
+  svg.appendChild(c);setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c)},1000);
+}
+
+/* ---------- Balken ---------- */
+function bars(id,rows){
+  var max=Math.max.apply(null,rows.map(function(r){return r.v}));
+  $('#'+id).innerHTML=rows.map(function(r){return '<li><span class="bn">'+r.n+'</span><span class="bt"><i style="width:'+(r.v/max*100)+'%;background:'+r.c+'"></i></span><span class="bv">'+fmt(r.v)+'</span></li>'}).join('');
+}
+var contSorted=Object.keys(CD).sort(function(a,b){return CD[b].a-CD[a].a});
+bars('barsCont',contSorted.map(function(k){return {n:CD[k].n,v:CD[k].a,c:'var(--c-'+k+')'}}));
+bars('barsOcean',['pa','at','in','sp','np'].map(function(k){return {n:OCEAN[k],v:OD[k].a,c:'var(--accent)'}}));
+
+/* ---------- Globus ---------- */
+var PARTS=[
+ ['achse','Erdachse','Die Erde dreht sich um eine gedachte Linie, die Erdachse. Eine Drehung dauert etwa 24 Stunden, das ist ein Tag. Die Achse steht leicht schräg (23,5°). Darum steht auch der Globus schief.'],
+ ['nordpol','Nordpol','Der Nordpol ist der nördlichste Punkt der Erde und das obere Ende der Erdachse. Er liegt mitten im eisbedeckten Nordpolarmeer.'],
+ ['suedpol','Südpol','Der Südpol ist der südlichste Punkt der Erde und das untere Ende der Erdachse. Er liegt auf dem Kontinent Antarktika.'],
+ ['aequator','Äquator','Der Äquator ist ein gedachter Kreis genau in der Mitte zwischen den Polen. Er ist etwa 40.000 km lang und teilt die Erde in die Nordhalbkugel und die Südhalbkugel.'],
+ ['breiten','Breitenkreise','Breitenkreise laufen parallel zum Äquator rund um die Erde. Je näher am Pol, desto kleiner sind sie. Man zählt von 0° (Äquator) bis 90° (Pol), nach Norden und nach Süden.'],
+ ['laengen','Längenkreise','Längenkreise (Meridiane) sind Halbkreise, die vom Nordpol zum Südpol laufen. Alle treffen sich an den Polen. Zusammen mit den Breitenkreisen bilden sie das Gradnetz.'],
+ ['nullm','Nullmeridian','Der Nullmeridian ist der Längenkreis mit 0°. Er führt durch Greenwich, einen Stadtteil von London. Er teilt die Erde in die Westhalbkugel und die Osthalbkugel.'],
+ ['halb-n','Nordhalbkugel','Die Nordhalbkugel ist alles, was nördlich des Äquators liegt. Dort liegen zum Beispiel Europa und Deutschland.'],
+ ['halb-s','Südhalbkugel','Die Südhalbkugel ist alles, was südlich des Äquators liegt. Dort liegen zum Beispiel Australien und Antarktika.']
+];
+function setPart(id){
+  var globe=$('#globe');globe.setAttribute('data-active',id);
+  $$('[data-p]',globe).forEach(function(el){el.classList.toggle('on',(' '+el.getAttribute('data-p')+' ').indexOf(' '+id+' ')>-1)});
+  $$('#gChips .chip').forEach(function(c){c.setAttribute('aria-pressed',c.dataset.p===id?'true':'false')});
+  var p=PARTS.filter(function(x){return x[0]===id})[0];
+  $('#gInfo').innerHTML='<h3>'+p[1]+'</h3><p style="margin-top:.4rem">'+p[2]+'</p>';
+}
+$('#gChips').innerHTML=PARTS.map(function(p){return '<button type="button" class="chip" data-p="'+p[0]+'" aria-pressed="false">'+p[1]+'</button>'}).join('');
+$('#gChips').addEventListener('click',function(e){var b=e.target.closest('.chip');if(b)setPart(b.dataset.p)});
+$('#globe').addEventListener('click',function(e){
+  var t=e.target.closest('[data-p]');if(!t)return;
+  var ps=t.getAttribute('data-p').split(' ');setPart(ps[0]);
+});
+setPart('aequator');
+
+/* ---------- Dropdown-Aufgabe ---------- */
+function dropTask(id,items,pool){
+  var root=$('#'+id);
+  var opts=pool.slice().sort(function(a,b){return a.localeCompare(b,'de')}).map(function(p){return '<option>'+p+'</option>'}).join('');
+  root.innerHTML='<ol class="rows">'+items.map(function(it,i){
+    var sel='<select data-i="'+i+'" aria-label="Antwort '+(i+1)+'"><option value="">wählen …</option>'+opts+'</select>';
+    var t=it.t.indexOf('{}')>-1?it.t.replace('{}',sel):it.t+' '+sel;
+    return '<li data-i="'+i+'"><span class="rt"><span class="nr">'+(i+1)+'</span>'+t+'</span><span class="mark"></span></li>';
+  }).join('')+'</ol><div class="bar"><button type="button" class="btn" data-a="check">Prüfen</button><button type="button" class="btn ghost" data-a="solve">Lösung zeigen</button><button type="button" class="btn ghost" data-a="reset">Neu starten</button><p class="score" role="status"></p></div>';
+  var score=$('.score',root);
+  function mark(show){
+    var n=0,open=0;
+    $$('li',root).forEach(function(li,i){
+      var s=$('select',li);var ok=s.value===items[i].a;
+      li.classList.remove('ok','bad');$('.mark',li).textContent='';
+      if(!s.value){open++;return}
+      if(ok)n++;
+      li.classList.add(ok?'ok':'bad');$('.mark',li).textContent=ok?'✓':'✗';
+    });
+    var tot=items.length;
+    score.textContent=open?(n+' von '+tot+' richtig, '+open+' noch offen'):(n===tot?'Alles richtig! Super.':n+' von '+tot+' richtig. Ändere die roten Antworten und prüfe noch einmal.');
+  }
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('[data-a]');if(!b)return;
+    var a=b.dataset.a;
+    if(a==='check')mark();
+    if(a==='solve'){$$('select',root).forEach(function(s,i){s.value=items[i].a});mark()}
+    if(a==='reset'){$$('select',root).forEach(function(s){s.value=''});$$('li',root).forEach(function(li){li.classList.remove('ok','bad');$('.mark',li).textContent=''});score.textContent=''}
+  });
+}
+
+/* ---------- Richtig/Falsch ---------- */
+function tfTask(id,items){
+  var root=$('#'+id);
+  function draw(){
+    root.innerHTML='<ol class="rows">'+items.map(function(it,i){return '<li data-i="'+i+'"><span class="rt"><span class="nr">'+(i+1)+'</span>'+it.t+'</span><span class="tfb"><button type="button" class="btn ghost" data-v="1">Richtig</button><button type="button" class="btn ghost" data-v="0">Falsch</button></span><span class="mark"></span><span class="why" hidden></span></li>'}).join('')+'</ol><div class="bar"><button type="button" class="btn ghost" data-a="reset">Neu starten</button><p class="score" role="status"></p></div>';
+  }
+  draw();
+  root.addEventListener('click',function(e){
+    var r=e.target.closest('[data-a="reset"]');if(r){draw();return}
+    var b=e.target.closest('[data-v]');if(!b)return;
+    var li=b.closest('li');if(li.classList.contains('ok')||li.classList.contains('bad'))return;
+    var it=items[+li.dataset.i];var ok=(b.dataset.v==='1')===it.a;
+    li.classList.add(ok?'ok':'bad');$('.mark',li).textContent=ok?'✓':'✗';
+    var w=$('.why',li);w.hidden=false;w.textContent=(ok?'Richtig. ':'Leider falsch. ')+it.w;
+    $$('[data-v]',li).forEach(function(x){x.disabled=true});
+    var done=$$('li.ok,li.bad',root).length,good=$$('li.ok',root).length;
+    $('.score',root).textContent=good+' von '+done+' richtig'+(done===items.length?(good===items.length?'. Perfekt!':'. Lies die Erklärungen noch einmal durch.'):'');
+  });
+}
+
+/* ---------- Beschriften ---------- */
+function labelTask(id,getItems,pool){
+  var root=$('#'+id);
+  function render(){
+    var items=getItems();
+    root.innerHTML='<div class="mapwrap">'+mapHTML({markers:items})+'</div><ol class="rows" style="margin-top:.9rem"></ol><div class="bar"><button type="button" class="btn" data-a="check">Prüfen</button><button type="button" class="btn ghost" data-a="solve">Lösung zeigen</button><button type="button" class="btn ghost" data-a="reset">Neu starten</button><p class="score" role="status"></p></div>';
+    var opts=pool(items).slice().sort(function(a,b){return a.localeCompare(b,'de')}).map(function(p){return '<option>'+p+'</option>'}).join('');
+    $('.rows',root).innerHTML=items.map(function(m,i){return '<li data-i="'+i+'"><span class="rt"><span class="nr">'+(i+1)+'</span><select aria-label="Name für Nummer '+(i+1)+'"><option value="">wählen …</option>'+opts+'</select></span><span class="mark"></span></li>'}).join('');
+    root._items=items;
+  }
+  function mk(i){return $('.mk[data-id="'+root._items[i].id+'"]',root)}
+  function check(){
+    var n=0,open=0,items=root._items;
+    $$('li',root).forEach(function(li,i){
+      var s=$('select',li),m=mk(i);li.classList.remove('ok','bad');m.classList.remove('ok','bad');$('.mark',li).textContent='';
+      if(!s.value){open++;return}
+      var ok=s.value===items[i].name;if(ok)n++;
+      li.classList.add(ok?'ok':'bad');m.classList.add(ok?'ok':'bad');$('.mark',li).textContent=ok?'✓':'✗';
+    });
+    $('.score',root).textContent=open?(n+' von '+items.length+' richtig, '+open+' noch offen'):(n===items.length?'Alles richtig! Sehr gut.':n+' von '+items.length+' richtig. Rote Zahlen noch einmal versuchen.');
+  }
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a;
+    if(a==='check')check();
+    if(a==='solve'){$$('select',root).forEach(function(s,i){s.value=root._items[i].name});check()}
+    if(a==='reset')render();
+  });
+  root.render=render;render();
+  return root;
+}
+
+/* ---------- Finden ---------- */
+function findTask(id,getTargets,classify,anchor,hitOnLand){
+  var root=$('#'+id);
+  var st={order:[],i:0,miss:0,score:0,done:false,wait:false};
+  function start(){
+    st.order=shuffle(getTargets());st.i=0;st.miss=0;st.score=0;st.done=false;st.wait=false;
+    root.innerHTML='<div class="mapwrap">'+mapHTML()+'</div><div class="bar"><p class="progress" style="margin:0"></p></div><p class="q" style="margin:.2rem 0 0;font-size:1.15rem"></p><p class="fb" role="status"></p><div class="bar"><button type="button" class="btn" data-a="next" hidden>Weiter</button><button type="button" class="btn ghost" data-a="reset">Neu starten</button></div>';
+    show();
+  }
+  function show(){
+    var t=st.order[st.i];st.miss=0;st.wait=false;
+    $$('.hit',root).forEach(function(x){x.classList.remove('hit')});
+    $('[data-a="next"]',root).hidden=true;
+    $('.progress',root).textContent='Frage '+(st.i+1)+' von '+st.order.length;
+    $('.q',root).innerHTML='Finde: <span style="color:var(--accent)">'+t.name+'</span>';
+    var f=$('.fb',root);f.textContent='';f.className='fb';
+  }
+  function finish(){
+    st.done=true;
+    $('.progress',root).textContent='Geschafft';
+    $('.q',root).innerHTML='<span class="result">'+st.score+' von '+st.order.length+' gleich beim ersten Versuch</span>';
+    var f=$('.fb',root);f.className='fb';f.textContent=st.score===st.order.length?'Fantastisch, du kennst dich aus!':st.score>=st.order.length-2?'Sehr gut. Probiere es noch einmal.':'Übung macht den Meister. Starte noch einmal.';
+    $('[data-a="next"]',root).hidden=true;
+  }
+  function advance(){st.i++;if(st.i>=st.order.length)finish();else show()}
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('[data-a]');
+    if(b){if(b.dataset.a==='reset')start();if(b.dataset.a==='next')advance();return}
+    var svg=e.target.closest('svg');if(!svg||st.done||st.wait)return;
+    var ll=lonlat(svg,e),res=classify(ll[0],ll[1]),t=st.order[st.i],f=$('.fb',root);
+    if(res.id===t.id){
+      if(st.miss===0)st.score++;
+      ping(svg,ll[0],ll[1],'ok');f.className='fb ok';f.textContent='Richtig! Das ist '+t.name+'.';
+      st.wait=true;setTimeout(function(){if(!st.done)advance()},900);
+    }else{
+      st.miss++;ping(svg,ll[0],ll[1],'bad');f.className='fb bad';
+      if(st.miss>=2){
+        f.textContent='Das ist '+res.say+'. Hier liegt '+t.name+'. Schau gut hin und merke es dir.';
+        if(hitOnLand){$$('.land[data-c="'+t.id+'"]',svg).forEach(function(p){p.classList.add('hit')})}
+        else{var a=anchor(t.id);ping(svg,a[0],a[1],'show')}
+        st.wait=true;$('[data-a="next"]',root).hidden=false;
+      }else f.textContent='Das ist '+res.say+'. Gesucht ist '+t.name+'. Versuche es noch einmal.';
+    }
+  });
+  root.restart=start;start();return root;
+}
+function classifyCont(lon,lat){var w=where(lon,lat);
+  if(w.t==='land')return {id:w.id,say:CONT[w.id]};
+  if(w.t==='lake')return {id:null,say:'ein See (Kaspisches Meer)'};
+  return {id:null,say:'Wasser (ein Ozean)'}}
+function classifyOcean(lon,lat){var w=where(lon,lat);
+  if(w.t==='land')return {id:null,say:'Land ('+CONT[w.id]+')'};
+  if(w.t==='lake')return {id:null,say:'ein See, kein Ozean'};
+  return {id:w.id,say:OCEAN[w.id]}}
+
+/* ---------- Ordnen nach Größe ---------- */
+function sizeTask(id){
+  var root=$('#'+id),picked=[],checked=false,order=contSorted;
+  var pool=shuffle(Object.keys(CD));
+  function draw(){
+    var left=pool.filter(function(k){return picked.indexOf(k)<0});
+    var html='<p class="q">Deine Reihenfolge (größter zuerst):</p>';
+    if(checked){
+      var n=0;html+='<ol class="sizeout">'+picked.map(function(k,i){var ok=order[i]===k;if(ok)n++;return '<li><span class="'+(ok?'ok':'bad')+'">'+(ok?'✓':'✗')+'</span> '+CD[k].n+' <span class="pill">'+fmt(CD[k].a)+' Mio. km²</span></li>'}).join('')+'</ol>';
+      html+='<p class="score" role="status">'+(n===7?'Alles richtig! Asien ist der größte, Australien der kleinste.':n+' von 7 stehen am richtigen Platz. Die richtige Reihenfolge: '+order.map(function(k){return CD[k].n}).join(', ')+'.')+'</p>';
+    }else{
+      html+=picked.length?'<ol class="sizeout">'+picked.map(function(k){return '<li>'+CD[k].n+'</li>'}).join('')+'</ol>':'<p class="mapnote" style="margin:0 0 .6rem">Noch nichts gewählt.</p>';
+      html+='<div class="pick">'+left.map(function(k){return '<button type="button" class="chip" data-k="'+k+'">'+CD[k].n+'</button>'}).join('')+'</div>';
+    }
+    html+='<div class="bar"><button type="button" class="btn" data-a="check"'+(picked.length<7||checked?' disabled':'')+'>Prüfen</button><button type="button" class="btn ghost" data-a="undo"'+(!picked.length||checked?' disabled':'')+'>Zurück</button><button type="button" class="btn ghost" data-a="reset">Neu starten</button></div>';
+    root.innerHTML=html;
+  }
+  root.addEventListener('click',function(e){
+    var c=e.target.closest('[data-k]');if(c){picked.push(c.dataset.k);draw();return}
+    var b=e.target.closest('[data-a]');if(!b||b.disabled)return;
+    if(b.dataset.a==='check'){checked=true}
+    if(b.dataset.a==='undo'){picked.pop()}
+    if(b.dataset.a==='reset'){picked=[];checked=false;pool=shuffle(pool)}
+    draw();
+  });
+  draw();
+}
+
+/* ---------- Entdecker-Karte ---------- */
+(function(){
+  var host=$('#m-explore');host.innerHTML=mapHTML({labels:true});
+  var svg=$('svg',host),card=$('#exCard');
+  function showCont(id){
+    $$('.land.sel',svg).forEach(function(p){p.classList.remove('sel')});
+    $$('.land[data-c="'+id+'"]',svg).forEach(function(p){p.classList.add('sel')});
+    var d=CD[id],rank=contSorted.indexOf(id)+1;
+    card.innerHTML='<div class="cardhd"><span class="dot" style="background:var(--c-'+id+')"></span><h3>'+d.n+'</h3><span class="pill">Platz '+rank+' von 7 nach Größe</span></div><p>'+d.t+'</p><div class="facts"><span class="big">'+fmt(d.a)+'</span> Mio. km²</div>';
+  }
+  function showOcean(id){
+    $$('.land.sel',svg).forEach(function(p){p.classList.remove('sel')});
+    var o=OD[id],rank=['pa','at','in','sp','np'].indexOf(id)+1;
+    card.innerHTML='<div class="cardhd"><span class="dot" style="background:var(--accent)"></span><h3>'+OCEAN[id]+'</h3><span class="pill">Platz '+rank+' von 5 nach Größe</span></div><p>'+o.t+'</p><div class="facts"><span class="big">'+o.a+'</span> Mio. km²</div>';
+  }
+  svg.addEventListener('click',function(e){
+    var ll=lonlat(svg,e),w=where(ll[0],ll[1]);
+    if(w.t==='land'){showCont(w.id);ping(svg,ll[0],ll[1],'show')}
+    else if(w.t==='sea'){showOcean(w.id);ping(svg,ll[0],ll[1],'show')}
+    else{$$('.land.sel',svg).forEach(function(p){p.classList.remove('sel')});card.innerHTML='<div class="cardhd"><h3>Kaspisches Meer</h3></div><p>Das ist der größte See der Erde. Weil er so riesig ist, nennt man ihn Meer. Er gehört aber zu keinem Ozean.</p>'}
+  });
+  showCont('eu');
+})();
+
+/* ---------- Aufgaben aufbauen ---------- */
+dropTask('t-globus-gaps',[
+ {t:'Die Erde dreht sich um die {}.',a:'Erdachse'},
+ {t:'Der {} liegt ganz im Norden der Erde.',a:'Nordpol'},
+ {t:'Der {} ist ein gedachter Kreis in der Mitte zwischen den Polen.',a:'Äquator'},
+ {t:'Er teilt die Erde in die Nordhalbkugel und die {}.',a:'Südhalbkugel'},
+ {t:'Die {} laufen als Kreise parallel zum Äquator.',a:'Breitenkreise'},
+ {t:'Der {} führt durch Greenwich bei London.',a:'Nullmeridian'}
+],['Erdachse','Nordpol','Südpol','Äquator','Südhalbkugel','Breitenkreise','Längenkreise','Nullmeridian']);
+
+tfTask('t-globus-tf',[
+ {t:'Ein Globus ist ein verkleinertes Modell der Erde.',a:true,w:'Der Globus zeigt die Erde rund und in ihrer richtigen Form.'},
+ {t:'Der Äquator führt durch den Nordpol und den Südpol.',a:false,w:'Die Pole liegen an den Enden der Erdachse. Der Äquator liegt genau in der Mitte dazwischen.'},
+ {t:'Die Erdachse steht auf dem Globus leicht schräg.',a:true,w:'Sie ist um etwa 23,5° geneigt.'},
+ {t:'Die Längenkreise laufen parallel zum Äquator.',a:false,w:'Das sind die Breitenkreise. Längenkreise laufen von Pol zu Pol.'},
+ {t:'Der Nullmeridian teilt die Erde in Ost- und Westhalbkugel.',a:true,w:'Er führt durch Greenwich. Östlich davon liegt die Osthalbkugel, westlich die Westhalbkugel.'},
+ {t:'Der Südpol liegt auf der Nordhalbkugel.',a:false,w:'Der Südpol liegt ganz im Süden, also auf der Südhalbkugel.'}
+]);
+
+dropTask('t-cont-who',[
+ {t:'Hier liegt der Südpol. Fast alles ist von Eis bedeckt. Ich bin {}.',a:'Antarktika'},
+ {t:'Hier liegt Deutschland. Ich bin {}.',a:'Europa'},
+ {t:'Auf mir liegt die Wüste Sahara. Ich bin {}.',a:'Afrika'},
+ {t:'Ich bin der größte Kontinent. Der Mount Everest steht auf mir. Ich bin {}.',a:'Asien'},
+ {t:'Ich bin der kleinste Kontinent und liege auf der Südhalbkugel. Ich bin {}.',a:'Australien'},
+ {t:'Bei mir fließt der Amazonas durch den Regenwald. Ich bin {}.',a:'Südamerika'},
+ {t:'Zu mir gehören Kanada, die USA und Mexiko. Ich bin {}.',a:'Nordamerika'}
+],Object.keys(CONT).map(function(k){return CONT[k]}));
+
+labelTask('t-cont-label',function(){return shuffle(Object.keys(CMARK)).map(function(k){return {id:k,name:CONT[k],lon:CMARK[k][0],lat:CMARK[k][1]}})},function(){return Object.keys(CONT).map(function(k){return CONT[k]})});
+
+findTask('t-cont-find',function(){return Object.keys(CONT).map(function(k){return {id:k,name:CONT[k]}})},classifyCont,null,true);
+
+sizeTask('t-cont-size');
+
+/* Ozeane */
+function oceanSet(polar){return polar?['pa','at','in','sp','np']:['pa','at','in']}
+var whoO=[
+ {k:'pa',t:'Ich bin der größte und tiefste Ozean. Im Marianengraben bin ich rund 11.000 m tief. Ich bin der {}.'},
+ {k:'at',t:'Ich liege zwischen Amerika im Westen sowie Europa und Afrika im Osten. Ich bin der {}.'},
+ {k:'in',t:'Ich liege zwischen Afrika, Asien und Australien und bin nach einem Land benannt. Ich bin der {}.'},
+ {k:'sp',t:'Ich umgebe den Kontinent Antarktika. Ich bin das {}.'},
+ {k:'np',t:'Ich liege rund um den Nordpol und bin großteils von Eis bedeckt. Ich bin das {}.'}
+];
+function whoRender(){
+  var polar=$('#polarWho').checked,set=oceanSet(polar);
+  dropTask('t-ocean-who',whoO.filter(function(w){return set.indexOf(w.k)>-1}).map(function(w){return {t:w.t,a:OCEAN[w.k]}}),set.map(function(k){return OCEAN[k]}));
+}
+$('#polarWho').addEventListener('change',whoRender);whoRender();
+
+var lblO=labelTask('t-ocean-label',function(){return shuffle(oceanSet($('#polarLabel').checked)).map(function(k){return {id:k,name:OCEAN[k],lon:OMARK[k][0],lat:OMARK[k][1]}})},function(){return oceanSet($('#polarLabel').checked).map(function(k){return OCEAN[k]})});
+$('#polarLabel').addEventListener('change',function(){lblO.render()});
+
+var findO=findTask('t-ocean-find',function(){return oceanSet($('#polarFind').checked).map(function(k){return {id:k,name:OCEAN[k]}})},classifyOcean,function(id){return OMARK[id]},false);
+$('#polarFind').addEventListener('change',function(){findO.restart()});
+
+/* ---------- Erweiterung: Infos aus Lisas Heft ---------- */
+function infoChips(chipsId,infoId,items,onSet){
+  var cb=$('#'+chipsId),ib=$('#'+infoId);
+  cb.innerHTML=items.map(function(p){return '<button type="button" class="chip" data-k="'+p[0]+'" aria-pressed="false">'+p[1]+'</button>'}).join('');
+  function set(k){
+    $$('.chip',cb).forEach(function(c){c.setAttribute('aria-pressed',c.dataset.k===k?'true':'false')});
+    var p=items.filter(function(x){return x[0]===k})[0];
+    ib.innerHTML='<h3>'+p[2]+'</h3><p style="margin-top:.4rem">'+p[3]+'</p>'+(p[4]?'<p class="mapnote">'+p[4]+'</p>':'');
+    if(onSet)onSet(k);
+  }
+  cb.addEventListener('click',function(e){var b=e.target.closest('.chip');if(b)set(b.dataset.k)});
+  set(items[0][0]);
+  return set;
+}
+
+function choiceTask(id,items,choices){
+  var root=$('#'+id);
+  function draw(){
+    root.innerHTML='<ol class="rows">'+items.map(function(it,i){return '<li data-i="'+i+'"><span class="rt"><span class="nr">'+(i+1)+'</span>'+it.t+'</span><span class="tfb">'+choices.map(function(c){return '<button type="button" class="btn ghost" data-v="'+esc(c)+'">'+c+'</button>'}).join('')+'</span><span class="mark"></span><span class="why" hidden></span></li>'}).join('')+'</ol><div class="bar"><button type="button" class="btn ghost" data-a="reset">Neu starten</button><p class="score" role="status"></p></div>';
+  }
+  draw();
+  root.addEventListener('click',function(e){
+    if(e.target.closest('[data-a="reset"]')){draw();return}
+    var b=e.target.closest('[data-v]');if(!b)return;
+    var li=b.closest('li');if(li.classList.contains('ok')||li.classList.contains('bad'))return;
+    var it=items[+li.dataset.i],ok=b.dataset.v===it.a;
+    li.classList.add(ok?'ok':'bad');$('.mark',li).textContent=ok?'✓':'✗';
+    var w=$('.why',li);w.hidden=false;w.textContent=(ok?'Richtig. ':'Leider falsch. ')+it.w;
+    $$('[data-v]',li).forEach(function(x){x.disabled=true});
+    var done=$$('li.ok,li.bad',root).length,good=$$('li.ok',root).length;
+    $('.score',root).textContent=good+' von '+done+' richtig'+(done===items.length?(good===items.length?'. Perfekt!':'. Lies die Erklärungen noch einmal durch.'):'');
+  });
+}
+
+function orderTask(id,order,heading,okMsg){
+  var root=$('#'+id),picked=[],checked=false,pool=shuffle(order);
+  function draw(){
+    var left=pool.filter(function(k){return picked.indexOf(k)<0});
+    var html='<p class="q">'+heading+'</p>';
+    if(checked){
+      var n=0;
+      html+='<ol class="sizeout">'+picked.map(function(k,i){var ok=order[i]===k;if(ok)n++;return '<li><span class="'+(ok?'ok':'bad')+'">'+(ok?'✓':'✗')+'</span> '+k+'</li>'}).join('')+'</ol>';
+      html+='<p class="score" role="status">'+(n===order.length?okMsg:n+' von '+order.length+' stehen am richtigen Platz. Richtig ist: '+order.join(', ')+'.')+'</p>';
+    }else{
+      html+=picked.length?'<ol class="sizeout">'+picked.map(function(k){return '<li>'+k+'</li>'}).join('')+'</ol>':'<p class="mapnote" style="margin:0 0 .6rem">Noch nichts gewählt.</p>';
+      html+='<div class="pick">'+left.map(function(k){return '<button type="button" class="chip" data-k="'+k+'">'+k+'</button>'}).join('')+'</div>';
+    }
+    html+='<div class="bar"><button type="button" class="btn" data-a="check"'+(picked.length<order.length||checked?' disabled':'')+'>Prüfen</button><button type="button" class="btn ghost" data-a="undo"'+(!picked.length||checked?' disabled':'')+'>Zurück</button><button type="button" class="btn ghost" data-a="reset">Neu starten</button></div>';
+    root.innerHTML=html;
+  }
+  root.addEventListener('click',function(e){
+    var c=e.target.closest('[data-k]');if(c){picked.push(c.dataset.k);draw();return}
+    var b=e.target.closest('[data-a]');if(!b||b.disabled)return;
+    if(b.dataset.a==='check')checked=true;
+    if(b.dataset.a==='undo')picked.pop();
+    if(b.dataset.a==='reset'){picked=[];checked=false;pool=shuffle(pool)}
+    draw();
+  });
+  draw();
+}
+
+/* ----- Erdkunde ----- */
+infoChips('fChips','fInfo',[
+ ['eo','','Erdoberfläche','Die Formen und die Gestaltung der Erdoberfläche.','Beispiel: Das Hochgebirge der Alpen'],
+ ['at','','Atmosphäre','Wetter, Klima und die Luft als Hülle der Erde.','Beispiel: Das Wetter und die Jahreszeiten'],
+ ['wi','','Wirtschaft','Wie Menschen Güter herstellen, verteilen und nutzen.','Beispiel: Landwirtschaft und ihre Produkte'],
+ ['ge','','Gesellschaft','Wie Menschen zusammenleben und ihren Raum gestalten.','Beispiel: Stadt- und Landleben im Vergleich']
+].map(function(x){x[1]=x[2];return x}));
+infoChips('aChips','aInfo',[
+ ['atl','','Atlas','Zum Nachschlagen und Orientieren.'],
+ ['kar','','Karten','Verschiedene Karten lesen und auswerten.'],
+ ['glo','','Globus','Die Erde im Maßstab verstehen.'],
+ ['end','','Digitale Endgeräte','Informationen recherchieren, präsentieren und gestalten.'],
+ ['dig','','Digitale Karten','Interaktive Karten nutzen, zum Beispiel Google Earth oder online Kartenportale.'],
+ ['kom','','Kompass','Orientierung in der Karte und im Gelände.']
+].map(function(x){x[1]=x[2];return x}));
+
+dropTask('t-fach-bereiche',[
+ {t:'Erdkunde heißt auch {}.',a:'Geografie'},
+ {t:'Das Hochgebirge der Alpen gehört zum Bereich {}.',a:'Erdoberfläche'},
+ {t:'Das Wetter und die Jahreszeiten gehören zum Bereich {}.',a:'Atmosphäre'},
+ {t:'Landwirtschaft und ihre Produkte gehören zum Bereich {}.',a:'Wirtschaft'},
+ {t:'Stadt- und Landleben im Vergleich gehört zum Bereich {}.',a:'Gesellschaft'}
+],['Atmosphäre','Erdoberfläche','Geografie','Gesellschaft','Wirtschaft']);
+
+dropTask('t-fach-mittel',[
+ {t:'Zum Nachschlagen und Orientieren nutze ich den {}.',a:'Atlas'},
+ {t:'Die Erde im Maßstab verstehe ich am {}.',a:'Globus'},
+ {t:'Zur Orientierung in der Karte und im Gelände nutze ich den {}.',a:'Kompass'},
+ {t:'Interaktive Karten wie Google Earth nennt man {}.',a:'Digitale Karten'},
+ {t:'Tablet und Laptop sind {}.',a:'Digitale Endgeräte'}
+],['Atlas','Digitale Endgeräte','Digitale Karten','Globus','Kompass']);
+
+/* ----- Weltall ----- */
+var PL=[['Merkur','Mein',7,'#a8a29e',120],['Venus','Vater',10,'#e0b070',170],['Erde','erklärt',11,'#3b82c4',225],['Mars','mir',8,'#c4623b',278],['Jupiter','jeden',26,'#d9a066',350],['Saturn','Sonntag',22,'#e3c98a',440],['Uranus','unseren',15,'#8fd3dc',525],['Neptun','Nachthimmel',15,'#4a6fd6',605]];
+(function(){
+  var host=$('#planetSvg');
+  var s='<svg class="sys" viewBox="0 0 660 250" role="img" aria-label="Das Sonnensystem: die Sonne und acht Planeten, von 1 bis 8 nummeriert"><rect width="660" height="250" rx="12" fill="#0d1b2a"/>';
+  s+='<circle cx="0" cy="125" r="78" fill="#f59e0b"/><circle cx="0" cy="125" r="64" fill="#fbbf24"/>';
+  PL.forEach(function(p){s+='<circle cx="0" cy="125" r="'+p[4]+'" fill="none" stroke="#fff" stroke-opacity=".18"/>'});
+  PL.forEach(function(p,i){
+    var x=p[4],r=p[2];
+    s+='<g class="pl" data-i="'+i+'" tabindex="0" role="button" aria-label="'+(i+1)+'. Planet">';
+    s+='<circle class="hit" cx="'+x+'" cy="125" r="'+(Math.max(r,14)+12)+'"/>';
+    s+='<circle class="ring" cx="'+x+'" cy="125" r="'+(r+9)+'"/>';
+    s+='<circle cx="'+x+'" cy="125" r="'+r+'" fill="'+p[3]+'"/>';
+    if(p[0]==='Saturn')s+='<ellipse cx="'+x+'" cy="125" rx="'+(r*1.8)+'" ry="'+(r*.45)+'" fill="none" stroke="#c9a96b" stroke-width="3" transform="rotate(-18 '+x+' 125)"/>';
+    s+='<circle cx="'+x+'" cy="212" r="11" fill="none" stroke="#fff" stroke-width="1.5"/><text class="pn" x="'+x+'" y="217">'+(i+1)+'</text></g>';
+  });
+  s+='</svg>';
+  host.innerHTML=s;
+  var set=infoChips('planetChips','planetInfo',PL.map(function(p,i){return [String(i),(i+1)+' '+p[0],(i+1)+'. Planet: '+p[0],'','']}),function(k){
+    var i=+k;
+    $$('.pl',host).forEach(function(g){g.classList.toggle('on',+g.dataset.i===i)});
+    var words=PL.map(function(q,j){return j===i?'<mark>'+q[1]+'</mark>':q[1]}).join(' ');
+    var extra=PL[i][0]==='Erde'?'Das ist unser Heimatplanet.':(PL[i][0]==='Saturn'?'Saturn hat auffällige Ringe.':'');
+    $('#planetInfo').innerHTML='<h3>'+(i+1)+'. Planet: '+PL[i][0]+'</h3><p style="margin-top:.4rem">'+(extra?extra+' ':'')+'Er ist von der Sonne aus der '+(i+1)+'. Planet.</p><p class="merk" style="margin-top:.5rem">Merkspruch: „'+words+'“</p>';
+  });
+  host.addEventListener('click',function(e){var g=e.target.closest('.pl');if(g)set(g.dataset.i)});
+  host.addEventListener('keydown',function(e){if(e.key!=='Enter'&&e.key!==' ')return;var g=e.target.closest('.pl');if(g){e.preventDefault();set(g.dataset.i)}});
+  set('2');
+})();
+
+orderTask('t-pl-order',PL.map(function(p){return p[0]}),'Deine Reihenfolge (sonnennächster Planet zuerst):','Alles richtig! Merkur ist der sonnennächste, Neptun der sonnenfernste Planet.');
+
+dropTask('t-pl-drop',[
+ {t:'Der Planet mit der Nummer 1 heißt {}.',a:'Merkur'},
+ {t:'Der Planet mit der Nummer 3 ist unser Heimatplanet. Er heißt {}.',a:'Erde'},
+ {t:'Der Planet mit der Nummer 4 heißt {}.',a:'Mars'},
+ {t:'Der Planet mit der Nummer 6 hat auffällige Ringe. Er heißt {}.',a:'Saturn'},
+ {t:'Der Planet mit der Nummer 8 heißt {}.',a:'Neptun'}
+],PL.map(function(p){return p[0]}));
+
+dropTask('t-pl-merk',[
+ {t:'Das Wort „Vater“ steht für den Planeten {}.',a:'Venus'},
+ {t:'Das Wort „erklärt“ steht für den Planeten {}.',a:'Erde'},
+ {t:'Das Wort „mir“ steht für den Planeten {}.',a:'Mars'},
+ {t:'Das Wort „Sonntag“ steht für den Planeten {}.',a:'Saturn'},
+ {t:'Das Wort „Nachthimmel“ steht für den Planeten {}.',a:'Neptun'}
+],PL.map(function(p){return p[0]}));
+
+tfTask('t-pl-tf',[
+ {t:'Im Mittelpunkt unseres Sonnensystems steht die Sonne.',a:true,w:'Die acht Planeten bewegen sich um die Sonne.'},
+ {t:'Unser Sonnensystem hat 9 Planeten.',a:false,w:'Es sind 8 Planeten: Merkur, Venus, Erde, Mars, Jupiter, Saturn, Uranus und Neptun.'},
+ {t:'Die Erde ist der dritte Planet von der Sonne aus.',a:true,w:'Vor der Erde kommen Merkur und Venus.'},
+ {t:'Die Erde steht im Mittelpunkt des Sonnensystems.',a:false,w:'Im Mittelpunkt steht die Sonne.'},
+ {t:'Unser Sonnensystem ist Teil der Milchstraße.',a:true,w:'Die Milchstraße ist eine von sehr vielen Galaxien im Weltall.'}
+]);
+
+/* ----- Atlas ----- */
+infoChips('atChips','atInfo',[
+ ['v','Vorderer Teil','Der vordere Teil','<b>Kartenübersicht:</b> ein schneller Überblick über die im Atlas vorhandenen Karten. Die Karten sind durch Rechtecke markiert und mit Seitenzahlen versehen.<br><b>Kartenverzeichnis:</b> ein detaillierter Überblick über die im Atlas vorhandenen Karten. Es ist 1. nach Regionen und 2. nach Themen geordnet.'],
+ ['h','Hauptteil','Der Hauptteil','<b>Kartenlesen:</b> Hilfe zum Kartenlesen und zum Beispiel die „Masterlegende“.<br><b>Kartensammlung:</b> alle Karten. Sie sind 1. nach Regionen geordnet (Deutschland, Europa …) und 2. innerhalb der Regionen nach Themen.'],
+ ['r','Hinterer Teil','Der hintere Teil','<b>Register:</b> das Namensverzeichnis aller Städte, Flüsse, Berge … Hinter jedem Namen stehen die Seite und das Planquadrat.<br><b>Sachregister:</b> hier stehen Fachbegriffe.','Beispiel: Sankt Wendel finde ich auf Seite 22 im Planquadrat C4.']
+]);
+
+function gridHTML(opt){
+  var cols=['A','B','C','D','E'];
+  var h='<table class="gridt"><thead><tr><th></th>'+cols.map(function(c){return '<th scope="col">'+c+'</th>'}).join('')+'</tr></thead><tbody>';
+  for(var r=1;r<=5;r++){
+    h+='<tr><th scope="row">'+r+'</th>';
+    cols.forEach(function(c){
+      var id=c+r;
+      h+='<td>'+(opt.inter?'<button type="button" class="gcell" data-id="'+id+'" aria-label="Planquadrat '+id+'"></button>':'<span class="gcell'+(id===opt.mark?' ex':'')+'">'+(id===opt.mark?'●':'')+'</span>')+'</td>';
+    });
+    h+='</tr>';
+  }
+  return h+'</tbody></table>';
+}
+$('#gridDemo').innerHTML=gridHTML({mark:'C4'})+'<p class="mapnote" style="text-align:center">Planquadrat C4: Spalte C, Zeile 4</p>';
+
+dropTask('t-at-drop',[
+ {t:'Einen schnellen Überblick über alle Karten im Atlas gibt die {}.',a:'Kartenübersicht'},
+ {t:'Einen detaillierten Überblick über die Karten bekomme ich im {}.',a:'Kartenverzeichnis'},
+ {t:'Die {} enthält alle Karten des Atlas.',a:'Kartensammlung'},
+ {t:'Namen von Städten, Flüssen und Bergen suche ich im {}.',a:'Register'},
+ {t:'Fachbegriffe finde ich im {}.',a:'Sachregister'},
+ {t:'Im Register steht hinter dem Namen die Seite und das {}.',a:'Planquadrat'}
+],['Kartenlesen','Kartenübersicht','Kartensammlung','Kartenverzeichnis','Planquadrat','Register','Sachregister']);
+
+(function(){
+  var root=$('#t-grid'),st;
+  function start(){
+    st={order:shuffle(['A1','B3','D2','E5','B5','D4','A4','E2','C1','C5']).slice(0,6),i:0,miss:0,score:0,wait:false,done:false};
+    root.innerHTML=gridHTML({inter:true})+'<p class="progress" style="margin-top:.8rem"></p><p class="q" style="font-size:1.15rem;margin:.2rem 0 0"></p><p class="fb" role="status"></p><div class="bar"><button type="button" class="btn" data-a="next" hidden>Weiter</button><button type="button" class="btn ghost" data-a="reset">Neu starten</button></div>';
+    show();
+  }
+  function show(){
+    var t=st.order[st.i];st.miss=0;st.wait=false;
+    $$('.gcell',root).forEach(function(c){c.classList.remove('ok','bad','hint')});
+    $('[data-a="next"]',root).hidden=true;
+    $('.progress',root).textContent='Frage '+(st.i+1)+' von '+st.order.length;
+    $('.q',root).innerHTML='Tippe auf das Planquadrat <span style="color:var(--accent)">'+t+'</span>';
+    var f=$('.fb',root);f.textContent='';f.className='fb';
+  }
+  function finish(){
+    st.done=true;
+    $('.progress',root).textContent='Geschafft';
+    $('.q',root).innerHTML='<span class="result">'+st.score+' von '+st.order.length+' gleich beim ersten Versuch</span>';
+    var f=$('.fb',root);f.className='fb';f.textContent=st.score===st.order.length?'Fantastisch, du findest jedes Planquadrat!':'Merke dir: erst der Buchstabe, dann die Zahl. Probiere es noch einmal.';
+    $('[data-a="next"]',root).hidden=true;
+  }
+  function advance(){st.i++;if(st.i>=st.order.length)finish();else show()}
+  root.addEventListener('click',function(e){
+    var a=e.target.closest('[data-a]');
+    if(a){if(a.dataset.a==='reset')start();if(a.dataset.a==='next')advance();return}
+    var c=e.target.closest('.gcell');if(!c||c.tagName!=='BUTTON'||st.done||st.wait)return;
+    var t=st.order[st.i],f=$('.fb',root);
+    if(c.dataset.id===t){
+      if(st.miss===0)st.score++;
+      c.classList.add('ok');f.className='fb ok';f.textContent='Richtig! Das ist '+t+'.';
+      st.wait=true;setTimeout(function(){if(!st.done)advance()},800);
+    }else{
+      st.miss++;c.classList.add('bad');f.className='fb bad';
+      if(st.miss>=2){
+        $('.gcell[data-id="'+t+'"]',root).classList.add('hint');
+        f.textContent='Hier liegt '+t+'. Erst den Buchstaben oben suchen, dann die Zahl links.';
+        st.wait=true;$('[data-a="next"]',root).hidden=false;
+      }else f.textContent='Das war '+c.dataset.id+'. Gesucht ist '+t+'. Versuche es noch einmal.';
+    }
+  });
+  start();
+})();
+
+/* ----- Himmelsrichtungen ----- */
+var DIRS=[['N','Norden',0],['NO','Nordosten',45],['O','Osten',90],['SO','Südosten',135],['S','Süden',180],['SW','Südwesten',225],['W','Westen',270],['NW','Nordwesten',315]];
+function cpt(r,a){var t=a*Math.PI/180;return [(150+r*Math.sin(t)).toFixed(1),(150-r*Math.cos(t)).toFixed(1)]}
+function compassSVG(opt){
+  opt=opt||{};
+  var s='<svg class="compass" viewBox="0 0 300 300" role="img" aria-label="Windrose mit acht Himmelsrichtungen"><circle class="c-ring" cx="150" cy="150" r="140"/>';
+  DIRS.forEach(function(d){
+    var a=d[2],card=a%90===0,rt=card?100:68,w=card?16:11;
+    var p1=cpt(rt,a),p2=cpt(w,a+45),p3=cpt(w,a-45);
+    s+='<polygon class="c-tip'+(d[0]==='N'?' n':'')+(card?'':' d')+'"'+(opt.markers?'':' data-k="'+d[0]+'"')+' points="'+p1.join(',')+' '+p2.join(',')+' 150,150 '+p3.join(',')+'"/>';
+  });
+  if(opt.markers){
+    opt.markers.forEach(function(m,i){
+      var p=cpt(m[2]%90===0?124:90,m[2]);
+      s+='<g class="cmk" data-i="'+i+'" transform="translate('+p[0]+' '+p[1]+')"><circle r="12"/><text y="4.5">'+(i+1)+'</text></g>';
+    });
+  }else{
+    DIRS.forEach(function(d){
+      var card=d[2]%90===0,p=cpt(card?124:90,d[2]);
+      s+='<text class="c-lbl'+(card?'':' d')+'" data-k="'+d[0]+'" x="'+p[0]+'" y="'+(+p[1]+(card?5:4))+'">'+d[0]+'</text>';
+    });
+  }
+  return s+'</svg>';
+}
+(function(){
+  var host=$('#compassHost');host.innerHTML=compassSVG();
+  var T={
+   N:'Der Norden liegt oben auf der Windrose. Bei uns ist die Sonne im Norden nie zu sehen.',
+   O:'Im Osten geht die Sonne auf.',
+   S:'Im Süden steigt die Sonne hoch hinauf.',
+   W:'Im Westen geht die Sonne unter.',
+   NO:'Der Nordosten liegt genau zwischen Norden und Osten.',
+   SO:'Der Südosten liegt genau zwischen Süden und Osten.',
+   SW:'Der Südwesten liegt genau zwischen Süden und Westen.',
+   NW:'Der Nordwesten liegt genau zwischen Norden und Westen.'
+  };
+  var set=infoChips('cChips','cInfo',DIRS.map(function(d){return [d[0],d[1],d[1]+' ('+d[0]+')',T[d[0]]]}),function(k){
+    $$('[data-k]',host).forEach(function(el){el.classList.toggle('on',el.getAttribute('data-k')===k)});
+  });
+  host.addEventListener('click',function(e){var t=e.target.closest('[data-k]');if(t)set(t.getAttribute('data-k'))});
+  set('O');
+})();
+
+(function(){
+  var root=$('#t-compass'),items;
+  function render(){
+    items=shuffle(DIRS);
+    root.innerHTML='<div>'+compassSVG({markers:items})+'</div><ol class="rows" style="margin-top:.9rem"></ol><div class="bar"><button type="button" class="btn" data-a="check">Prüfen</button><button type="button" class="btn ghost" data-a="solve">Lösung zeigen</button><button type="button" class="btn ghost" data-a="reset">Neu starten</button><p class="score" role="status"></p></div>';
+    var opts=DIRS.map(function(d){return d[1]}).sort(function(a,b){return a.localeCompare(b,'de')}).map(function(p){return '<option>'+p+'</option>'}).join('');
+    $('.rows',root).innerHTML=items.map(function(m,i){return '<li data-i="'+i+'"><span class="rt"><span class="nr">'+(i+1)+'</span><select aria-label="Himmelsrichtung für Nummer '+(i+1)+'"><option value="">wählen …</option>'+opts+'</select></span><span class="mark"></span></li>'}).join('');
+  }
+  function check(){
+    var n=0,open=0;
+    $$('li',root).forEach(function(li,i){
+      var s=$('select',li),m=$('.cmk[data-i="'+i+'"]',root);
+      li.classList.remove('ok','bad');m.classList.remove('ok','bad');$('.mark',li).textContent='';
+      if(!s.value){open++;return}
+      var ok=s.value===items[i][1];if(ok)n++;
+      li.classList.add(ok?'ok':'bad');m.classList.add(ok?'ok':'bad');$('.mark',li).textContent=ok?'✓':'✗';
+    });
+    $('.score',root).textContent=open?(n+' von 8 richtig, '+open+' noch offen'):(n===8?'Alles richtig! Sehr gut.':n+' von 8 richtig. Rote Zahlen noch einmal versuchen.');
+  }
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a;
+    if(a==='check')check();
+    if(a==='solve'){$$('select',root).forEach(function(s,i){s.value=items[i][1]});check()}
+    if(a==='reset')render();
+  });
+  render();
+})();
+
+dropTask('t-merkvers',[
+ {t:'Im {} geht die Sonne auf,',a:'Osten'},
+ {t:'im {} steigt sie hoch hinauf,',a:'Süden'},
+ {t:'im {} wird sie untergehen,',a:'Westen'},
+ {t:'im {} ist sie nie zu sehen.',a:'Norden'}
+],['Norden','Osten','Süden','Westen']);
+
+dropTask('t-dir-words',[
+ {t:'Europa liegt {} von Afrika.',a:'nördlich'},
+ {t:'Südamerika liegt {} von Europa.',a:'südwestlich'},
+ {t:'Afrika liegt {} von Europa.',a:'südlich'},
+ {t:'Australien liegt {} von Asien.',a:'südöstlich'}
+],['nördlich','nordöstlich','nordwestlich','östlich','südlich','südöstlich','südwestlich','westlich']);
+
+dropTask('t-dir-conts',[
+ {t:'Westlich von Asien liegt {}.',a:'Europa'},
+ {t:'Nordöstlich von Afrika liegt {}.',a:'Asien'},
+ {t:'Südöstlich von Asien liegt {}.',a:'Australien'}
+],Object.keys(CONT).map(function(k){return CONT[k]}));
+
+/* ----- Karten ----- */
+(function(){
+  var host=$('#townHost');
+  var HOUSES=[[24,24,38,26,'#b5533c'],[72,28,32,22,'#7d6a5a'],[24,62,32,26,'#a0a7ad'],[68,62,34,22,'#c26a45'],[256,30,30,24,'#8c5a45'],[294,28,36,26,'#b5533c'],[196,76,32,22,'#a0a7ad'],[238,72,36,24,'#c26a45'],[284,76,34,22,'#7d6a5a'],[24,140,34,26,'#7d6a5a'],[66,144,28,22,'#b5533c'],[104,140,32,30,'#8c5a45']];
+  var HOSP=[196,26,50,36];
+  var TREES=[[190,148],[210,166],[232,150],[256,170],[282,150],[306,168],[322,150],[200,190],[240,192],[290,192]];
+  var s='<svg class="town" data-mode="lb" viewBox="0 0 360 220" role="img" aria-label="Ein kleiner Ort, einmal als Luftbild und einmal als Karte">';
+  /* Luftbild */
+  s+='<g class="lb"><rect width="360" height="220" fill="#9bb77a"/><rect x="176" y="132" width="164" height="74" fill="#86a566"/>';
+  s+='<rect x="0" y="108" width="360" height="14" fill="#5d6168"/><line x1="0" y1="115" x2="360" y2="115" stroke="#fff" stroke-width="1.2" stroke-dasharray="8 6"/>';
+  s+='<rect x="146" y="0" width="8" height="220" fill="#6b6f76"/>';
+  s+='<rect x="0" y="210" width="360" height="3" fill="#3a3a3a"/>';
+  for(var tx=4;tx<360;tx+=9)s+='<rect x="'+tx+'" y="208" width="3" height="7" fill="#6b4f35"/>';
+  HOUSES.forEach(function(h){s+='<rect x="'+(h[0]+3)+'" y="'+(h[1]+3)+'" width="'+h[2]+'" height="'+h[3]+'" fill="#000" opacity=".25"/><rect x="'+h[0]+'" y="'+h[1]+'" width="'+h[2]+'" height="'+h[3]+'" fill="'+h[4]+'"/><line x1="'+h[0]+'" y1="'+(h[1]+h[3]/2)+'" x2="'+(h[0]+h[2])+'" y2="'+(h[1]+h[3]/2)+'" stroke="#000" stroke-opacity=".3"/>'});
+  s+='<rect x="'+(HOSP[0]+3)+'" y="'+(HOSP[1]+3)+'" width="'+HOSP[2]+'" height="'+HOSP[3]+'" fill="#000" opacity=".25"/><rect x="'+HOSP[0]+'" y="'+HOSP[1]+'" width="'+HOSP[2]+'" height="'+HOSP[3]+'" fill="#d8dbe0"/><rect x="'+(HOSP[0]+10)+'" y="'+(HOSP[1]+8)+'" width="30" height="20" fill="#b9bec6"/>';
+  TREES.forEach(function(t){s+='<circle cx="'+t[0]+'" cy="'+t[1]+'" r="9" fill="#3f6d3b"/><circle cx="'+(t[0]-2)+'" cy="'+(t[1]-2)+'" r="5" fill="#5b8c4f"/>'});
+  s+='<rect x="40" y="110" width="9" height="5" rx="1" fill="#d62828"/><rect x="214" y="116" width="9" height="5" rx="1" fill="#2b6cb0"/><rect x="300" y="110" width="9" height="5" rx="1" fill="#f2f2f2"/></g>';
+  /* Karte */
+  s+='<g class="kt"><rect width="360" height="220" fill="#f4efe3"/><rect x="176" y="132" width="164" height="74" fill="#a9d98f"/>';
+  s+='<rect x="146" y="0" width="8" height="220" fill="#fff" stroke="#b5b0a3"/>';
+  s+='<rect x="0" y="108" width="360" height="14" fill="#f2c94c" stroke="#c9a227"/>';
+  s+='<line x1="0" y1="211" x2="360" y2="211" stroke="#333" stroke-width="2.2" stroke-dasharray="7 3"/>';
+  HOUSES.forEach(function(h){s+='<rect x="'+h[0]+'" y="'+h[1]+'" width="'+h[2]+'" height="'+h[3]+'" fill="#e0577d" stroke="#b53a5e"/>'});
+  s+='<rect x="'+HOSP[0]+'" y="'+HOSP[1]+'" width="'+HOSP[2]+'" height="'+HOSP[3]+'" fill="#e0577d" stroke="#b53a5e"/><circle cx="'+(HOSP[0]+HOSP[2]/2)+'" cy="'+(HOSP[1]+HOSP[3]/2)+'" r="10" fill="#fff" stroke="#d62828" stroke-width="2"/><path d="M'+(HOSP[0]+HOSP[2]/2)+' '+(HOSP[1]+HOSP[3]/2-6)+'v12M'+(HOSP[0]+HOSP[2]/2-6)+' '+(HOSP[1]+HOSP[3]/2)+'h12" stroke="#d62828" stroke-width="2.4"/>';
+  TREES.forEach(function(t,i){if(i%2===0)s+='<circle cx="'+t[0]+'" cy="'+t[1]+'" r="3.5" fill="#4f8f3a"/>'});
+  s+='<text x="8" y="119" font-size="7.5" font-style="italic" fill="#5a4a10" font-family="Lexend,sans-serif">Hauptstraße</text></g>';
+  s+='</svg>';
+  host.innerHTML=s;
+  var svg=$('svg',host),leg=$('#townLegend');
+  $('#townChips').addEventListener('click',function(e){
+    var b=e.target.closest('.chip');if(!b)return;
+    svg.setAttribute('data-mode',b.dataset.m);leg.hidden=b.dataset.m!=='kt';
+    $$('#townChips .chip').forEach(function(c){c.setAttribute('aria-pressed',c===b?'true':'false')});
+  });
+})();
+
+infoChips('kChips','kInfo',[
+ ['k','Karte','Karte','Eine Karte ist eine verkleinerte, vereinfachte und verallgemeinerte Darstellung der Erdoberfläche oder eines Teils davon.','Jede Karte besitzt eine Legende.'],
+ ['p','Physische Karte','Physische Karte','Sie zeigt die natürlichen Landschaften der Erde. Sie bildet vor allem das Relief (die Höhenunterschiede) und die Gewässer ab.'],
+ ['t','Thematische Karte','Thematische Karte','Sie konzentriert sich auf ein bestimmtes Thema. Sie macht unsichtbare oder gesellschaftliche Dinge sichtbar, zum Beispiel Wirtschaft, Klima oder Verkehr.'],
+ ['l','Legende','Legende','Dort sind die Bedeutungen der Flächenfärbungen, der besonderen Linien und der Symbole erklärt.','<span class="warn" style="display:block;margin-top:.5rem">Aufpassen! Die Bedeutung von Farben oder Zeichen kann je nach Karte unterschiedlich sein. Schau deshalb immer in die Legende.</span>']
+]);
+
+choiceTask('t-k-luft',[
+ {t:'Man erkennt Dachfarben und Fassadenfarben.',a:'Luftbild',w:'Ein Luftbild zeigt die Wirklichkeit sehr detailliert.'},
+ {t:'Die Häuser werden als Grundriss gezeigt, meist in Rot.',a:'Karte',w:'In der Karte werden Häuser vereinfacht als Grundriss dargestellt.'},
+ {t:'Man sieht Autos auf den Straßen.',a:'Luftbild',w:'Autos, Straßenmarkierungen und Schienen sind auf dem Luftbild zu erkennen.'},
+ {t:'Farben und Symbole werden in einer Legende erklärt.',a:'Karte',w:'Die Legende gehört zur Karte.'},
+ {t:'Wiesen und Pflanzen werden meist in Grün mit Symbolen gezeigt.',a:'Karte',w:'In der Karte stehen Farben und Symbole für Pflanzen.'},
+ {t:'Es gibt Senkrecht- und Schrägaufnahmen.',a:'Luftbild',w:'Man unterscheidet Senkrechtluftbilder und Schrägluftbilder.'}
+],['Luftbild','Karte']);
+
+dropTask('t-k-gaps',[
+ {t:'Eine Karte ist eine {}, vereinfachte und verallgemeinerte Darstellung der Erdoberfläche.',a:'verkleinerte'},
+ {t:'Eine {} Karte zeigt die natürlichen Landschaften der Erde.',a:'physische'},
+ {t:'Sie bildet vor allem das {} (die Höhenunterschiede) und die Gewässer ab.',a:'Relief'},
+ {t:'Eine {} Karte konzentriert sich auf ein bestimmtes Thema.',a:'thematische'},
+ {t:'Was die Farben und Zeichen bedeuten, erklärt die {}.',a:'Legende'}
+],['Legende','physische','Relief','thematische','verkleinerte']);
+
+choiceTask('t-k-typ',[
+ {t:'Eine Karte, die zeigt, wo Gebirge und Tiefländer liegen.',a:'Physisch',w:'Das Relief gehört zur physischen Karte.'},
+ {t:'Eine Wirtschaftskarte.',a:'Thematisch',w:'Wirtschaft ist ein Thema, das man nicht direkt sieht.'},
+ {t:'Eine Karte der Flüsse und Seen.',a:'Physisch',w:'Gewässer zeigt die physische Karte.'},
+ {t:'Eine Klimakarte.',a:'Thematisch',w:'Das Klima ist ein Thema, das man nicht direkt sieht.'},
+ {t:'Eine Verkehrskarte.',a:'Thematisch',w:'Verkehr ist ein gesellschaftliches Thema.'}
+],['Physisch','Thematisch']);
+
+tfTask('t-k-tf',[
+ {t:'Eine Legende erklärt die Farben und Zeichen einer Karte.',a:true,w:'Jede Karte besitzt eine Legende.'},
+ {t:'Ein rotes Zeichen bedeutet auf jeder Karte dasselbe.',a:false,w:'Aufpassen! Die Bedeutung kann je nach Karte unterschiedlich sein. Schau immer in die Legende.'},
+ {t:'Eine Karte zeigt alle Einzelheiten der Wirklichkeit.',a:false,w:'Eine Karte ist verkleinert, vereinfacht und verallgemeinert.'},
+ {t:'Eine thematische Karte kann unsichtbare Dinge sichtbar machen.',a:true,w:'Zum Beispiel Wirtschaft, Klima oder Verkehr.'},
+ {t:'Die physische Karte bildet vor allem Höhenunterschiede und Gewässer ab.',a:true,w:'Sie zeigt die natürlichen Landschaften der Erde.'}
+]);
+
+/* Aufgaben automatisch durchnummerieren */
+$$('.task .tl').filter(function(el){return el.textContent.trim()==='Aufgabe'}).forEach(function(el,i){el.textContent='Aufgabe '+(i+1)});
+
+/* ---------- Abschlusstest ---------- */
+var QS=[
+ {q:'Wie viele Planeten hat unser Sonnensystem?',o:['6','7','8','9'],a:'8',e:'Die Erde gehört zu den 8 Planeten unseres Sonnensystems.'},
+ {q:'Der wievielte Planet von der Sonne aus ist die Erde?',o:['der 2.','der 3.','der 4.','der 5.'],a:'der 3.',e:'Zuerst kommen Merkur und Venus, dann die Erde.'},
+ {q:'Was steht im Mittelpunkt unseres Sonnensystems?',o:['Die Erde','Der Mond','Die Sonne','Der Jupiter'],a:'Die Sonne',e:'Alle Planeten bewegen sich um die Sonne.'},
+ {q:'Zu welcher Galaxie gehört unser Sonnensystem?',o:['Milchstraße','Andromeda','Sirius'],a:'Milchstraße',e:'Unser Sonnensystem ist Teil der Milchstraße, einer von sehr vielen Galaxien.'},
+ {q:'Was bedeutet das griechische Wort „geos“?',o:['Karte','Erde','beschreiben','Kugel'],a:'Erde',e:'geos heißt Erde und graphein heißt beschreiben. Darum heißt Erdkunde auch Geografie.'},
+ {q:'Wo findest du im Atlas Städte, Flüsse und Berge?',o:['In der Kartenübersicht','Im Register','Im Sachregister'],a:'Im Register',e:'Das Register ist das Namensverzeichnis aller Städte, Flüsse, Berge …'},
+ {q:'Was bedeutet „Sankt Wendel 22, C4“ im Register?',o:['Seite 22, Planquadrat C4','Seite C4, Planquadrat 22','Karte 22 und Karte C4'],a:'Seite 22, Planquadrat C4',e:'Im Register stehen der Name, die Seite und das Planquadrat.'},
+ {q:'In welcher Himmelsrichtung geht die Sonne auf?',o:['Norden','Osten','Süden','Westen'],a:'Osten',e:'Im Osten geht die Sonne auf, im Westen geht sie unter.'},
+ {q:'Welche Himmelsrichtung liegt genau zwischen Süden und Westen?',o:['Südosten','Nordwesten','Südwesten','Nordosten'],a:'Südwesten',e:'Zwischen Süden und Westen liegt der Südwesten.'},
+ {q:'Wie heißt die Erklärung der Farben und Zeichen auf einer Karte?',o:['Legende','Register','Globus','Atlas'],a:'Legende',e:'Jede Karte besitzt eine Legende.'},
+ {q:'Welche Karte zeigt vor allem Höhenunterschiede und Gewässer?',o:['Thematische Karte','Physische Karte','Luftbild'],a:'Physische Karte',e:'Die physische Karte bildet das Relief und die Gewässer ab.'},
+ {q:'Wie werden Häuser auf Karten meist dargestellt?',o:['grün','blau','rot','schwarz'],a:'rot',e:'Der Grundriss der Häuser wird meist rot gezeigt. Pflanzen werden meist grün gezeigt.'},
+ {q:'Wie viele Kontinente gibt es?',o:['5','6','7','9'],a:'7',e:'Es sind sieben: Afrika, Antarktika, Asien, Australien, Europa, Nordamerika und Südamerika.'},
+ {q:'Wie heißt der größte Ozean der Erde?',o:['Atlantischer Ozean','Pazifischer Ozean','Indischer Ozean'],a:'Pazifischer Ozean',e:'Der Pazifik ist größer als alle Landflächen der Erde zusammen.'},
+ {q:'Welcher gedachte Kreis teilt die Erde in Nord- und Südhalbkugel?',o:['Nullmeridian','Äquator','Erdachse','Längenkreis'],a:'Äquator',e:'Der Äquator liegt in der Mitte zwischen Nordpol und Südpol.'},
+ {q:'Auf welchem Kontinent liegt Deutschland?',o:['Asien','Afrika','Europa','Nordamerika'],a:'Europa',e:'Deutschland liegt in der Mitte Europas.'},
+ {q:'Wie viel Prozent der Erdoberfläche sind mit Wasser bedeckt?',o:['etwa 30 %','etwa 50 %','etwa 71 %','etwa 95 %'],a:'etwa 71 %',e:'Rund 71 % sind Wasser und nur 29 % Land.'},
+ {q:'Auf welchem Kontinent liegt der Südpol?',o:['Australien','Südamerika','Antarktika','Afrika'],a:'Antarktika',e:'Antarktika ist der eisige Kontinent am Südpol.'},
+ {q:'Durch welchen Ort führt der Nullmeridian?',o:['Paris','Berlin','Greenwich (London)','Rom'],a:'Greenwich (London)',e:'Der Nullmeridian führt durch Greenwich, einen Stadtteil von London.'},
+ {q:'Welcher Kontinent ist der kleinste?',o:['Europa','Antarktika','Südamerika','Australien'],a:'Australien',e:'Australien (mit Ozeanien) hat etwa 8,5 Mio. km².'},
+ {q:'Welcher Ozean liegt zwischen Europa/Afrika und Amerika?',o:['Pazifischer Ozean','Atlantischer Ozean','Indischer Ozean'],a:'Atlantischer Ozean',e:'Das ist der Atlantik, der zweitgrößte Ozean.'}
+];
+(function(){
+  var root=$('#quiz'),order,i,score,locked;
+  function start(){order=shuffle(QS).slice(0,12);i=0;score=0;locked=false;draw()}
+  function draw(){
+    if(i>=order.length){
+      var msg=score===order.length?'Ausgezeichnet! Du bist ein Erdkunde-Profi.':score>=9?'Sehr gut gemacht.':score>=6?'Gut. Wiederhole noch einmal die Karten.':'Lies noch einmal die Infos und versuche es danach neu.';
+      root.innerHTML='<p class="progress">Fertig</p><p class="result">'+score+' von '+order.length+' richtig</p><p class="fb">'+msg+'</p><div class="bar"><button type="button" class="btn" data-a="again">Test wiederholen</button></div>';
+      return;
+    }
+    var q=order[i];locked=false;
+    root.innerHTML='<p class="progress">Frage '+(i+1)+' von '+order.length+'</p><p class="q">'+esc(q.q)+'</p><div class="opts">'+shuffle(q.o).map(function(o){return '<button type="button" class="opt" data-o="'+esc(o)+'">'+esc(o)+'</button>'}).join('')+'</div><p class="fb" role="status"></p><div class="bar"><button type="button" class="btn" data-a="next" hidden>Weiter</button></div>';
+  }
+  root.addEventListener('click',function(e){
+    var a=e.target.closest('[data-a]');
+    if(a){if(a.dataset.a==='again')start();if(a.dataset.a==='next'){i++;draw()}return}
+    var b=e.target.closest('[data-o]');if(!b||locked)return;locked=true;
+    var q=order[i],ok=b.dataset.o===q.a;if(ok)score++;
+    $$('.opt',root).forEach(function(x){x.disabled=true;if(x.dataset.o===q.a)x.classList.add('ok')});
+    if(!ok)b.classList.add('bad');
+    var f=$('.fb',root);f.className='fb '+(ok?'ok':'bad');f.textContent=(ok?'Richtig! ':'Nicht ganz. ')+q.e;
+    var n=$('[data-a="next"]',root);n.hidden=false;n.textContent=i===order.length-1?'Ergebnis ansehen':'Weiter';
+  });
+  start();
+})();
+})();
+</script>
+
+</body>
+</html>
