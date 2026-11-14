@@ -1,4 +1,4 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Knochen-Expedition</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -173,7 +173,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .item .t small{display:block;color:var(--muted);font-weight:600}
 .item.ok{border-color:var(--ok);background:var(--ok-bg)}
 .item.bad{border-color:var(--bad);background:var(--bad-bg)}
-.tog{display:flex;gap:6px}
+.tog{display:flex;gap:6px;flex-wrap:wrap}
 .tog button{border:2px solid var(--accent);background:transparent;color:var(--accent);border-radius:10px;padding:2px 12px;min-height:42px;font-weight:800}
 .tog button:disabled{opacity:.5;cursor:default}
 .tog button.picked{background:var(--accent);color:var(--on-accent)}
@@ -235,8 +235,46 @@ footer{margin-top:28px;color:var(--muted);font-size:.9rem;text-align:center}
 .cf{position:fixed;top:-20px;width:10px;height:14px;border-radius:2px;z-index:50;pointer-events:none;animation:fall 1.8s ease-in forwards}
 @keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.9}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Gelenkbau */
+.gsvg{display:block;width:100%;max-width:320px;height:auto;margin:0 auto;position:relative}
+.gp{cursor:pointer;transition:filter .2s}
+.gp:hover,.gp:focus-visible{filter:drop-shadow(0 0 5px var(--glow));outline:none}
+.gp.sel{filter:drop-shadow(0 0 7px var(--sun))}
+.gmk circle{fill:#fff;stroke:#12243a;stroke-width:2}
+.gmk text{font:800 13px var(--display);fill:#12243a;text-anchor:middle;dominant-baseline:central}
+.gmk line{stroke:#cfeff5;stroke-width:1.5}
+.funclist{list-style:none;padding:0;margin:10px 0 14px;display:grid;gap:6px}
+.funclist li{display:flex;gap:10px;align-items:baseline;border:2px solid var(--line);border-radius:12px;padding:6px 12px;background:var(--bg)}
+.funclist b{font-family:var(--display);color:var(--accent);font-size:1.1rem;flex:none}
+.frsvg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto}
+.frsvg text{fill:#cfeff5;font:700 13px var(--body)}
+@keyframes glide{0%,100%{transform:translateX(-46px)}50%{transform:translateX(46px)}}
+@keyframes jerk{0%{transform:translateX(-46px)}20%{transform:translateX(-30px)}25%{transform:translateX(-30px)}45%{transform:translateX(-6px)}50%{transform:translateX(-6px)}70%{transform:translateX(24px)}75%{transform:translateX(24px)}100%{transform:translateX(46px)}}
+@keyframes sparkle{0%,100%{opacity:0}30%,60%{opacity:1}}
+.fr-top{animation:glide 3.2s ease-in-out infinite}
+.fr-off .fr-top{animation:jerk 1.6s steps(1,end) infinite alternate}
+.fr-oil{opacity:1;transition:opacity .4s}
+.fr-off .fr-oil{opacity:0}
+.fr-sp{opacity:0}
+.fr-off .fr-sp{animation:sparkle .5s infinite}
+.btn[aria-pressed="true"]{box-shadow:0 0 0 3px var(--sun)}
+
+/* Gelenktypen */
+.gtypes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}
+@media (max-width:700px){.gtypes{grid-template-columns:1fr}}
+.gcard{display:flex;flex-direction:column;gap:8px;min-width:0}
+.gcard h3{margin-top:4px}
+.gcard .ex{color:var(--accent);font-weight:800;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase}
+.gcard .gcap{margin:0}
+.gcard .btn{align-self:flex-start}
+@keyframes twist{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.twist{transform-origin:50px 96px;animation:twist 2.6s ease-in-out infinite}
+@keyframes rock{0%,100%{transform:rotate(-24deg)}50%{transform:rotate(24deg)}}
+@keyframes tilt{0%,100%{transform:scale(1,1)}50%{transform:scale(1,.7)}}
+.sad-a{transform-origin:112px 140px;animation:rock 3.4s ease-in-out infinite}
+.sad-b{transform-origin:112px 140px;animation:tilt 1.7s ease-in-out infinite}
 </style>
-</head><body>
 <div class="wrap">
 <header class="top">
   <div>
@@ -292,32 +330,11 @@ footer{margin-top:28px;color:var(--muted);font-size:.9rem;text-align:center}
 
 <section class="station" id="s-memory" hidden>
   <h2>Knochen-Memory</h2>
-  <p class="lead">Finde die Paare: Jeder Knochen gehört zu seiner Aufgabe. Drehe zwei Karten um. Passen sie zusammen, bleiben sie offen.</p>
+  <p class="lead">Finde die Paare: Jeder Knochen und jedes Gelenkteil gehört zu seiner Aufgabe. Drehe zwei Karten um. Passen sie zusammen, bleiben sie offen.</p>
   <p class="counter" id="memCount"></p>
   <div class="mgrid" id="memGrid"></div>
   <div class="fb" id="memFb" aria-live="polite"></div>
   <div class="tools"><button class="btn ghost" id="memReset">Neu mischen</button></div>
-</section>
-
-<section class="station" id="s-gelenke" hidden>
-  <h2>Gelenke: Hier knickt das Skelett ein</h2>
-  <p class="lead">Knochen sind steif. Trotzdem kannst du dich bücken, tanzen und werfen. Das geht, weil an vielen Stellen zwei Knochen in einem <b>Gelenk</b> zusammentreffen. Ein glatter Knorpel überzieht die Knochenenden und die Gelenkschmiere wirkt wie Öl in einer Maschine. Bänder halten alles zusammen.</p>
-  <div class="pair">
-    <div>
-      <div class="xray gl" id="hingeBox"></div>
-      <p class="gcap"><b>Scharniergelenk</b> (Ellenbogen, Knie, Finger): Es klappt nur in eine Richtung, wie eine Tür.</p>
-      <button class="btn ghost" data-pause="hingeBox">Stopp / Start</button>
-    </div>
-    <div>
-      <div class="xray gl" id="ballBox"></div>
-      <p class="gcap"><b>Kugelgelenk</b> (Schulter, Hüfte): Der runde Gelenkkopf steckt in der Gelenkpfanne und kann in alle Richtungen schwingen.</p>
-      <button class="btn ghost" data-pause="ballBox">Stopp / Start</button>
-    </div>
-  </div>
-  <div class="fun"><b>Wusstest du schon?</b>Es gibt noch mehr Gelenke: Dein Kopf dreht sich in einem Drehgelenk am Hals, und dein Daumen sitzt in einem Sattelgelenk. Deshalb kann er sich so gut zu den anderen Fingern bewegen.</div>
-  <h3 style="margin-top:24px">Welches Gelenk ist das?</h3>
-  <div class="items" id="gItems"></div>
-  <div class="fb" id="gFb" aria-live="polite"></div>
 </section>
 
 <section class="station" id="s-aufbau" hidden>
@@ -335,10 +352,56 @@ footer{margin-top:28px;color:var(--muted);font-size:.9rem;text-align:center}
   </div>
   <div class="fun"><b>Mach den Versuch (mit Erwachsenen)</b>Lege einen sauberen, gekochten Hühnerknochen etwa zwei bis drei Tage in ein Glas mit Essig. Danach ist er biegsam wie Gummi. Der Essig löst den Kalk heraus, der Knochen hart macht. Übrig bleibt das elastische Eiweiß. Nach dem Versuch gründlich die Hände waschen!</div>
 </section>
+<section class="station" id="s-gelenkbau" hidden>
+  <h2>Gelenke: bewegliche Verbindungen</h2>
+  <p class="lead">Vielleicht hast du schon Turnerinnen gesehen, die sich extrem verbiegen können. Das geht, weil deine Knochen nicht fest miteinander verwachsen sind. Zwischen ihnen gibt es eine bewegliche Verbindung: das <b>Gelenk</b>. Erst durch Gelenke werden Bewegungen möglich.</p>
+  <h3 style="margin-top:18px">Knochen, Gelenk, Knochen</h3>
+  <p class="lead">Alle Gelenke sind ähnlich aufgebaut. Ein Knochen bildet die vertiefte <b>Gelenkpfanne</b>, ein anderer den verdickten <b>Gelenkkopf</b>. Tippe auf die Teile oder auf die Namen unter dem Bild.</p>
+  <div class="two">
+    <div class="xray" id="gelBox"></div>
+    <div class="info" id="gelInfo"></div>
+  </div>
+  <div class="chips" id="gelChips"></div>
+  <p class="counter" id="gelCount"></p>
+
+  <h3 style="margin-top:26px">Warum reiben die Knochen nicht aneinander?</h3>
+  <p class="lead">Die Gelenkflächen sind mit einer festen, aber elastischen Knorpelschicht überzogen. Die Gelenkschmiere füllt den Gelenkspalt aus. Probiere es aus und schalte die Schmiere an und aus.</p>
+  <div class="xray" id="frictionBox"></div>
+  <div class="tools"><button class="btn ghost" id="frOff" aria-pressed="false">Ohne Gelenkschmiere</button><button class="btn" id="frOn" aria-pressed="true">Mit Gelenkschmiere</button></div>
+  <div class="fb" id="frFb" aria-live="polite"></div>
+  <div class="fun"><b>Bänder geben Halt</b>Jedes Gelenk ist von Bändern umgeben. Sie sind sehr reißfest und halten die Knochen zusammen. So wird beim Bewegen verhindert, dass sich die Knochen gegeneinander verschieben.</div>
+
+  <h3 style="margin-top:26px">Aufgabe A: Beschrifte das Gelenk</h3>
+  <p class="lead">Schreibe zu jeder Nummer im Bild den richtigen Namen.</p>
+  <div class="two"><div class="xray" id="gelBoxA"></div><div id="gelNameTask"></div></div>
+  <h3 style="margin-top:26px">Aufgabe B: Wer macht was?</h3>
+  <p class="lead">Ordne jedem Bestandteil des Gelenks seine Funktion zu. Wähle den passenden Buchstaben.</p>
+  <ul class="funclist" id="gelFuncList"></ul>
+  <div id="gelFuncTask"></div>
+  <div class="tools"><button class="btn" id="gelCheck">Prüfen</button></div>
+  <div class="fb" id="gelFb" aria-live="polite"></div>
+</section>
+
+<section class="station" id="s-gelenke" hidden>
+  <h2>Gelenktypen: Die Form bestimmt die Bewegung</h2>
+  <p class="lead">Wie ein Gelenk sich bewegen kann, hängt von seiner Form ab. Schau dir die vier Gelenktypen an. Mit der Taste unter dem Bild hältst du die Animation an.</p>
+  <div class="gtypes" id="gTypes"></div>
+  <div class="fun"><b>Die Hand, ein Präzisionswerkzeug</b>Ohne Probleme greifst du eine Büroklammer mit Daumen und Zeigefinger. Das gelingt, weil deine Fingerknochen durch Gelenke beweglich sind. Außerdem kannst du den Daumen den anderen Fingern gegenüberstellen. So werden die Finger zu einem vielseitig einsetzbaren Greifwerkzeug.</div>
+
+  <h3 style="margin-top:26px">Welches Gelenk ist das?</h3>
+  <p class="lead">Ordne jedem Gelenk den passenden Typ zu.</p>
+  <div class="items" id="gItems"></div>
+  <h3 style="margin-top:26px">Probier es aus: das Drehgelenk</h3>
+  <p class="lead">Lege deinen Unterarm auf den Tisch und drehe deine Hand, einmal mit der Handfläche nach oben und einmal nach unten. Dabei dreht sich die Speiche um die Elle.</p>
+  <div class="opts" id="drehMC"></div>
+  <div class="fb" id="gFb" aria-live="polite"></div>
+</section>
+
+
 
 <section class="station" id="s-quiz" hidden>
   <h2>Das große Knochen-Quiz</h2>
-  <p class="lead">Acht Fragen, eine richtige Antwort. Nach jeder Antwort erfährst du, warum sie stimmt.</p>
+  <p class="lead">Elf Fragen, jeweils eine richtige Antwort. Nach jeder Antwort erfährst du, warum sie stimmt.</p>
   <div id="quizBox"></div>
 </section>
 
@@ -391,7 +454,7 @@ function save(){try{localStorage.setItem(STORE,JSON.stringify({p:progress,n:play
 
 const STATIONS=[
  {id:'start',label:'Start'},{id:'atlas',label:'Skelett-Atlas'},{id:'beschriften',label:'Beschriften'},
- {id:'memory',label:'Memory'},{id:'gelenke',label:'Gelenke'},{id:'aufbau',label:'Knochenbau'},
+ {id:'memory',label:'Memory'},{id:'aufbau',label:'Knochenbau'},{id:'gelenkbau',label:'Gelenkbau'},{id:'gelenke',label:'Gelenktypen'},
  {id:'quiz',label:'Quiz'},{id:'wf',label:'Wahr oder falsch'},{id:'luecke',label:'Lückentext'},
  {id:'salat',label:'Buchstabensalat'},{id:'urkunde',label:'Urkunde'}
 ];
@@ -604,7 +667,7 @@ function place(n){
 }
 
 /* ---------- Memory ---------- */
-const PAIRS=[['Schädel','schützt das Gehirn'],['Rippen','schützen Herz und Lunge'],['Wirbelsäule','hält dich aufrecht'],['Kniescheibe','schützt das Kniegelenk'],['Oberschenkel-knochen','längster Knochen im Körper'],['Becken','trägt den Oberkörper']];
+const PAIRS=[['Schädel','schützt das Gehirn'],['Rippen','schützen Herz und Lunge'],['Wirbelsäule','hält dich aufrecht'],['Kniescheibe','schützt das Kniegelenk'],['Oberschenkel-knochen','längster Knochen im Körper'],['Becken','trägt den Oberkörper'],['Bänder','halten die Knochen zusammen'],['Gelenk-schmiere','verhindert das Reiben']];
 let memOpen=[],memMoves=0,memFound=0,memLock=false;
 function initMemory(){$('#memReset').addEventListener('click',memStart);$('#memGrid').addEventListener('click',memClick);memStart()}
 function memStart(){
@@ -624,7 +687,7 @@ function memClick(e){
   if(a.dataset.i===b.dataset.i){
     a.classList.add('done');b.classList.add('done');memFound++;
     if(memFound===PAIRS.length){
-      const st=memMoves<=9?3:memMoves<=14?2:1;award('memory',st);
+      const st=memMoves<=12?3:memMoves<=18?2:1;award('memory',st);
       fbSet($('#memFb'),`Alle Paare gefunden in ${memMoves} Zügen!`,'ok');if(st===3)burst();
     }
   }else{
@@ -632,28 +695,126 @@ function memClick(e){
     setTimeout(()=>{a.classList.remove('flip');b.classList.remove('flip');memLock=false},900);
   }
 }
-/* ---------- Gelenke ---------- */
+/* ---------- Gelenkbau (Buchseite 220) ---------- */
+const GP={
+ kopf:{n:'Gelenkkopf',t:'Ein Knochen bildet den verdickten Gelenkkopf. Er ist rund und liegt in der Gelenkpfanne des anderen Knochens.'},
+ haut:{n:'Knochenhaut',t:'Die Knochenhaut überzieht den Knochen von außen. In ihr verlaufen feine Blutgefäße und Nerven.'},
+ knorpel:{n:'Knorpel',t:'Die Gelenkflächen sind mit einer festen, aber elastischen Knorpelschicht überzogen. Sie wirkt wie ein glattes Polster.'},
+ kapsel:{n:'Gelenkkapsel',t:'Die Gelenkkapsel umschließt das Gelenk außen wie eine Hülle.'},
+ band:{n:'Band',t:'Bänder sind sehr reißfest. Sie umgeben das Gelenk und halten die Knochen zusammen. So verschieben sich die Knochen beim Bewegen nicht gegeneinander.'},
+ spalt:{n:'Gelenkspalt mit Gelenkschmiere',t:'Zwischen Gelenkkopf und Gelenkpfanne liegt der Gelenkspalt. Die Gelenkschmiere füllt ihn aus. Zusammen mit dem Knorpel verhindert sie, dass die Knochen aneinanderreiben und sich abnutzen. So lassen sich Gelenke auch bei großem Druck noch bewegen.'},
+ pfanne:{n:'Gelenkpfanne',t:'Der andere Knochen bildet die vertiefte Gelenkpfanne. Darin liegt der Gelenkkopf.'}
+};
+const GORDER=['kopf','haut','knorpel','kapsel','band','spalt','pfanne'];
+/* Markerlage: [Marker x, Marker y, Ziel x, Ziel y] */
+const JM=[[270,64,160,186],[40,40,120,60],[44,300,112,238],[24,118,66,150],[272,120,216,164],[276,262,194,244],[258,360,170,360]];
+function jointSVG(interactive,marks){
+  const col={bone:'var(--bone)',haut:'#e2604f',kn:'#7fd0e6',sch:'#ffe9a6',ka:'#b79ae0',ba:'#f0b34a'};
+  const G=(p,inner)=>`<g class="${interactive?'gp':''}" data-p="${p}"${interactive?` tabindex="0" role="button" aria-label="${GP[p].n}"`:''}>${inner}</g>`;
+  const pfanne=`<path d="M62 200L238 200C238 255 205 290 180 305L180 440L120 440L120 305C95 290 62 255 62 200Z" fill="${col.bone}" stroke="${col.haut}" stroke-width="3" stroke-linejoin="round"/>`;
+  const kopf=`<path d="M120 0L120 160A50 50 0 1 0 180 160L180 0Z" fill="${col.bone}" stroke="${col.haut}" stroke-width="3" stroke-linejoin="round"/>`;
+  const knorpel=`<path d="M76 200A74 74 0 0 0 224 200Z" fill="${col.kn}"/>`;
+  const knorpel2=`<path d="M96 200A54 54 0 0 0 204 200" fill="none" stroke="${col.kn}" stroke-width="8"/>`;
+  const spalt=`<path d="M84 200A66 66 0 0 0 216 200Z" fill="${col.sch}"/>`;
+  const band=`<path d="M122 130C90 150 70 175 70 206M178 130C210 150 230 175 230 206" fill="none" stroke="${col.ba}" stroke-width="9" stroke-linecap="round"/>`;
+  const kapsel=`<path d="M126 96C70 125 44 170 58 222M174 96C230 125 256 170 242 222" fill="none" stroke="${col.ka}" stroke-width="7" stroke-linecap="round"/>`;
+  let mk='';
+  if(marks)mk=JM.map((m,i)=>`<g class="gmk"><line x1="${m[0]}" y1="${m[1]}" x2="${m[2]}" y2="${m[3]}"/><circle cx="${m[0]}" cy="${m[1]}" r="12"/><text x="${m[0]}" y="${m[1]+1}">${i+1}</text></g>`).join('');
+  return `<svg class="gsvg" viewBox="0 0 300 440" role="img" aria-label="Schema eines Gelenks">${G('pfanne',pfanne)}${G('knorpel',knorpel)}${G('spalt',spalt)}${G('kopf',kopf)}${G('knorpel',knorpel2)}${G('band',band)}${G('kapsel',kapsel)}${G('haut',`<path d="M120 4L120 40M180 4L180 40" stroke="${col.haut}" stroke-width="7" stroke-linecap="round" fill="none"/>`)}${mk}</svg>`;
+}
+const FUNCS_G=[
+ ['A','verdickter, runder Knochenteil, der in die Pfanne passt','kopf'],
+ ['B','vertiefter Knochenteil, in dem der Gelenkkopf liegt','pfanne'],
+ ['C','fester, aber elastischer Überzug der Gelenkflächen','knorpel'],
+ ['D','umschließt das Gelenk außen','kapsel'],
+ ['E','füllt den Gelenkspalt und verhindert zusammen mit dem Knorpel das Aneinanderreiben','spalt'],
+ ['F','sehr reißfeste Stränge, die die Knochen zusammenhalten','band']
+];
+const FPART=[['Bänder','F'],['Gelenkkapsel','D'],['Gelenkkopf','A'],['Gelenkpfanne','B'],['Gelenkschmiere','E'],['Knorpelschicht','C']];
+const gelSeen=new Set();
+function pickGel(p){
+  $$('#gelBox .gp').forEach(g=>g.classList.toggle('sel',g.dataset.p===p));
+  $$('#gelChips .chip').forEach(c=>{c.classList.toggle('on',c.dataset.p===p);if(c.dataset.p===p)c.classList.add('seen')});
+  $('#gelInfo').innerHTML=`<h3>${GP[p].n}</h3><p style="margin-top:8px">${GP[p].t}</p>`;
+  gelSeen.add(p);$('#gelCount').textContent=`Entdeckt: ${gelSeen.size} von 7 Teilen`;
+}
+function initGelenkbau(){
+  $('#gelBox').innerHTML=jointSVG(true,false);
+  $('#gelBoxA').innerHTML=jointSVG(false,true);
+  $('#gelChips').innerHTML=GORDER.map(p=>`<button class="chip" data-p="${p}">${GP[p].n}</button>`).join('');
+  $('#gelInfo').innerHTML='<h3>Tippe auf ein Teil</h3><p class="lead">Das Bild zeigt ein Gelenk, längs aufgeschnitten. Oben liegt der Gelenkkopf, unten die Gelenkpfanne.</p>';
+  $('#gelCount').textContent='Entdeckt: 0 von 7 Teilen';
+  $('#gelBox').addEventListener('click',e=>{const g=e.target.closest('.gp');if(g)pickGel(g.dataset.p)});
+  $('#gelBox').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('.gp');if(g){e.preventDefault();pickGel(g.dataset.p)}}});
+  $('#gelChips').addEventListener('click',e=>{const c=e.target.closest('.chip');if(c)pickGel(c.dataset.p)});
+
+  /* Reibung */
+  const T=(x,y,s)=>`<text x="${x}" y="${y}">${s}</text>`;
+  $('#frictionBox').innerHTML=`<svg id="frSvg" class="frsvg" viewBox="0 0 400 165" role="img" aria-label="Animation: zwei Knochen gleiten aneinander vorbei">
+   <rect x="40" y="99" width="280" height="40" rx="6" fill="var(--bone)" stroke="#e2604f" stroke-width="2.5"/><rect x="40" y="99" width="280" height="8" fill="#7fd0e6"/>
+   <rect class="fr-oil" x="40" y="86" width="280" height="13" fill="#ffe9a6"/>
+   <g class="fr-top"><rect x="90" y="46" width="180" height="40" rx="6" fill="var(--bone)" stroke="#e2604f" stroke-width="2.5"/><rect x="90" y="78" width="180" height="8" fill="#7fd0e6"/></g>
+   <g class="fr-sp" stroke="#ff7a6e" stroke-width="3" stroke-linecap="round"><path d="M110 92l-7-9M110 92l8-9M180 92l-7-10M180 92l8-10M250 92l-7-9M250 92l8-9"/></g>
+   ${T(40,36,'Knochen oben')}${T(40,158,'Knochen unten')}${T(328,112,'Knorpel')}${T(328,94,'Schmiere')}</svg>`;
+  const setFr=on=>{
+    $('#frSvg').classList.toggle('fr-off',!on);
+    $('#frOn').setAttribute('aria-pressed',on);$('#frOff').setAttribute('aria-pressed',!on);
+    $('#frFb').textContent=on?'Mit Knorpel und Gelenkschmiere gleiten die Knochen sanft aneinander vorbei.':'Ohne Schmiere ruckelt und reibt es. Die Knochen würden sich abnutzen.';
+    $('#frFb').className='fb '+(on?'ok':'bad');
+  };
+  $('#frOn').addEventListener('click',()=>setFr(true));
+  $('#frOff').addEventListener('click',()=>setFr(false));
+  setFr(true);
+
+  /* Aufgabe A und B */
+  const names=GORDER.map(p=>GP[p].n).sort((a,b)=>a.localeCompare(b,'de'));
+  $('#gelNameTask').innerHTML=GORDER.map((p,i)=>`<div class="sel-row"><span class="no">${i+1}</span><select data-a="${p}" id="gn-${p}" aria-label="Nummer ${i+1}"><option value="">Wähle…</option>${names.map(n=>`<option>${n}</option>`).join('')}</select></div>`).join('');
+  $('#gelFuncList').innerHTML=FUNCS_G.map(f=>`<li><b>${f[0]}</b><span>${f[1]}</span></li>`).join('');
+  $('#gelFuncTask').innerHTML=FPART.map(f=>`<div class="sel-row"><span style="min-width:140px;font-weight:800">${f[0]}</span><select data-a="${f[1]}" id="gf-${f[1]}" aria-label="Funktion ${f[0]}"><option value="">Wähle…</option>${'ABCDEF'.split('').map(l=>`<option>${l}</option>`).join('')}</select></div>`).join('');
+  let tries=0;
+  $('#gelCheck').addEventListener('click',()=>{
+    tries++;let ok=0;const sels=[...$$('#gelNameTask select'),...$$('#gelFuncTask select')];
+    sels.forEach(s=>{
+      const right=GP[s.dataset.a]?GP[s.dataset.a].n===s.value:s.dataset.a===s.value;
+      s.className=right?'ok':'bad';if(right)ok++;
+    });
+    if(ok===sels.length){
+      const st=tries===1?3:tries<=3?2:1;award('gelenkbau',st);
+      fbSet($('#gelFb'),'Alles richtig! Du kennst den Aufbau eines Gelenks.','ok');if(st===3)burst();
+    }else fbSet($('#gelFb'),`${ok} von ${sels.length} richtig. Die roten Felder prüfst du noch einmal.`,'bad');
+  });
+}
+
+/* ---------- Gelenktypen (Buchseite 221) ---------- */
 function initGelenke(){
   const T=(x,y,t)=>`<text x="${x}" y="${y}">${t}</text>`;
-  $('#hingeBox').innerHTML=`<svg viewBox="0 0 300 200" class="sk" role="img" aria-label="Animation Scharniergelenk">
-   <g class="sk">${limb(30,110,150,110,14)}</g>
-   <g class="hinge-fore sk">${limb(150,110,268,110,12)}</g>
-   <circle class="pin" cx="150" cy="110" r="6"/>${T(24,150,'Oberarm')}${T(176,160,'Unterarm')}${T(104,64,'Scharniergelenk')}</svg>`;
-  $('#ballBox').innerHTML=`<svg viewBox="0 0 300 200" class="sk" role="img" aria-label="Animation Kugelgelenk">
-   <g class="ball-arm sk"><circle class="fc" cx="150" cy="110" r="20"/><circle class="es" cx="150" cy="110" r="20" stroke-width="2.5"/>${limb(150,110,268,110,12)}</g>
-   <g class="sk"><path class="es" d="M140 72C112 88 112 132 140 148" stroke-width="12" stroke-linecap="round"/><path class="fs" d="M140 72C112 88 112 132 140 148" stroke-width="8" stroke-linecap="round"/></g>
-   ${T(14,50,'Gelenkpfanne')}${T(14,176,'Gelenkkopf (Kugel)')}${T(196,50,'Kugelgelenk')}</svg>`;
-  $$('[data-pause]').forEach(b=>b.addEventListener('click',()=>$('#'+b.dataset.pause).classList.toggle('paused')));
-  const G=[
-   ['Schulter','k','Der runde Kopf des Oberarmknochens steckt in einer Pfanne.'],
-   ['Ellenbogen','s','Der Unterarm lässt sich nur auf- und zuklappen wie eine Tür.'],
-   ['Hüfte','k','Das Bein kann nach vorn, hinten und zur Seite schwingen.'],
-   ['Knie','s','Du kannst das Bein beugen und strecken, aber nicht im Kreis schwingen.'],
-   ['Fingergelenk','s','Der Finger knickt nur in eine Richtung ab.'],
-   ['Ein Gelenk, in dem der Arm im Kreis schwingen kann','k','Ball in der Pfanne: Das ist ein Kugelgelenk.']
+  const S=(l,inner)=>`<svg viewBox="0 0 300 200" class="sk" role="img" aria-label="${l}">${inner}</svg>`;
+  const GT=[
+   {id:'hinge',n:'Scharniergelenk',ex:'Ellenbogen, Knie',t:'Wie bei einem Türscharnier lässt sich der Unterarm nur nach oben und unten bewegen. Mehr geht hier nicht.',
+    svg:S('Animation Scharniergelenk',`${limb(30,110,150,110,14)}<g class="hinge-fore">${limb(150,110,268,110,12)}</g><circle class="pin" cx="150" cy="110" r="6"/>${T(24,150,'Oberarm')}${T(176,160,'Unterarm')}${T(96,188,'Scharniergelenk')}`)},
+   {id:'dreh',n:'Drehgelenk',ex:'zwischen Elle und Speiche',t:'Hier dreht sich die Speiche um die Elle. Deshalb kannst du die Hand mit der Handfläche nach oben und nach unten drehen.',
+    svg:S('Animation Drehgelenk',`${limb(36,110,262,110,11)}<g class="twist">${limb(50,96,262,96,8)}</g>${T(30,150,'Elle')}${T(150,56,'Speiche dreht sich')}${T(90,184,'Drehgelenk')}`)},
+   {id:'kugel',n:'Kugelgelenk',ex:'Schulter, Hüfte',t:'Der Gelenkkopf des Oberarmknochens ist kugelförmig. Zusammen mit der Gelenkpfanne des Schulterblatts sind kreisende Bewegungen möglich.',
+    svg:S('Animation Kugelgelenk',`<g class="ball-arm"><circle class="fc" cx="150" cy="110" r="20"/><circle class="es" cx="150" cy="110" r="20" stroke-width="2.5"/>${limb(150,110,268,110,12)}</g><path class="es" d="M140 72C112 88 112 132 140 148" stroke-width="12" stroke-linecap="round"/><path class="fs" d="M140 72C112 88 112 132 140 148" stroke-width="8" stroke-linecap="round"/>${T(14,50,'Gelenkpfanne')}${T(14,176,'Gelenkkopf (Kugel)')}${T(196,50,'Kugelgelenk')}`)},
+   {id:'sattel',n:'Sattelgelenk',ex:'Daumen',t:'Die Form der Gelenkpfanne erinnert an einen Sattel. Dein Daumen kann sich vor und zurück und zur Seite bewegen, so lässt er sich den anderen Fingern gegenüberstellen.',
+    svg:S('Animation Sattelgelenk',`<path class="b" d="M44 120Q112 175 180 120L180 182L44 182Z"/><g class="sad-b"><g class="sad-a">${limb(112,134,226,62,10)}</g></g>${T(190,160,'Handwurzel-')}${T(190,176,'knochen')}${T(20,40,'Sattelgelenk')}${T(20,58,'Daumenknochen schwingt')}`)}
   ];
-  let wrong=0,done=0;
-  $('#gItems').innerHTML=G.map((g,i)=>`<div class="item" data-i="${i}"><div class="t">${g[0]}</div><div class="tog"><button data-a="k">Kugelgelenk</button><button data-a="s">Scharniergelenk</button></div></div>`).join('');
+  $('#gTypes').innerHTML=GT.map(g=>`<div class="gcard"><div class="xray gl" id="gx-${g.id}">${g.svg}</div><div class="ex">${g.ex}</div><h3>${g.n}</h3><p class="gcap">${g.t}</p><button class="btn ghost" data-pause="gx-${g.id}">Animation anhalten</button></div>`).join('');
+  $$('[data-pause]').forEach(b=>b.addEventListener('click',()=>{const on=$('#'+b.dataset.pause).classList.toggle('paused');b.textContent=on?'Animation starten':'Animation anhalten'}));
+
+  /* Zuordnen */
+  const TY=[['s','Scharniergelenk'],['d','Drehgelenk'],['k','Kugelgelenk'],['a','Sattelgelenk']];
+  const G=[
+   ['Schulter','k','Der runde Kopf des Oberarmknochens steckt in der Pfanne des Schulterblatts.'],
+   ['Ellenbogen','s','Der Unterarm lässt sich nur nach oben und unten bewegen.'],
+   ['Hüfte','k','Der kugelförmige Kopf des Oberschenkelknochens kreist in der Pfanne.'],
+   ['Knie','s','Das Bein lässt sich nur beugen und strecken, wie eine Tür.'],
+   ['Wurzel des Daumens','a','Die Pfanne sieht aus wie ein Sattel.'],
+   ['Unterarm: Hand drehen','d','Die Speiche dreht sich um die Elle.']
+  ];
+  let wrong=0,done=0;const need=G.length+1;
+  const finish=()=>{if(done===need){const st=wrong<=1?3:wrong<=3?2:1;award('gelenke',st);fbSet($('#gFb'),`Geschafft! Fehlversuche: ${wrong}`,'ok');if(st===3)burst()}};
+  $('#gItems').innerHTML=G.map((g,i)=>`<div class="item" data-i="${i}"><div class="t">${g[0]}</div><div class="tog">${TY.map(t=>`<button data-a="${t[0]}">${t[1]}</button>`).join('')}</div></div>`).join('');
   $('#gItems').addEventListener('click',e=>{
     const b=e.target.closest('button[data-a]');if(!b)return;
     const it=b.closest('.item'),g=G[+it.dataset.i];
@@ -661,9 +822,24 @@ function initGelenke(){
       it.classList.remove('bad');it.classList.add('ok');b.classList.add('picked');
       $$('button',it).forEach(x=>x.disabled=true);
       it.querySelector('.t').insertAdjacentHTML('beforeend',`<small>${g[2]}</small>`);
-      done++;
-      if(done===G.length){const st=wrong<=1?3:wrong<=3?2:1;award('gelenke',st);fbSet($('#gFb'),`Alles richtig zugeordnet! Fehlversuche: ${wrong}`,'ok');if(st===3)burst()}
-    }else{wrong++;it.classList.add('bad');fbSet($('#gFb'),'Das war nicht ganz richtig. Denke an die Bewegung: Nur eine Richtung oder alle Richtungen?','bad')}
+      done++;finish();
+    }else{wrong++;it.classList.add('bad');fbSet($('#gFb'),'Das war nicht ganz richtig. Denke an die Form: Tür, Kugel, Sattel oder Drehung?','bad')}
+  });
+
+  /* Probier es aus */
+  const MC=shuffle([
+   {t:'Die Hand lässt sich mit der Handfläche nach oben und nach unten drehen.',ok:true},
+   {t:'Der Unterarm klappt nach oben und unten wie eine Tür.',ok:false},
+   {t:'Der Arm schwingt in großen Kreisen.',ok:false},
+   {t:'Der Daumen bewegt sich zu den anderen Fingern.',ok:false}]);
+  $('#drehMC').innerHTML=MC.map((o,i)=>`<button class="opt" data-i="${i}">${o.t}</button>`).join('');
+  $('#drehMC').addEventListener('click',e=>{
+    const b=e.target.closest('.opt');if(!b||b.disabled)return;
+    if(MC[+b.dataset.i].ok){
+      $$('#drehMC .opt').forEach(x=>x.disabled=true);b.classList.add('ok');
+      fbSet($('#gFb'),'Richtig! Das Drehgelenk zwischen Elle und Speiche macht diese Drehung möglich.','ok');
+      done++;finish();
+    }else{wrong++;b.classList.add('bad');b.disabled=true;fbSet($('#gFb'),'Probiere die Bewegung noch einmal mit deinem Arm aus.','bad')}
   });
 }
 
@@ -717,6 +893,9 @@ const QUIZ=[
  {q:'Wozu dienen die Bandscheiben?',o:['Sie speichern Blut','Sie sind Stoßdämpfer zwischen den Wirbeln','Sie schützen das Herz','Sie halten den Unterkiefer'],a:1,why:'Bandscheiben liegen zwischen den Wirbeln und federn Stöße ab.'},
  {q:'Wo im Knochen entsteht neues Blut?',o:['In der Knochenhaut','Im Gelenkknorpel','Im Knochenmark','In der harten Knochenschicht'],a:2,why:'Das rote Knochenmark ist die Blutfabrik des Körpers.'},
  {q:'Welches Gelenk ist ein Kugelgelenk?',o:['Ellenbogen','Knie','Fingergelenk','Schulter'],a:3,why:'Die Schulter ist ein Kugelgelenk. Der Arm kann in alle Richtungen schwingen.'},
+ {q:'Wozu dienen die Bänder am Gelenk?',o:['Sie halten die Knochen des Gelenks zusammen','Sie bilden neues Blut','Sie schützen das Gehirn','Sie bewegen die Knochen von allein'],a:0,why:'Bänder sind sehr reißfest. Sie verhindern, dass sich die Knochen im Gelenk gegeneinander verschieben.'},
+ {q:'Welches Gelenk hast du an der Wurzel des Daumens?',o:['Sattelgelenk','Scharniergelenk','Kugelgelenk','Gelenk gibt es dort nicht'],a:0,why:'Die Gelenkpfanne am Daumen erinnert an einen Sattel. Deshalb heißt es Sattelgelenk.'},
+ {q:'Was verhindert zusammen mit dem Knorpel, dass Knochen im Gelenk aneinanderreiben?',o:['Das Knochenmark','Die Gelenkschmiere','Die Knochenhaut','Die Bandscheibe'],a:1,why:'Die Gelenkschmiere füllt den Gelenkspalt aus. So gleiten die Knochen leicht aneinander vorbei.'},
  {q:'Wodurch sind Knochen hart und trotzdem etwas biegsam?',o:['Durch Kalk und Eiweiß','Nur durch Wasser','Nur durch Fett','Durch Luft in den Knochen'],a:0,why:'Kalk macht Knochen hart, das Eiweiß macht sie elastisch.'}
 ];
 const WF=[
@@ -727,7 +906,9 @@ const WF=[
  {q:'Das Knie ist ein Kugelgelenk.',a:1,why:'Das Knie ist ein Scharniergelenk und lässt sich nur beugen und strecken.'},
  {q:'Giraffen haben mehr Halswirbel als Menschen.',a:1,why:'Beide haben 7 Halswirbel. Bei der Giraffe sind sie nur viel länger.'},
  {q:'Gebrochene Knochen können wieder zusammenwachsen.',a:0,why:'Dank der Knochenhaut und neuer Knochenzellen heilt ein Bruch wieder.'},
- {q:'Muskeln ziehen an den Knochen und bewegen sie.',a:0,why:'Ohne Muskeln könnten sich die Knochen nicht bewegen.'}
+ {q:'Muskeln ziehen an den Knochen und bewegen sie.',a:0,why:'Ohne Muskeln könnten sich die Knochen nicht bewegen.'},
+ {q:'Bänder halten die Knochen eines Gelenks zusammen.',a:0,why:'Bänder sind reißfest und umgeben jedes Gelenk.'},
+ {q:'Der Daumen hat ein Scharniergelenk.',a:1,why:'Am Daumen sitzt ein Sattelgelenk. Es erlaubt Bewegungen in zwei Richtungen.'}
 ];
 function choiceStation(root,items,sid,shuf,labels){
   const el=document.getElementById(root);let i=0,wrong=0,order=[];
@@ -755,9 +936,9 @@ function choiceStation(root,items,sid,shuf,labels){
 }
 
 /* ---------- Lückentext ---------- */
-const GAP=['Dein Skelett besteht aus etwa ',{a:'206'},' Knochen. Der ',{a:'Schädel'},' schützt das Gehirn. Die ',{a:'Rippen'},' bilden zusammen mit dem Brustbein den Brustkorb und schützen Herz und Lunge. Die ',{a:'Wirbelsäule'},' hält dich aufrecht. Zwischen den einzelnen Wirbeln liegen die ',{a:'Bandscheiben'},' als Stoßdämpfer. Zwei Knochen treffen sich in einem ',{a:'Gelenk'},'. Im ',{a:'Knochenmark'},' wird Blut gebildet. Der ',{a:'Oberschenkelknochen'},' ist der längste Knochen im Körper.'];
+const GAP=['Dein Skelett besteht aus etwa ',{a:'206'},' Knochen. Der ',{a:'Schädel'},' schützt das Gehirn. Die ',{a:'Rippen'},' bilden zusammen mit dem Brustbein den Brustkorb und schützen Herz und Lunge. Die ',{a:'Wirbelsäule'},' hält dich aufrecht. Zwischen den einzelnen Wirbeln liegen die ',{a:'Bandscheiben'},' als Stoßdämpfer. Zwei Knochen treffen sich in einem ',{a:'Gelenk'},'. Die ',{a:'Bänder'},' halten sie zusammen und die ',{a:'Gelenkschmiere'},' verhindert das Aneinanderreiben. Im ',{a:'Knochenmark'},' wird Blut gebildet. Der ',{a:'Oberschenkelknochen'},' ist der längste Knochen im Körper.'];
 function initGap(){
-  const words=['206','Schädel','Rippen','Wirbelsäule','Bandscheiben','Gelenk','Knochenmark','Oberschenkelknochen','Muskeln','Haut'].sort((a,b)=>a.localeCompare(b,'de',{numeric:true}));
+  const words=['206','Schädel','Rippen','Wirbelsäule','Bandscheiben','Gelenk','Knochenmark','Oberschenkelknochen','Bänder','Gelenkschmiere','Muskeln','Haut'].sort((a,b)=>a.localeCompare(b,'de',{numeric:true}));
   $('#bank').innerHTML=words.map(w=>`<span>${w}</span>`).join('');
   let k=0;
   $('#gap').innerHTML=GAP.map(p=>typeof p==='string'?p:`<select data-a="${p.a}" id="gap${k++}" aria-label="Lücke ${k}"><option value="">…</option>${words.map(w=>`<option>${w}</option>`).join('')}</select>`).join('');
@@ -778,7 +959,9 @@ const SALAT=[
  {w:'WIRBELSÄULE',h:'Sie hält dich aufrecht und besteht aus vielen einzelnen Wirbeln.'},
  {w:'KNIESCHEIBE',h:'Ein kleiner runder Knochen, der das Knie schützt.'},
  {w:'BECKEN',h:'Es trägt deinen Oberkörper und verbindet ihn mit den Beinen.'},
- {w:'SCHLÜSSELBEIN',h:'Es verbindet die Schulter mit dem Brustbein.'}
+ {w:'SCHLÜSSELBEIN',h:'Es verbindet die Schulter mit dem Brustbein.'},
+ {w:'KUGELGELENK',h:'Die Schulter hat dieses Gelenk. Der Gelenkkopf ist rund wie eine Kugel.'},
+ {w:'GELENKSCHMIERE',h:'Sie füllt den Gelenkspalt und verhindert das Aneinanderreiben der Knochen.'}
 ];
 function initSalat(){
   const el=$('#salatBox');let i=0,pen=0,order=[],ans=[],tiles=[],lock=false;
@@ -848,11 +1031,13 @@ function initCert(){
 /* ---------- Start der Seite ---------- */
 buildNav();
 $('#hero').innerHTML=skeletonSVG({interactive:false,wave:true,cls:'breathe'});
-initStart();initAtlas();initLabel();initMemory();initGelenke();initAufbau();
+initStart();initAtlas();initLabel();initMemory();initAufbau();initGelenkbau();initGelenke();
 choiceStation('quizBox',QUIZ,'quiz',true);
 choiceStation('wfBox',WF,'wf',false,['Wahr','Falsch']);
 initGap();initSalat();initCert();
 refresh();
 show((location.hash||'#start').slice(1));
 window.addEventListener('hashchange',()=>show((location.hash||'#start').slice(1)));
-</script></body></html>
+</script>
+
+</body></html>
