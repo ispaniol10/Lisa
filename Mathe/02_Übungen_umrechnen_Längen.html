@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Längen-Meister</title>
+<style>
+:root{
+  --bg:#f3faf8; --card:#ffffff; --ink:#17302c; --muted:#58706b; --line:#cde2dc;
+  --pri:#00897b; --pri-d:#00695c; --on-pri:#ffffff; --acc:#ef6c00; --acc-bg:#fff1dc;
+  --ok:#1b7a2f; --ok-bg:#e4f5e7; --bad:#b3261e; --bad-bg:#fdebe9;
+  --hi:#ffe9a6; --hi-ink:#4a3600; --zero:#ef6c00; --soft:#e6f4f1; --focus:#1565c0;
+  --shadow:0 2px 10px rgba(0,60,50,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1b19; --card:#152826; --ink:#e7f3f0; --muted:#9bb5af; --line:#2b4a46;
+    --pri:#2bb3a3; --pri-d:#7fd6cb; --on-pri:#00201c; --acc:#ffa94d; --acc-bg:#3a2a12;
+    --ok:#7fd48f; --ok-bg:#143321; --bad:#ff9a93; --bad-bg:#3b1a18;
+    --hi:#6b5410; --hi-ink:#fff2c2; --zero:#ffa94d; --soft:#1b3431; --focus:#8ab4ff;
+    --shadow:0 2px 10px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1b19; --card:#152826; --ink:#e7f3f0; --muted:#9bb5af; --line:#2b4a46;
+  --pri:#2bb3a3; --pri-d:#7fd6cb; --on-pri:#00201c; --acc:#ffa94d; --acc-bg:#3a2a12;
+  --ok:#7fd48f; --ok-bg:#143321; --bad:#ff9a93; --bad-bg:#3b1a18;
+  --hi:#6b5410; --hi-ink:#fff2c2; --zero:#ffa94d; --soft:#1b3431; --focus:#8ab4ff;
+  --shadow:0 2px 10px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,-apple-system,sans-serif;line-height:1.5;font-size:17px}
+header{background:var(--pri);color:var(--on-pri);padding:14px 16px 10px}
+.hwrap,main,.tabs{max-width:980px;margin:0 auto}
+.hwrap{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h1{margin:0;font-size:1.5rem;line-height:1.2}
+h1 small{display:block;font-size:.85rem;font-weight:normal;opacity:.9}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.22);border-radius:999px;padding:4px 12px;font-weight:bold;font-size:.95rem;white-space:nowrap}
+:root[data-theme="dark"] .pill{background:rgba(0,0,0,.25)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill{background:rgba(0,0,0,.25)}}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 12px 0;scrollbar-width:thin}
+.tab{flex:0 0 auto;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px 14px 0 0;border-bottom:none;padding:9px 14px;font:inherit;font-weight:bold;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--pri);border-color:var(--pri);color:var(--on-pri)}
+.tab:focus-visible,.btn:focus-visible,.chip:focus-visible,.cellbtn:focus-visible,.tok:focus-visible,.dot:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+main{padding:0 12px 40px}
+.panel{display:none;background:var(--card);border:2px solid var(--line);border-radius:0 14px 14px 14px;padding:16px;box-shadow:var(--shadow)}
+.panel.on{display:block}
+h2{margin:.2em 0 .4em;font-size:1.3rem;color:var(--pri-d)}
+h3{margin:1em 0 .3em;font-size:1.05rem;color:var(--pri-d)}
+p{margin:.4em 0}
+.lead{color:var(--muted)}
+.btn{font:inherit;font-weight:bold;border:2px solid var(--pri);background:var(--card);color:var(--pri-d);border-radius:12px;padding:8px 16px;cursor:pointer}
+.btn.pri{background:var(--pri);color:var(--on-pri)}
+.btn:hover{filter:brightness(.96)}
+.btn[disabled]{opacity:.5;cursor:default}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+.chip{font:inherit;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--soft);border-color:var(--pri);font-weight:bold;color:var(--pri-d)}
+.items{display:grid;gap:10px;margin-top:8px}
+.item{position:relative;border:2px solid var(--line);border-radius:12px;padding:10px 44px 10px 12px;background:var(--card)}
+.item.ok{border-color:var(--ok);background:var(--ok-bg)}
+.item.bad{border-color:var(--bad);background:var(--bad-bg)}
+.mark{position:absolute;right:12px;top:8px;font-size:1.5rem;font-weight:bold}
+.item.ok .mark{color:var(--ok)} .item.bad .mark{color:var(--bad)}
+.fb{margin-top:6px;font-size:.95rem}
+.fb:empty{display:none}
+.q{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:1.1rem}
+.given{font-weight:bold}
+input.num,input.exp,select{font:inherit;font-size:1rem;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 8px}
+input.num{width:9.5em} input.exp{width:3.2em;text-align:center}
+input:focus,select:focus{outline:3px solid var(--focus);outline-offset:1px}
+sup{font-size:.7em}
+.summary{font-weight:bold;min-height:1.5em;margin-top:4px}
+.note{background:var(--acc-bg);border-left:5px solid var(--acc);padding:8px 12px;border-radius:8px;margin:10px 0}
+.tip{background:var(--soft);border-left:5px solid var(--pri);padding:8px 12px;border-radius:8px;margin:10px 0}
+/* Stellenwerttafel */
+.tafelwrap{overflow-x:auto;margin:8px 0}
+table.tafel{border-collapse:collapse;min-width:560px;width:100%}
+.tafel th,.tafel td{border:2px solid var(--line);text-align:center;padding:0}
+.tafel th{font-size:.78rem;padding:4px 2px;background:var(--soft);line-height:1.15;font-weight:bold}
+.tafel th.unitcol{background:var(--hi);color:var(--hi-ink)}
+.tafel td input{width:100%;min-width:2.4em;height:2.6em;border:none;background:transparent;color:var(--ink);text-align:center;font:inherit;font-size:1.15rem;padding:0}
+.tafel td input:focus{outline:3px solid var(--focus);outline-offset:-3px}
+.tafel td.good{background:var(--ok-bg)} .tafel td.wrong{background:var(--bad-bg)}
+/* Tokens (Winzige Längen) */
+.tokrow,.boxrow{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tok{font:inherit;font-weight:bold;border:2px solid var(--pri);background:var(--card);color:var(--pri-d);border-radius:10px;padding:5px 12px;cursor:pointer}
+.tok[aria-pressed="true"]{background:var(--pri);color:var(--on-pri)}
+.tok.used{opacity:.45}
+.boxrow{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px}
+.cellbtn{flex:0 0 auto;min-width:64px;height:54px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font:inherit;font-weight:bold;cursor:pointer}
+.cellbtn.fixed{background:var(--soft);cursor:default;color:var(--muted)}
+.cellbtn.right{background:var(--ok-bg);border-color:var(--ok)} .cellbtn.wrongc{background:var(--bad-bg);border-color:var(--bad)}
+.rf{display:flex;gap:8px;margin-top:6px}
+.rf button{font:inherit;font-weight:bold;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:5px 18px;cursor:pointer}
+.rf button[aria-pressed="true"]{background:var(--pri);border-color:var(--pri);color:var(--on-pri)}
+/* Erklärung */
+.slidenav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;flex-wrap:wrap}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--pri);background:transparent;padding:0;cursor:pointer}
+.dot[aria-current="true"]{background:var(--pri)}
+.bubble{display:flex;gap:12px;align-items:flex-start;margin:8px 0 12px}
+.bubble svg{flex:0 0 96px}
+.bubble .say{background:var(--soft);border:2px solid var(--line);border-radius:16px;padding:10px 14px;position:relative}
+.stage{background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:14px;margin:10px 0;overflow:hidden}
+.stairs{position:relative;display:flex;gap:6px;align-items:flex-start;height:190px}
+.step{flex:1;min-width:0;background:var(--soft);border:2px solid var(--pri);border-radius:8px 8px 0 0;text-align:center;font-weight:bold;padding-top:6px;color:var(--pri-d)}
+.metti{position:absolute;font-size:2rem;transition:left .9s ease,top .9s ease;line-height:1;pointer-events:none}
+.factor{opacity:0;transform:translateY(6px);transition:opacity .5s,transform .5s;display:inline-block;margin:2px 4px;padding:3px 10px;border-radius:999px;background:var(--acc-bg);border:2px solid var(--acc);font-weight:bold}
+.factor.show{opacity:1;transform:none}
+.cutbar{position:relative;height:46px;border:3px solid var(--pri-d);border-radius:8px;background:var(--soft);overflow:hidden;margin:26px 0 8px}
+.cutbar .lines{position:absolute;inset:0;transition:opacity .5s}
+.scissors{position:absolute;top:-24px;left:0;font-size:1.4rem;transition:left 1s ease;line-height:1}
+.bignum{font-size:1.5rem;font-weight:bold;text-align:center;color:var(--pri-d)}
+.digits{display:flex;justify-content:center;align-items:flex-end;flex-wrap:wrap;min-height:5.2rem;padding-top:1.6rem;font-size:2.4rem;font-weight:bold;letter-spacing:.04em}
+.dg{display:inline-block;min-width:1.05ch;text-align:center}
+.dg.z{color:var(--zero);animation:pop .5s both}
+.dg.dim{opacity:.35}
+.dg.old{animation:none}
+.cm{position:relative;color:var(--acc);font-size:3rem;line-height:1;margin:0 2px}
+.cm::before{content:"🐸";position:absolute;left:50%;top:-1.15em;transform:translateX(-50%);font-size:1.6rem}
+.cm.hop{animation:hop .55s}
+@keyframes hop{0%{transform:translateY(0)}40%{transform:translateY(-22px)}100%{transform:translateY(0)}}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes drop{from{transform:translateY(-26px);opacity:0}to{transform:none;opacity:1}}
+.drop{display:inline-block;animation:drop .5s ease-out both}
+.machine{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;margin:6px 0}
+.arrowbig{font-size:1.4rem;font-weight:bold;color:var(--acc)}
+table.mini{border-collapse:collapse;margin:8px auto;min-width:min(100%,520px)}
+.mini th,.mini td{border:2px solid var(--line);text-align:center;padding:2px 4px;min-width:3.1em;height:2.7em;font-size:1.3rem;font-weight:bold}
+.mini th{font-size:.8rem;background:var(--soft);height:auto;line-height:1.2}
+.mini td.unitc,.mini th.unitc{background:var(--hi);color:var(--hi-ink)}
+.mini td.tgt,.mini th.tgt{background:var(--ok-bg);color:var(--ok)}
+.mini td.ghost{color:var(--zero)}
+.mini td{position:relative}
+.mini td.cpos::after{content:",";position:absolute;right:-6px;bottom:-9px;font-size:3rem;font-weight:bold;line-height:1;color:var(--acc);z-index:2}
+.zoomrow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:6px;align-items:center;text-align:center}
+.zbox{border:3px solid var(--pri);border-radius:12px;padding:8px;background:var(--card);opacity:.25;transform:scale(.8);transition:all .7s}
+.zbox.on{opacity:1;transform:none}
+.zarrow{font-weight:bold;color:var(--acc);opacity:0;transition:opacity .6s}
+.zarrow.on{opacity:1}
+.zbig{font-size:1.4rem;font-weight:bold}
+@media (max-width:640px){
+  body{font-size:16px} h1{font-size:1.25rem}
+  .zoomrow{grid-template-columns:1fr;} .zarrow{transform:rotate(90deg)}
+  .bubble{flex-direction:column;align-items:center} .digits{font-size:2rem}
+  input.num{width:7.2em}
+  table.mini{min-width:0;width:100%}
+  .mini th,.mini td{min-width:0;font-size:1.1rem;padding:2px 1px}
+  .mini th{font-size:.62rem}
+  .slidenav{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .dots{grid-column:1/-1;order:3}
+  .slidenav .btn:last-child{justify-self:end}
+}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <h1>📏 Längen-Meister<small>Meter, Zentimeter &amp; Co. umrechnen – mit Metti und Hüpfi</small></h1>
+    <div class="stats" aria-live="polite">
+      <span class="pill" id="st-stars">⭐ 0</span>
+      <span class="pill" id="st-streak">🔥 Serie: 0</span>
+      <span class="pill" id="st-best">🏆 Rekord: 0</span>
+    </div>
+  </div>
+</header>
+<div class="tabs" role="tablist" aria-label="Bereiche" id="tabs"></div>
+<main id="main"></main>
+
+<script>
+'use strict';
+/* ============================================================
+   Grundlagen: Einheiten + exakte Dezimalrechnung mit Strings
+   (keine Gleitkommazahlen -> kein 0,1+0,2-Problem)
+   ============================================================ */
+const REDUCE = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const sleep = ms => new Promise(r => setTimeout(r, REDUCE ? Math.min(ms, 30) : ms));
+const E   = {km:3, m:0, dm:-1, cm:-2, mm:-3, um:-6, nm:-9};   // Zehnerpotenz im Vergleich zu 1 m
+const LAB = {km:'km', m:'m', dm:'dm', cm:'cm', mm:'mm', um:'µm', nm:'nm'};
+const rnd  = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = arr => arr[rnd(0, arr.length - 1)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function parseDec(str){
+  const s = String(str).replace(/[\s  ]/g, '').replace(',', '.');
+  if (!/^\d*\.?\d*$/.test(s) || !/\d/.test(s)) return null;
+  const parts = s.split('.');
+  const i = parts[0] || '', f = parts[1] || '';
+  return {d: i + f, p: i.length};
+}
+function normDec(o){
+  let d = o.d, p = o.p;
+  if (p < 0){ d = '0'.repeat(-p) + d; p = 0; }
+  if (p > d.length) d += '0'.repeat(p - d.length);
+  let i = d.slice(0, p).replace(/^0+/, ''); if (i === '') i = '0';
+  const f = d.slice(p).replace(/0+$/, '');
+  return {i, f};
+}
+const shiftDec = (str, k) => { const o = parseDec(str); o.p += k; return normDec(o); };
+const sameDec  = (a, b) => a.i === b.i && a.f === b.f;
+const plain = n => n.i + (n.f ? ',' + n.f : '');
+const fmt = n => n.i.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + (n.f ? ',' + n.f : '');
+const unitLab = u => LAB[u];
+const stellen = n => n === 1 ? '1 Stelle' : n + ' Stellen';
+
+/* ============================================================
+   Kleine Helfer (DOM)
+   ============================================================ */
+function h(tag, props, ...kids){
+  const el = document.createElement(tag);
+  if (props) for (const [k, v] of Object.entries(props)){
+    if (k === 'class') el.className = v;
+    else if (k === 'html') el.innerHTML = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (v === true) el.setAttribute(k, '');
+    else if (v !== false && v != null) el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()){ if (kid == null || kid === false) continue; el.append(kid.nodeType ? kid : document.createTextNode(kid)); }
+  return el;
+}
+const $ = (s, el = document) => el.querySelector(s);
+
+/* ============================================================
+   Sterne, Serie, Rekord
+   ============================================================ */
+const stats = {stars: 0, streak: 0, best: 0};
+try { stats.best = parseInt(localStorage.getItem('laengen_best') || '0', 10) || 0; } catch (e) {}
+function renderStats(){
+  $('#st-stars').textContent = '⭐ ' + stats.stars;
+  $('#st-streak').textContent = '🔥 Serie: ' + stats.streak;
+  $('#st-best').textContent = '🏆 Rekord: ' + stats.best;
+}
+function award(ok){
+  if (ok){ stats.stars++; stats.streak++; if (stats.streak > stats.best){ stats.best = stats.streak; try { localStorage.setItem('laengen_best', String(stats.best)); } catch (e) {} } }
+  else stats.streak = 0;
+  renderStats();
+}
+
+/* ============================================================
+   Aufgaben-Rahmen: Item (eine Aufgabe) + Round (Liste mit Prüfen)
+   ============================================================ */
+function mkItem(body, check, fill){
+  const mark = h('span', {class: 'mark', 'aria-hidden': 'true'});
+  const fb = h('div', {class: 'fb', role: 'status'});
+  const el = h('div', {class: 'item'}, body, mark, fb);
+  let attempts = 0;
+  const it = {el, fill,
+    run(){
+      const r = check(attempts);
+      if (r.pending){ fb.innerHTML = r.msg; return false; }
+      const first = attempts === 0; attempts++;
+      el.classList.toggle('ok', r.ok); el.classList.toggle('bad', !r.ok);
+      mark.textContent = r.ok ? '✓' : '✗';
+      fb.innerHTML = r.msg || '';
+      if (first) award(r.ok);
+      return r.ok;
+    }};
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') it.run(); });
+  return it;
+}
+function Round(host, makeItems){
+  const list = h('div', {class: 'items'});
+  const summary = h('div', {class: 'summary', role: 'status', 'aria-live': 'polite'});
+  let items = [];
+  const api = {
+    fresh(){ list.innerHTML = ''; summary.textContent = ''; items = makeItems(); items.forEach(it => list.append(it.el)); },
+    check(){
+      const real = items.filter(i => i.run);
+      let ok = 0; real.forEach(i => { if (i.run()) ok++; });
+      summary.textContent = ok === real.length ? '🎉 Alles richtig! Super gemacht!' : ok + ' von ' + real.length + ' richtig – schau dir die roten Aufgaben noch einmal an.';
+    },
+    get items(){ return items; }
+  };
+  host.append(list,
+    h('div', {class: 'actions'},
+      h('button', {class: 'btn pri', onclick: () => api.check()}, 'Prüfen ✓'),
+      h('button', {class: 'btn', onclick: () => api.fresh()}, 'Neue Aufgaben 🔄')),
+    summary);
+  api.fresh();
+  return api;
+}
+const heading = txt => ({el: h('h3', null, txt)});
+const numInput = label => h('input', {type: 'text', inputmode: 'decimal', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', class: 'num', 'aria-label': label});
+const BADNUM = 'Bitte nur Ziffern und ein Komma schreiben (zum Beispiel <b>12,5</b>).';
+const badNumMsg = v => String(v).trim() === '' ? 'Schreibe zuerst deine Antwort in das Feld.' : BADNUM;
+
+/* ============================================================
+   Aufgabentyp 1: Umrechnen (Zahl -> Zahl)
+   ============================================================ */
+function hintMove(u1, u2){
+  const k = E[u1] - E[u2];
+  if (k > 0) return `Von ${LAB[u1]} nach ${LAB[u2]} ist die Einheit kleiner, also wird die Zahl größer: Komma ${stellen(k)} nach <b>rechts</b>.`;
+  return `Von ${LAB[u1]} nach ${LAB[u2]} ist die Einheit größer, also wird die Zahl kleiner: Komma ${stellen(-k)} nach <b>links</b>.`;
+}
+function genNum(k){
+  let dec, ip;
+  if (k > 0){ dec = pick([0, 0, 1, 1, 2, 3].filter(d => d <= k + 1)); ip = pick([rnd(1, 9), rnd(2, 99), rnd(10, 999), 0]); }
+  else      { dec = pick([0, 0, 1, 1, 2]); ip = pick([rnd(10, 999), rnd(100, 9999), rnd(1000, 99999)]); }
+  if (ip === 0 && dec === 0) ip = rnd(1, 9);
+  let ds = ''; for (let i = 0; i < dec; i++) ds += (i === dec - 1 ? rnd(1, 9) : rnd(0, 9));
+  return ip + (dec ? ',' + ds : '');
+}
+function convItem(u1, u2, num){
+  const ans = shiftDec(num, E[u1] - E[u2]);
+  const inp = numInput('Ergebnis in ' + LAB[u2]);
+  const body = h('div', {class: 'q'}, h('span', {class: 'given'}, `${fmt(normDec(parseDec(num)))} ${LAB[u1]} =`), inp, h('span', null, LAB[u2]));
+  return mkItem(body, n => {
+    const p = parseDec(inp.value);
+    if (!p) return {pending: true, msg: badNumMsg(inp.value)};
+    if (sameDec(normDec(p), ans)) return {ok: true, msg: `Richtig! ${fmt(normDec(parseDec(num)))} ${LAB[u1]} = ${fmt(ans)} ${LAB[u2]}`};
+    return {ok: false, msg: hintMove(u1, u2) + (n >= 1 ? ` Richtig ist: <b>${fmt(ans)} ${LAB[u2]}</b>.` : ' Versuch es noch einmal!')};
+  }, () => { inp.value = plain(ans); });
+}
+const CATS = {
+  'km-m': [['km','m'],['m','km']],
+  'm-cm': [['m','cm'],['cm','m']],
+  'cm-mm': [['cm','mm'],['mm','cm']],
+  'dm': [['m','dm'],['dm','m'],['dm','cm'],['cm','dm'],['dm','mm'],['mm','dm']],
+  'm-mm': [['m','mm'],['mm','m']]
+};
+CATS.alle = Object.values(CATS).flat();
+
+/* Aufgabentyp 2: „Schreibe ohne Komma“ (Zahl + frei wählbare Einheit) */
+function unitAnsItem(num, u, units, prompt, extraOk){
+  const inp = numInput('Zahl ohne Komma');
+  const sel = h('select', {'aria-label': 'Einheit'}, units.map(x => h('option', {value: x}, LAB[x])));
+  const orig = normDec(parseDec(num));
+  const body = h('div', {class: 'q'}, h('span', {class: 'given'}, `${prompt} ${fmt(orig)} ${LAB[u]} =`), inp, sel);
+  // beste Einheit: die größte der angebotenen, in der das Ergebnis eine ganze Zahl ist
+  const cand = units.filter(x => !shiftDec(num, E[u] - E[x]).f).sort((a, b) => E[b] - E[a]);
+  const best = cand[0] || units[units.length - 1];
+  const bestNum = shiftDec(num, E[u] - E[best]);
+  return mkItem(body, n => {
+    const p = parseDec(inp.value);
+    if (!p) return {pending: true, msg: badNumMsg(inp.value)};
+    const nn = normDec(p);
+    if (nn.f) return {ok: false, msg: 'In deiner Antwort steht noch ein Komma. Wähle eine <b>kleinere Einheit</b>, dann verschwindet es.' + (n >= 1 ? ` Zum Beispiel: <b>${fmt(bestNum)} ${LAB[best]}</b>.` : '')};
+    const back = normDec({d: p.d, p: p.p + (E[sel.value] - E[u])});
+    if (sameDec(back, orig)) return {ok: true, msg: `Richtig! ${fmt(orig)} ${LAB[u]} = ${fmt(nn)} ${LAB[sel.value]}` + (sel.value !== best ? ` (noch ein bisschen größer gedacht: ${fmt(bestNum)} ${LAB[best]} geht auch)` : '')};
+    return {ok: false, msg: 'Die Zahl passt nicht zur gewählten Einheit. Überprüfe die Einheit und die Kommaverschiebung.' + (n >= 1 ? ` Richtig wäre zum Beispiel: <b>${fmt(bestNum)} ${LAB[best]}</b>.` : '')};
+  }, () => { inp.value = plain(bestNum); sel.value = best; });
+}
+function genNoComma(){
+  const u = pick(['km', 'm', 'm', 'dm', 'cm']);
+  const maxDec = Math.min(3, E[u] + 3);
+  const dec = rnd(1, maxDec);
+  let ds = ''; for (let i = 0; i < dec; i++) ds += (i === dec - 1 ? rnd(1, 9) : rnd(0, 9));
+  const ip = pick([0, rnd(1, 9), rnd(1, 99), rnd(10, 150)]);
+  const num = ip + ',' + ds;
+  const units = ['km', 'm', 'dm', 'cm', 'mm'].filter(x => E[x] < E[u]);
+  return unitAnsItem(num, u, units, 'Ohne Komma:');
+}
+
+/* Aufgabentyp 3: Kommaverschiebungsregel formulieren */
+function regelItem(u1, u2, units){
+  const k = E[u1] - E[u2];
+  const num = genNum(k).replace(/,.*$/, '') + ',' + rnd(1, 9);
+  const exAns = shiftDec(num, k);
+  const selN = h('select', {'aria-label': 'Anzahl Stellen'}, h('option', {value: ''}, '?'), [1,2,3,4,5,6,7,8,9].map(n => h('option', {value: n}, n)));
+  const selD = h('select', {'aria-label': 'Richtung'}, h('option', {value: ''}, '?'), h('option', {value: 'rechts'}, 'rechts'), h('option', {value: 'links'}, 'links'));
+  const inp = numInput('Beispiel-Ergebnis');
+  const body = h('div', null,
+    h('div', {class: 'q'}, h('span', {class: 'given'}, `${LAB[u1]} → ${LAB[u2]}:`), 'Das Komma wandert', selN, 'Stelle(n) nach', selD, '.'),
+    h('div', {class: 'q', style: 'margin-top:8px'}, 'Beispiel:', h('span', {class: 'given'}, `${num} ${LAB[u1]} =`), inp, h('span', null, LAB[u2])));
+  return mkItem(body, n => {
+    const p = parseDec(inp.value);
+    if (!selN.value || !selD.value || !p) return {pending: true, msg: 'Fülle bitte beide Auswahlfelder und das Beispiel aus.'};
+    const okN = Number(selN.value) === Math.abs(k), okD = selD.value === (k > 0 ? 'rechts' : 'links'), okE = sameDec(normDec(p), exAns);
+    if (okN && okD && okE) return {ok: true, msg: `Richtig! ${num} ${LAB[u1]} = ${fmt(exAns)} ${LAB[u2]}`};
+    const bits = [];
+    if (!okN || !okD) bits.push(hintMove(u1, u2));
+    if (!okE) bits.push('Das Beispiel stimmt noch nicht.');
+    if (n >= 1) bits.push(`Richtig: ${stellen(Math.abs(k))} nach ${k > 0 ? 'rechts' : 'links'}, Beispiel <b>${fmt(exAns)} ${LAB[u2]}</b>.`);
+    return {ok: false, msg: bits.join(' ')};
+  }, () => { selN.value = String(Math.abs(k)); selD.value = k > 0 ? 'rechts' : 'links'; inp.value = plain(exAns); });
+}
+
+/* ============================================================
+   Aufgabentyp 4: Stellenwerttafel
+   ============================================================ */
+const TCOLS = ['100 km', '10 km', '1 km', '100 m', '10 m', '1 m', '100 mm<br>1 dm', '10 mm<br>1 cm', '1 mm'];
+const TUNITCOL = {km: 2, m: 5, dm: 6, cm: 7, mm: 8};
+function genTafel(mode){
+  const kind = mode === 'ganz' ? 'int' : mode === 'komma' ? 'dec' : pick(['int', 'int', 'dec', 'dec', 'mixed']);
+  if (kind === 'mixed'){
+    const a = rnd(1, 99), b = rnd(1, 999);
+    return {text: `${a} km ${b} m`, mm: String(a * 1000000 + b * 1000), unitCol: 5, lowest: 5, comma: `${a},${String(b).padStart(3, '0')} km`.replace(/0+$/, '')};
+  }
+  if (kind === 'int'){
+    const u = pick(['mm', 'cm', 'dm', 'm', 'm', 'km']);
+    const n = {mm: rnd(100, 999999), cm: rnd(10, 99999), dm: rnd(10, 9999), m: rnd(10, 99999), km: rnd(1, 99)}[u];
+    return {text: `${n} ${LAB[u]}`, mm: shiftDec(String(n), E[u] + 3).i, unitCol: TUNITCOL[u], lowest: TUNITCOL[u], comma: null};
+  }
+  const u = pick(['m', 'm', 'dm', 'cm', 'km', 'km']);
+  const maxDec = Math.min(5, E[u] + 3);
+  const dec = rnd(1, maxDec);
+  let ds = ''; for (let i = 0; i < dec; i++) ds += (i === dec - 1 ? rnd(1, 9) : rnd(0, 9));
+  const ip = pick([0, rnd(1, 9), rnd(1, 99)]);
+  const num = ip + ',' + ds;
+  return {text: `${num} ${LAB[u]}`, mm: shiftDec(num, E[u] + 3).i, unitCol: TUNITCOL[u], lowest: Math.min(8, TUNITCOL[u] + dec), comma: null};
+}
+function tafelItem(t){
+  const padded = t.mm.padStart(9, '0');
+  const lead = 9 - t.mm.length;
+  const inputs = [];
+  const head = h('tr', null, TCOLS.map((c, i) => h('th', {class: i === t.unitCol ? 'unitcol' : '', html: c})));
+  const row = h('tr', null, TCOLS.map((c, i) => {
+    const inp = h('input', {type: 'text', inputmode: 'numeric', maxlength: '1', autocomplete: 'off', 'aria-label': 'Spalte ' + c.replace('<br>', ' / ')});
+    inputs.push(inp); return h('td', null, inp);
+  }));
+  const note = h('div', {class: 'lead', style: 'font-size:.9rem'}, 'Die gelbe Spalte ist die Einerziffer (hier steht später das Komma).');
+  const body = h('div', null, h('div', {class: 'given q'}, 'Trage ein: ', h('b', null, t.text)), h('div', {class: 'tafelwrap'}, h('table', {class: 'tafel'}, head, row)), note);
+  return mkItem(body, n => {
+    let allOk = true, empty = 0;
+    inputs.forEach((inp, i) => {
+      const v = inp.value.trim(), td = inp.parentElement;
+      const mayBeBlank = i < lead || i > t.lowest;
+      const ok = v === padded[i] || (mayBeBlank && v === '');
+      if (v === '' && !mayBeBlank) empty++;
+      td.classList.toggle('good', ok); td.classList.toggle('wrong', !ok);
+      if (!ok) allOk = false;
+    });
+    if (allOk) return {ok: true, msg: 'Richtig eingetragen! Das Komma steht hinter der gelben Einerziffer.'};
+    return {ok: false, msg: 'Rot markierte Felder stimmen noch nicht.' + (empty ? ' Achtung: Eine <b>Null in der Mitte</b> muss man hinschreiben!' : '') + (n >= 1 ? ' Tipp: Schreibe jede Ziffer in die Spalte ihrer Einheit.' : '')};
+  }, () => { inputs.forEach((inp, i) => { inp.value = (i < lead || i > t.lowest) ? '' : padded[i]; }); });
+}
+
+/* ============================================================
+   Aufgabentyp 5: Einheiten-Kästchen (µm … nm)
+   ============================================================ */
+const BOXLAB = ['1 nm', '10 nm', '100 nm', '1 µm', '10 µm', '100 µm', '1 mm', '10 mm', '100 mm', '1 m', '10 m', '100 m']; // Index = Position von rechts
+const TOKENS = [{l: '1 m', p: 9}, {l: '1 dm', p: 8}, {l: '1 cm', p: 7}, {l: '1 mm', p: 6}, {l: '100 µm', p: 5}, {l: '10 µm', p: 4}, {l: '1 µm', p: 3}, {l: '100 nm', p: 2}];
+function boxItem(){
+  const toks = shuffle(TOKENS).slice(0, 3).sort((a, b) => b.p - a.p);
+  const placed = {};   // Position -> token
+  let sel = null;
+  const tokBtns = toks.map(t => h('button', {class: 'tok', type: 'button', 'aria-pressed': 'false', onclick: () => { sel = (sel === t ? null : t); refresh(); }}, t.l));
+  const cells = [];
+  for (let p = 11; p >= 0; p--){
+    const fixed = p < 2;
+    const b = h('button', {class: 'cellbtn' + (fixed ? ' fixed' : ''), type: 'button', 'aria-label': 'Kästchen ' + (12 - p), disabled: fixed ? true : false, onclick: () => {
+      if (placed[p]){ delete placed[p]; }
+      else if (sel){ for (const k of Object.keys(placed)) if (placed[k] === sel) delete placed[k]; placed[p] = sel; sel = null; }
+      refresh();
+    }}, fixed ? BOXLAB[p] : '');
+    cells[p] = b;
+  }
+  function refresh(){
+    toks.forEach((t, i) => { const used = Object.values(placed).includes(t); tokBtns[i].classList.toggle('used', used); tokBtns[i].setAttribute('aria-pressed', String(sel === t)); });
+    for (let p = 2; p < 12; p++){ cells[p].textContent = placed[p] ? placed[p].l : ''; cells[p].classList.remove('right', 'wrongc'); }
+  }
+  const body = h('div', null,
+    h('div', {class: 'given'}, 'Setze die Einheiten in die richtigen Kästchen. Erst die Einheit anklicken, dann das Kästchen:'),
+    h('div', {class: 'tokrow'}, tokBtns),
+    h('div', {class: 'boxrow'}, [11,10,9,8,7,6,5,4,3,2,1,0].map(p => cells[p])),
+    h('div', {class: 'lead', style: 'font-size:.9rem'}, 'Von rechts nach links wird jede Einheit 10-mal so groß – so wie in der Stellenwerttafel.'));
+  return mkItem(body, n => {
+    if (Object.keys(placed).length < toks.length) return {pending: true, msg: 'Setze erst alle Einheiten in die Kästchen.'};
+    let ok = true;
+    for (let p = 2; p < 12; p++){
+      const t = placed[p]; if (!t) continue;
+      const good = t.p === p; if (!good) ok = false;
+      cells[p].classList.add(good ? 'right' : 'wrongc');
+    }
+    if (ok) return {ok: true, msg: 'Perfekt! Jede Einheit sitzt genau an ihrem Platz.'};
+    return {ok: false, msg: 'Rot markierte Einheiten sitzen falsch. Tipp: Zähle von rechts: 1 nm → 10 nm → 100 nm → 1 µm → …' + (n >= 1 ? ' Du kannst eine Einheit anklicken, um sie wieder zu entfernen.' : '')};
+  }, () => { for (const k of Object.keys(placed)) delete placed[k]; toks.forEach(t => { placed[t.p] = t; }); refresh(); });
+}
+
+/* Zehnerpotenzen */
+const ZSTARTS = [['m', ['mm', 'um', 'nm']], ['mm', ['um', 'nm']], ['um', ['nm']], ['cm', ['mm', 'um', 'nm']], ['dm', ['mm', 'um', 'nm']]];
+function zehnerItem(){
+  const [start, targets] = pick(ZSTARTS);
+  const inps = targets.map(() => h('input', {type: 'text', inputmode: 'numeric', class: 'exp', autocomplete: 'off', 'aria-label': 'Hochzahl'}));
+  const parts = [h('span', {class: 'given'}, `1 ${LAB[start]} =`)];
+  targets.forEach((t, i) => { parts.push(h('span', null, '10', h('sup', null, inps[i]), ` ${LAB[t]}` + (i < targets.length - 1 ? ' =' : ''))); });
+  const body = h('div', {class: 'q'}, parts);
+  const exps = targets.map(t => E[start] - E[t]);
+  return mkItem(body, n => {
+    if (inps.some(i => i.value.trim() === '')) return {pending: true, msg: 'Fülle alle Hochzahlen aus.'};
+    const ok = inps.every((i, k) => Number(i.value.trim()) === exps[k]);
+    if (ok) return {ok: true, msg: 'Richtig! ' + targets.map((t, k) => `1 ${LAB[start]} = 10<sup>${exps[k]}</sup> ${LAB[t]}`).join(', ')};
+    return {ok: false, msg: 'Die Hochzahl sagt, wie viele Nullen die Zahl hat: 10<sup>3</sup> = 1000 (drei Nullen).' + (n >= 1 ? ` Richtig wäre: ${exps.join(', ')}.` : '')};
+  }, () => inps.forEach((i, k) => { i.value = exps[k]; }));
+}
+
+/* Alltags-Größen (ohne Komma schreiben) */
+const FACTKINDS = [
+  {name: 'Korndurchmesser von Feinsand', e: -4, d: [1, 5]},
+  {name: 'Dicke des menschlichen Haares', e: -5, d: [4, 9]},
+  {name: 'Durchmesser eines roten Blutkörperchens', e: -6, d: [6, 9]},
+  {name: 'Größe eines Bakteriums', e: -6, d: [1, 5]},
+  {name: 'Größe eines Virus', e: -8, d: [2, 9]}
+];
+function genFact(k){
+  k = k || pick(FACTKINDS); const d = rnd(k.d[0], k.d[1]);
+  const num = '0,' + '0'.repeat(-k.e - 1) + d;
+  return unitAnsItem(num, 'm', ['mm', 'um', 'nm'], k.name + ':');
+}
+
+/* ============================================================
+   Aufgabentyp 6: Richtig oder falsch?
+   ============================================================ */
+function rfItem(text, truth, reason){
+  let val = null;
+  const bR = h('button', {type: 'button', 'aria-pressed': 'false', onclick: () => set(true)}, 'richtig');
+  const bF = h('button', {type: 'button', 'aria-pressed': 'false', onclick: () => set(false)}, 'falsch');
+  function set(v){ val = v; bR.setAttribute('aria-pressed', String(v === true)); bF.setAttribute('aria-pressed', String(v === false)); }
+  const body = h('div', null, h('div', {class: 'q given', html: text}), h('div', {class: 'rf'}, bR, bF));
+  return mkItem(body, n => {
+    if (val === null) return {pending: true, msg: 'Wähle „richtig“ oder „falsch“.'};
+    const ok = val === truth;
+    return {ok, msg: (ok ? 'Stimmt! ' : 'Leider nicht. ') + reason};
+  }, () => set(truth));
+}
+function decStr(ip, dec){ let ds = ''; for (let i = 0; i < dec; i++) ds += (i === dec - 1 ? rnd(1, 9) : rnd(0, 9)); return ip + ',' + ds; }
+function genRF(){
+  const t = rnd(1, 5), truth = Math.random() < 0.5;
+  if (t === 1){ // Nullen hinten
+    const u = pick(['m', 'cm', 'km', 'dm']); const base = decStr(pick([0, rnd(1, 20)]), rnd(1, 2));
+    const left = base + '0'.repeat(rnd(1, 2));
+    const wrong = plain(shiftDec(base, pick([1, -1])));
+    return {text: `${left} ${LAB[u]} = ${truth ? base : wrong} ${LAB[u]}`, truth,
+      reason: truth ? `Angehängte Nullen hinter dem Komma ändern den Wert nicht: ${left} ${LAB[u]} = ${base} ${LAB[u]}.` : `${left} ${LAB[u]} = ${base} ${LAB[u]} (und nicht ${wrong} ${LAB[u]}).`};
+  }
+  if (t === 2){ // ganze Zahl mit ,0
+    const u = pick(['m', 'cm', 'km', 'dm', 'mm']); const n = rnd(2, 99);
+    const wrong = plain(shiftDec(String(n), pick([1, -1])));
+    const right = n + ',' + '0'.repeat(rnd(1, 2));
+    return {text: `${n} ${LAB[u]} = ${truth ? right : wrong} ${LAB[u]}`, truth,
+      reason: truth ? `Man darf eine ganze Zahl mit ,0 schreiben: ${n} ${LAB[u]} = ${n},0 ${LAB[u]}.` : `${n} ${LAB[u]} = ${n},0 ${LAB[u]} und nicht ${wrong} ${LAB[u]}.`};
+  }
+  if (t === 3){ // gemischte Einheiten
+    const pairs = [['km', 'm', 3], ['m', 'cm', 2], ['cm', 'mm', 1], ['m', 'mm', 3], ['m', 'dm', 1], ['dm', 'cm', 1]];
+    const [B, S, r] = pick(pairs); const a = rnd(1, 99), b = rnd(1, Math.pow(10, r) - 1);
+    const rightDec = normDec({d: String(a) + String(b).padStart(r, '0'), p: String(a).length});
+    let claim = rightDec;
+    if (!truth){
+      const cands = [normDec(parseDec(a + ',' + b)), normDec(parseDec(a + ',' + (b + 1))), normDec(parseDec(a + ',' + Math.max(1, b - 1))), {i: String(a + 1), f: rightDec.f}]
+        .filter(c => !sameDec(c, rightDec));
+      claim = pick(cands);
+    }
+    return {text: `${a} ${LAB[B]} ${b} ${LAB[S]} = ${fmt(claim)} ${LAB[B]}`, truth,
+      reason: `${b} ${LAB[S]} sind ${fmt(normDec({d: String(b), p: String(b).length - r}))} ${LAB[B]}, also ${a} ${LAB[B]} ${b} ${LAB[S]} = <b>${fmt(rightDec)} ${LAB[B]}</b>.`};
+  }
+  if (t === 4){ // führende Nullen
+    const u = pick(['m', 'cm', 'km']); const base = decStr(rnd(1, 99), 1);
+    const left = '0'.repeat(rnd(1, 3)) + base + (Math.random() < 0.5 ? '00' : '');
+    const wrong = plain(shiftDec(base, pick([1, -1])));
+    return {text: `${left} ${LAB[u]} = ${truth ? base : wrong} ${LAB[u]}`, truth,
+      reason: truth ? `Nullen ganz vorne und Nullen ganz hinten (hinter dem Komma) ändern den Wert nicht: ${left} ${LAB[u]} = ${base} ${LAB[u]}.` : `${left} ${LAB[u]} = ${base} ${LAB[u]} – nicht ${wrong} ${LAB[u]}.`};
+  }
+  const pairs = [['km', 'm', 3], ['m', 'dm', 1], ['m', 'cm', 2], ['m', 'mm', 3], ['cm', 'mm', 1], ['dm', 'cm', 1], ['dm', 'mm', 2], ['mm', 'um', 3], ['um', 'nm', 3]];
+  const [A, B, r] = pick(pairs); const n = rnd(2, 9);
+  const rightV = n * Math.pow(10, r), wrongV = n * Math.pow(10, Math.max(1, r + pick([-1, 1])));
+  return {text: `${n} ${LAB[A]} = ${truth ? rightV : (wrongV === rightV ? rightV * 10 : wrongV)} ${LAB[B]}`, truth,
+    reason: `${n} ${LAB[A]} = <b>${rightV} ${LAB[B]}</b> (1 ${LAB[A]} = ${Math.pow(10, r)} ${LAB[B]}).`};
+}
+
+/* ============================================================
+   Aufgabentyp 7: Sachaufgaben
+   ============================================================ */
+function wordItem(text, answer, unit, solution){
+  const inp = h('input', {type: 'text', inputmode: 'numeric', class: 'num', autocomplete: 'off', 'aria-label': 'Antwort'});
+  const body = h('div', null, h('div', {html: text}), h('div', {class: 'q', style: 'margin-top:8px'}, 'Antwort:', inp, h('span', null, unit)));
+  return mkItem(body, n => {
+    const p = parseDec(inp.value);
+    if (!p) return {pending: true, msg: 'Schreibe eine Zahl als Antwort.'};
+    if (sameDec(normDec(p), normDec(parseDec(String(answer))))) return {ok: true, msg: 'Richtig! ' + solution};
+    return {ok: false, msg: 'Noch nicht richtig. Rechne zuerst alles in eine Einheit um.' + (n >= 1 ? '<br>' + solution : '')};
+  }, () => { inp.value = String(answer); });
+}
+function genWord(kind){
+  if (kind === 'jump'){
+    const k = rnd(2, 9), n = k * 1000, divs = []; for (let j = 1; j <= k; j++) if (k % j === 0) divs.push(j);
+    const j = pick(divs), total = k * 1111;
+    return wordItem(`Hüpfi der Frosch 🐸 schafft bei einem Sprung <b>${j} m</b>. Wie viele Sprünge braucht er für eine Strecke von<br><b>${n} m + ${n} dm + ${n} cm + ${n} mm</b>?`,
+      total / j, 'Sprünge', `${n} m + ${n/10} m + ${n/100} m + ${n/1000} m = ${total} m, und ${total} m : ${j} m = <b>${total / j}</b> Sprünge.`);
+  }
+  if (kind === 'metti'){
+    const a = pick([2, 4, 5, 10, 20, 25, 50]), b = rnd(1, 9);
+    return wordItem(`Metti die Maßband-Raupe 🐛 ist <b>${a} cm</b> lang. Wie oft passt sie der Länge nach auf eine Strecke von <b>${b} m</b>?`,
+      b * 100 / a, 'Mal', `${b} m = ${b * 100} cm, und ${b * 100} cm : ${a} cm = <b>${b * 100 / a}</b>.`);
+  }
+  if (kind === 'blut'){
+    const s = pick([2, 4, 5, 8, 10, 20, 25, 40, 50]), d = rnd(1, 4);
+    return wordItem(`Ein rotes Blutkörperchen ist ungefähr <b>${s} µm</b> breit. Wie viele solcher Blutkörperchen passen nebeneinander auf eine Strecke von <b>${d} mm</b>?`,
+      d * 1000 / s, 'Stück', `${d} mm = ${d * 1000} µm, und ${d * 1000} µm : ${s} µm = <b>${d * 1000 / s}</b>.`);
+  }
+  const a = rnd(2, 9), b = rnd(2, 9) * 10;
+  return wordItem(`Ein Wanderweg ist <b>${a} km</b> lang. Nach <b>${a * 500 + b} m</b> macht Lisa eine Pause. Wie viele Meter muss sie noch laufen?`,
+    a * 1000 - (a * 500 + b), 'm', `${a} km = ${a * 1000} m, und ${a * 1000} m − ${a * 500 + b} m = <b>${a * 1000 - (a * 500 + b)} m</b>.`);
+}
+
+/* ============================================================
+   Metti (Maskottchen)
+   ============================================================ */
+function mettiSVG(){
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `<svg viewBox="0 0 96 80" width="96" height="80" role="img" aria-label="Metti, die Maßband-Raupe">
+    <g stroke="#1b5e20" stroke-width="2">
+      <circle cx="14" cy="58" r="11" fill="#9ccc65"/><circle cx="30" cy="54" r="12" fill="#aed581"/>
+      <circle cx="47" cy="52" r="12" fill="#9ccc65"/><circle cx="64" cy="48" r="13" fill="#aed581"/>
+      <circle cx="80" cy="36" r="15" fill="#c5e1a5"/></g>
+    <g stroke="#33691e" stroke-width="1.6"><path d="M30 62v6M47 61v7M64 59v7M14 66v4"/></g>
+    <circle cx="75" cy="32" r="4.5" fill="#fff" stroke="#1b5e20"/><circle cx="86" cy="32" r="4.5" fill="#fff" stroke="#1b5e20"/>
+    <circle cx="76" cy="33" r="2" fill="#1b5e20"/><circle cx="87" cy="33" r="2" fill="#1b5e20"/>
+    <path d="M75 42q6 6 12 0" fill="none" stroke="#1b5e20" stroke-width="2" stroke-linecap="round"/>
+    <path d="M74 22q-4-12-10-12M88 22q4-12 10-12" fill="none" stroke="#1b5e20" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  return wrap.firstElementChild;
+}
+const bubble = html => h('div', {class: 'bubble'}, mettiSVG(), h('div', {class: 'say', html}));
+
+/* ============================================================
+   Erklärung mit Folien + Animationen
+   ============================================================ */
+let animTok = 0;
+const live = tok => tok === animTok;
+
+function renderHops(area, d, p, opts = {}){
+  area.innerHTML = '';
+  const parts = [];
+  if (p === 0) parts.push(h('span', {class: 'dg dim'}, '0'));
+  for (let i = 0; i <= d.length; i++){
+    if (i === p) parts.push(h('span', {class: 'cm' + (opts.hop ? ' hop' : ''), 'aria-label': 'Komma'}, ','));
+    if (i < d.length) parts.push(h('span', {class: 'dg' + (opts.newZero === i ? ' z' : (opts.zeroSet && opts.zeroSet.has(i) ? ' z old' : ''))}, d[i]));
+  }
+  area.append(...parts);
+}
+async function runHops(area, numStr, u1, u2, tok, info){
+  const o = parseDec(numStr);
+  if (!o){ area.textContent = 'Bitte gib eine Zahl ein (zum Beispiel 3,54).'; return; }
+  const k = E[u1] - E[u2];
+  let d = o.d, p = o.p; const zeroSet = new Set();
+  renderHops(area, d, p);
+  info.textContent = k === 0 ? 'Gleiche Einheit – das Komma bleibt, wo es ist.' : (k > 0 ? `${LAB[u1]} → ${LAB[u2]}: kleinere Einheit, mehr Stücke ⇒ die Zahl wird größer ⇒ Hüpfi hüpft ${stellen(k)} nach RECHTS.` : `${LAB[u1]} → ${LAB[u2]}: größere Einheit, weniger Stücke ⇒ die Zahl wird kleiner ⇒ Hüpfi hüpft ${stellen(-k)} nach LINKS.`);
+  await sleep(900);
+  for (let s = 0; s < Math.abs(k); s++){
+    if (!live(tok)) return;
+    let nz = null;
+    if (k > 0){ if (p === d.length){ d += '0'; nz = d.length - 1; zeroSet.add(nz); } p += 1; }
+    else { if (p === 0){ d = '0' + d; const shifted = new Set(); zeroSet.forEach(z => shifted.add(z + 1)); zeroSet.clear(); shifted.forEach(z => zeroSet.add(z)); nz = 0; zeroSet.add(0); } else p -= 1; }
+    renderHops(area, d, p, {hop: true, newZero: nz, zeroSet});
+    await sleep(750);
+  }
+  if (!live(tok)) return;
+  const res = normDec({d, p});
+  info.innerHTML += `<br><b>Ergebnis: ${fmt(normDec(o))} ${LAB[u1]} = ${fmt(res)} ${LAB[u2]}</b>` + (zeroSet.size ? ' (die <span style="color:var(--zero);font-weight:bold">orangen Nullen</span> werden aufgefüllt)' : '');
+}
+function unitSelect(sel){ return h('select', {'aria-label': 'Einheit'}, ['km', 'm', 'dm', 'cm', 'mm', 'um', 'nm'].map(u => h('option', {value: u, selected: u === sel}, LAB[u]))); }
+
+const SLIDES = [
+/* 1 --------------------------------------------------------- */
+{ title: 'Hallo! Die Einheiten-Treppe', build(root, tok){
+  root.append(bubble('Hallo, ich bin <b>Metti</b>, die Maßband-Raupe! 🐛 Heute lernst du mit mir, Längen umzurechnen. Zuerst schauen wir uns die <b>Einheiten-Treppe</b> an – klick auf „Metti, lauf los!“'));
+  const names = ['km', 'm', 'dm', 'cm', 'mm'], facts = ['', '× 1000', '× 10', '× 10', '× 10'];
+  const stairs = h('div', {class: 'stairs'}, names.map((n, i) => h('div', {class: 'step', style: `margin-top:${i * 28}px;height:${150 - i * 20}px`}, n)));
+  const metti = h('div', {class: 'metti', 'aria-hidden': 'true'}, '🐛');
+  stairs.append(metti);
+  const chipsRow = h('div', {style: 'text-align:center;min-height:2.6em'}, names.slice(1).map((n, i) => h('span', {class: 'factor'}, `${names[i]} → ${n}: ${facts[i + 1]}`)));
+  const info = h('p', {class: 'lead', style: 'text-align:center'}, 'Bei jeder Stufe nach unten wird die Einheit kleiner – und es passen mehr davon in die Länge.');
+  const stage = h('div', {class: 'stage'}, stairs, chipsRow, info);
+  const place = i => { const s = stairs.children[i], sr = s.getBoundingClientRect(), pr = stairs.getBoundingClientRect(); metti.style.left = (sr.left - pr.left + sr.width / 2 - 16) + 'px'; metti.style.top = (sr.top - pr.top - 34) + 'px'; };
+  const reset = () => { chipsRow.querySelectorAll('.factor').forEach(c => c.classList.remove('show')); metti.style.transition = 'none'; place(0); void metti.offsetWidth; metti.style.transition = ''; };
+  const go = async () => {
+    reset(); await sleep(300);
+    for (let i = 1; i < names.length; i++){ if (!live(tok)) return; place(i); await sleep(1000); chipsRow.children[i - 1].classList.add('show'); await sleep(400); }
+    if (live(tok)) info.innerHTML = '<b>Merke:</b> 1 km = 1000 m · 1 m = 10 dm = 100 cm = 1000 mm · 1 dm = 10 cm · 1 cm = 10 mm';
+  };
+  root.append(stage, h('div', {class: 'actions'}, h('button', {class: 'btn pri', onclick: go}, 'Metti, lauf los! ▶')));
+  requestAnimationFrame(reset);
+}},
+/* 2 --------------------------------------------------------- */
+{ title: 'Warum wird die Zahl größer?', build(root, tok){
+  root.append(bubble('Stell dir einen Meterstab vor. Wenn wir ihn in <b>kleinere Stücke</b> schneiden, bekommen wir <b>mehr Stücke</b>. Genau deshalb wird die Zahl größer, wenn die Einheit kleiner wird! ✂️'));
+  const stages = [{n: 1, t: '1 m', sub: 'Ein ganzer Meter.'}, {n: 10, t: '10 dm', sub: '1 m = 10 dm – zehn Stücke!'}, {n: 100, t: '100 cm', sub: '1 m = 100 cm – hundert Stücke!'}, {n: 1000, t: '1000 mm', sub: '1 m = 1000 mm – tausend winzige Stücke!'}];
+  const lines = h('div', {class: 'lines'});
+  const bar = h('div', {class: 'cutbar'}, lines);
+  const sc = h('div', {class: 'scissors', 'aria-hidden': 'true'}, '✂️'); bar.append(sc);
+  const big = h('div', {class: 'bignum', 'aria-live': 'polite'}, '1 m'); const sub = h('p', {class: 'lead', style: 'text-align:center'}, stages[0].sub);
+  let idx = 0;
+  const pattern = n => {
+    if (n === 1) return 'none';
+    if (n === 10) return 'repeating-linear-gradient(90deg,var(--pri-d) 0 3px,transparent 3px 10%)';
+    if (n === 100) return 'repeating-linear-gradient(90deg,var(--pri-d) 0 1.5px,transparent 1.5px 1%)';
+    return 'repeating-linear-gradient(90deg,var(--pri-d) 0 1.5px,transparent 1.5px 1%),repeating-linear-gradient(90deg,rgba(0,100,90,.45) 0 .5px,transparent .5px .1%)';
+  };
+  const btn = h('button', {class: 'btn pri', onclick: async () => {
+    if (idx === stages.length - 1){ idx = 0; lines.style.backgroundImage = 'none'; sc.style.left = '0'; big.textContent = stages[0].t; sub.textContent = stages[0].sub; btn.textContent = 'Schneide! ✂️'; return; }
+    idx++; sc.style.left = 'calc(100% - 1.6rem)'; await sleep(600); lines.style.backgroundImage = pattern(stages[idx].n);
+    big.textContent = stages[idx].t; sub.textContent = stages[idx].sub; await sleep(500); sc.style.left = '0';
+    btn.textContent = idx === stages.length - 1 ? 'Nochmal von vorn' : 'Weiter schneiden! ✂️';
+  }}, 'Schneide! ✂️');
+  root.append(h('div', {class: 'stage'}, bar, big, sub), h('div', {class: 'actions'}, btn),
+    h('div', {class: 'tip', html: '<b>Merke:</b> Kleinere Einheit ⇒ größere Zahl. Größere Einheit ⇒ kleinere Zahl. Das gilt immer!'}));
+}},
+/* 3 --------------------------------------------------------- */
+{ title: 'Die Stellenwerttafel', build(root, tok){
+  root.append(bubble('In der <b>Stellenwerttafel</b> hat jede Einheit ihre eigene Spalte. Das Komma steht immer <b>hinter der Einerziffer</b> – das ist die Ziffer in der Spalte der Einheit, mit der die Zahl angegeben ist. Schau zu!'));
+  const COL7 = ['1 km', '100 m', '10 m', '1 m', '1 dm', '1 cm', '1 mm'], UC = {km: 0, m: 3, dm: 4, cm: 5, mm: 6};
+  const examples = [{num: '3,54', u: 'm', to: 'cm'}, {num: '4,705', u: 'km', to: 'm'}, {num: '2,5', u: 'dm', to: 'mm'}, {num: '27,5', u: 'cm', to: 'mm'}];
+  let ex = examples[0];
+  const stage = h('div', {class: 'stage'}), info = h('p', {class: 'lead', style: 'text-align:center;min-height:3em'});
+  let cells = [], ths = [];
+  function setup(){
+    animTok++; const my = animTok;
+    const mm = shiftDec(ex.num, E[ex.u] + 3).i.padStart(7, '0');
+    const dec = (ex.num.split(',')[1] || '').length, unitCol = UC[ex.u];
+    const lowest = Math.min(6, unitCol + dec), msd = Math.min(unitCol, mm.search(/[1-9]/));
+    stage.innerHTML = '';
+    const head = h('tr', null, COL7.map(c => h('th', null, c)));
+    cells = COL7.map(() => h('td')); ths = [...head.children];
+    const table = h('table', {class: 'mini'}, head, h('tr', null, cells));
+    const txt = h('div', {class: 'bignum'}, ex.num + ' ' + LAB[ex.u]);
+    stage.append(txt, table);
+    info.textContent = 'Wir tragen die Länge ein …';
+    const toBtn = h('button', {class: 'btn pri', disabled: true}, `Jetzt in ${LAB[ex.to]} lesen ▶`);
+    actionRow.innerHTML = ''; actionRow.append(toBtn);
+    (async () => {
+      await sleep(500);
+      ths[unitCol].classList.add('unitc');
+      for (let c = msd; c <= lowest; c++){ if (!live(my)) return; cells[c].innerHTML = ''; cells[c].append(h('span', {class: 'drop'}, mm[c])); await sleep(550); }
+      if (!live(my)) return;
+      cells[unitCol].classList.add('unitc', 'cpos');
+      info.innerHTML = `Die gelbe Spalte ist die <b>Einerziffer</b> (Spalte „${COL7[unitCol]}“). Das Komma steht dahinter.`;
+      toBtn.disabled = false;
+      toBtn.onclick = async () => {
+        toBtn.disabled = true; const t = UC[ex.to];
+        cells.forEach(c => c.classList.remove('cpos', 'unitc')); ths.forEach(c => c.classList.remove('unitc'));
+        for (let c = lowest + 1; c <= t; c++){ if (!live(my)) return; cells[c].innerHTML = ''; cells[c].classList.add('ghost'); cells[c].append(h('span', {class: 'drop'}, '0')); await sleep(450); }
+        if (!live(my)) return;
+        ths[t].classList.add('tgt'); cells[t].classList.add('tgt', 'cpos'); cells[t].classList.remove('ghost');
+        const res = shiftDec(ex.num, E[ex.u] - E[ex.to]);
+        info.innerHTML = `Jetzt ist <b>${COL7[t]}</b> die Einerziffer – das Komma ist ${stellen(Math.abs(UC[ex.to] - unitCol))} gewandert.<br><b>${ex.num} ${LAB[ex.u]} = ${fmt(res)} ${LAB[ex.to]}</b>` + (t > lowest ? ' (orange: aufgefüllte Nullen)' : '');
+        txt.textContent = `${ex.num} ${LAB[ex.u]} = ${fmt(res)} ${LAB[ex.to]}`;
+        toBtn.textContent = 'Nochmal ansehen 🔁'; toBtn.disabled = false; toBtn.onclick = setup;
+      };
+    })();
+  }
+  const actionRow = h('div', {class: 'actions'});
+  const chips = h('div', {class: 'chips', role: 'group', 'aria-label': 'Beispiel wählen'}, examples.map((e, i) => h('button', {class: 'chip', 'aria-pressed': String(i === 0), type: 'button', onclick: ev => { ex = e; chips.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', 'false')); ev.currentTarget.setAttribute('aria-pressed', 'true'); setup(); }}, `${e.num} ${LAB[e.u]} → ${LAB[e.to]}`)));
+  root.append(chips, stage, info, actionRow);
+  setup();
+}},
+/* 4 --------------------------------------------------------- */
+{ title: 'Hüpfi hüpft über das Komma', build(root, tok){
+  root.append(bubble('Das ist <b>Hüpfi</b>, der Komma-Frosch 🐸. Du sagst ihm, welche Zahl du hast und in welche Einheit du umrechnen willst – dann hüpft er das Komma an die richtige Stelle. Probier es aus!'));
+  const num = h('input', {type: 'text', class: 'num', value: '3,54', inputmode: 'decimal', 'aria-label': 'Zahl', style: 'width:7em'});
+  const s1 = unitSelect('m'), s2 = unitSelect('cm');
+  const area = h('div', {class: 'digits', 'aria-live': 'polite'}), info = h('p', {class: 'lead', style: 'text-align:center;min-height:3.5em'});
+  const go = () => { animTok++; runHops(area, num.value, s1.value, s2.value, animTok, info); };
+  root.append(h('div', {class: 'stage'}, h('div', {class: 'machine'}, num, s1, h('span', {class: 'arrowbig'}, '➜'), s2, h('button', {class: 'btn pri', onclick: go}, 'Hüpf los! 🐸')), area, info),
+    h('div', {class: 'tip', html: '<b>Hüpf-Regel:</b> kleinere Einheit ⇒ Komma nach <b>rechts</b> · größere Einheit ⇒ Komma nach <b>links</b>.<br>Zähle die Stufen auf der Einheiten-Treppe: zwischen m und cm sind es 2 Stufen (m→dm→cm), also 2 Hüpfer.'}));
+  go();
+}},
+/* 5 --------------------------------------------------------- */
+{ title: 'Knifflige Fälle', build(root, tok){
+  root.append(bubble('Manchmal fehlt etwas: Es ist <b>kein Komma</b> zu sehen, oder es sind <b>nicht genug Ziffern</b> da. Kein Problem – Hüpfi weiß, was zu tun ist! Wähle einen Fall:'));
+  const cases = [
+    {l: '742 cm → m', n: '742', a: 'cm', b: 'm', t: 'Hier steht kein Komma. Aber: Bei einer ganzen Zahl steckt das Komma <b>unsichtbar hinten</b> (742, ). Von dort hüpft Hüpfi 2 Stellen nach links.'},
+    {l: '7,5 cm → m', n: '7,5', a: 'cm', b: 'm', t: 'Vor der 7 fehlen Stellen! Hüpfi füllt sie mit <b>Nullen</b> auf – und vor dem Komma steht dann eine 0.'},
+    {l: '3,6 m → mm', n: '3,6', a: 'm', b: 'mm', t: 'Hinter der 6 fehlen Stellen! Hüpfi hängt <b>Nullen</b> an, bis er 3 Stellen gehüpft ist.'}
+  ];
+  const area = h('div', {class: 'digits', 'aria-live': 'polite'}), info = h('p', {class: 'lead', style: 'text-align:center;min-height:3.5em'}), cap = h('div', {class: 'note'});
+  const chips = h('div', {class: 'chips', role: 'group', 'aria-label': 'Fall wählen'}, cases.map((c, i) => h('button', {class: 'chip', type: 'button', 'aria-pressed': String(i === 0), onclick: ev => { chips.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', 'false')); ev.currentTarget.setAttribute('aria-pressed', 'true'); play(c); }}, c.l)));
+  const play = c => { animTok++; cap.innerHTML = c.t; runHops(area, c.n, c.a, c.b, animTok, info); };
+  root.append(chips, h('div', {class: 'stage'}, area, info), cap, h('div', {class: 'actions'}, h('button', {class: 'btn', onclick: () => play(cases[[...chips.children].findIndex(x => x.getAttribute('aria-pressed') === 'true')])}, 'Nochmal ansehen 🔁')));
+  play(cases[0]);
+}},
+/* 6 --------------------------------------------------------- */
+{ title: 'Winzige Längen: µm und nm', build(root, tok){
+  root.append(bubble('Es gibt noch viel kleinere Einheiten! Jedes Mal wird durch <b>1000</b> geteilt: Millimeter → <b>Mikrometer</b> (µm, gesprochen „mü“) → <b>Nanometer</b> (nm). Starte den Zoom!'));
+  const boxes = [
+    h('div', {class: 'zbox'}, h('div', {class: 'zbig'}, '1 mm'), h('div', null, 'Das ist die Dicke einer Bleistiftmine-Spitze.')),
+    h('div', {class: 'zbox'}, h('div', {class: 'zbig'}, '1 µm'), h('div', null, 'Ein Haar ist etwa 60 µm dick, ein rotes Blutkörperchen etwa 8 µm.')),
+    h('div', {class: 'zbox'}, h('div', {class: 'zbig'}, '1 nm'), h('div', null, 'Viren sind etwa 20 bis 300 nm groß.'))];
+  const arrows = [h('div', {class: 'zarrow'}, '🔍 ÷ 1000'), h('div', {class: 'zarrow'}, '🔍 ÷ 1000')];
+  const info = h('p', {class: 'lead', style: 'text-align:center;min-height:2.4em'});
+  const go = async () => {
+    boxes.forEach(b => b.classList.remove('on')); arrows.forEach(a => a.classList.remove('on')); info.textContent = '';
+    await sleep(200);
+    for (let i = 0; i < 3; i++){ if (!live(tok)) return; boxes[i].classList.add('on'); if (i < 2) { await sleep(700); arrows[i].classList.add('on'); } await sleep(1100); }
+    if (live(tok)) info.innerHTML = '<b>1 mm = 1000 µm = 1 000 000 nm</b> – oder mit Zehnerpotenzen: 1 mm = 10<sup>3</sup> µm = 10<sup>6</sup> nm';
+  };
+  root.append(h('div', {class: 'stage'}, h('div', {class: 'zoomrow'}, boxes[0], arrows[0], boxes[1], arrows[1], boxes[2]), info),
+    h('div', {class: 'actions'}, h('button', {class: 'btn pri', onclick: go}, 'Zoom! 🔍')),
+    h('div', {class: 'tip', html: '<b>Zehnerpotenz:</b> 10<sup>3</sup> bedeutet 10·10·10 = 1000. Die kleine Zahl oben (Hochzahl) sagt dir, wie viele Nullen die Zahl hat. Wichtig: 1 m = 10<sup>3</sup> mm = 10<sup>6</sup> µm = 10<sup>9</sup> nm.'}));
+  go();
+}},
+/* 7 --------------------------------------------------------- */
+{ title: 'Dein Merkzettel', build(root, tok){
+  root.append(bubble('Super, du hast alles gesehen! Hier ist dein Merkzettel. Dann kannst du gleich mit den Übungen loslegen – es gibt <b>immer neue Aufgaben</b>! 🎉'));
+  root.append(h('div', {class: 'tip', html: `<b>1. Die Treppe:</b> 1 km = 1000 m · 1 m = 10 dm = 100 cm = 1000 mm · 1 dm = 10 cm · 1 cm = 10 mm<br>
+    <b>2. Hüpf-Regel:</b> kleinere Einheit ⇒ Komma nach rechts (Zahl wird größer). Größere Einheit ⇒ Komma nach links (Zahl wird kleiner).<br>
+    <b>3. Stufen zählen:</b> So viele Stufen auf der Treppe, so viele Stellen hüpft das Komma. (km ↔ m: 3 · m ↔ cm: 2 · m ↔ mm: 3 · cm ↔ mm: 1)<br>
+    <b>4. Fehlt etwas?</b> Kein Komma? Es steht unsichtbar hinten. Fehlende Stellen? Mit Nullen auffüllen.<br>
+    <b>5. Winzig:</b> 1 mm = 10<sup>3</sup> µm = 10<sup>6</sup> nm · 1 m = 10<sup>3</sup> mm = 10<sup>6</sup> µm = 10<sup>9</sup> nm<br>
+    <b>6. Nullen:</b> Nullen ganz vorne und Nullen hinter dem Komma ganz hinten ändern den Wert nicht (12,8 m = 00012,800 m).`}),
+    h('div', {class: 'actions'}, h('button', {class: 'btn pri', onclick: () => showTab('stellen')}, 'Los geht’s: Stellenwerttafel ➜'), h('button', {class: 'btn', onclick: () => showTab('umw')}, 'Gleich umrechnen ➜')));
+}}
+];
+
+function buildExplain(host){
+  let cur = 0;
+  const title = h('h2'), body = h('div'), dots = h('div', {class: 'dots', role: 'group', 'aria-label': 'Folien'});
+  const prev = h('button', {class: 'btn', onclick: () => show(cur - 1)}, '◀ Zurück'), next = h('button', {class: 'btn pri', onclick: () => show(cur + 1)}, 'Weiter ▶');
+  const dotEls = SLIDES.map((s, i) => h('button', {class: 'dot', type: 'button', 'aria-label': `Folie ${i + 1}: ${s.title}`, onclick: () => show(i)}));
+  dots.append(...dotEls);
+  function show(i){
+    cur = Math.max(0, Math.min(SLIDES.length - 1, i)); animTok++; const tok = animTok;
+    title.textContent = `${cur + 1}. ${SLIDES[cur].title}`; body.innerHTML = '';
+    SLIDES[cur].build(body, tok);
+    dotEls.forEach((d, k) => d.setAttribute('aria-current', String(k === cur)));
+    prev.disabled = cur === 0; next.disabled = cur === SLIDES.length - 1;
+  }
+  host.append(title, body, h('div', {class: 'slidenav'}, prev, dots, next));
+  return {show, stop(){ animTok++; }, start(){ show(cur); }};
+}
+
+/* ============================================================
+   Tabs aufbauen
+   ============================================================ */
+const TABS = [
+  {id: 'erkl', label: '📖 Erklärung'},
+  {id: 'stellen', label: '🔢 Stellenwerttafel'},
+  {id: 'umw', label: '✏️ Umwandeln'},
+  {id: 'klein', label: '🔬 Winzige Längen'},
+  {id: 'rf', label: '✅ Richtig oder falsch?'},
+  {id: 'sach', label: '🐸 Sachaufgaben'}
+];
+const panels = {}, rounds = {}; let explain = null;
+function showTab(id){
+  TABS.forEach(t => { const on = t.id === id; panels[t.id].classList.toggle('on', on); const b = document.getElementById('tab-' + t.id); b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+  if (id === 'erkl') explain.start(); else explain.stop();
+  window.scrollTo({top: 0, behavior: REDUCE ? 'auto' : 'smooth'});
+}
+function chipGroup(options, initial, onChange){
+  const wrap = h('div', {class: 'chips', role: 'group'});
+  options.forEach(([val, label]) => wrap.append(h('button', {class: 'chip', type: 'button', 'aria-pressed': String(val === initial), onclick: ev => { wrap.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', 'false')); ev.currentTarget.setAttribute('aria-pressed', 'true'); onChange(val); }}, label)));
+  return wrap;
+}
+function init(){
+  const tabs = $('#tabs'), main = $('#main');
+  TABS.forEach(t => {
+    tabs.append(h('button', {class: 'tab', role: 'tab', id: 'tab-' + t.id, 'aria-selected': 'false', 'aria-controls': 'panel-' + t.id, onclick: () => showTab(t.id), onkeydown: e => {
+      const i = TABS.findIndex(x => x.id === t.id);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ const n = TABS[(i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length]; showTab(n.id); document.getElementById('tab-' + n.id).focus(); }
+    }}, t.label));
+    const p = h('section', {class: 'panel', id: 'panel-' + t.id, role: 'tabpanel', 'aria-labelledby': 'tab-' + t.id}); panels[t.id] = p; main.append(p);
+  });
+  // Erklärung
+  explain = buildExplain(panels.erkl);
+
+  // Stellenwerttafel
+  let tafelMode = 'gemischt';
+  panels.stellen.append(h('h2', null, 'Stellenwerttafel & Kommaschreibweise'),
+    h('p', {class: 'lead'}, 'Trage jede Länge in die Stellenwerttafel ein: Jede Ziffer kommt in die Spalte ihrer Einheit. Nullen in der Mitte musst du mitschreiben. Vor und hinter der Zahl darfst du Felder leer lassen.'),
+    chipGroup([['gemischt', 'Gemischt'], ['ganz', 'Nur ganze Zahlen'], ['komma', 'Mit Komma']], 'gemischt', v => { tafelMode = v; rounds.stellen.fresh(); }));
+  rounds.stellen = Round(panels.stellen, () => [1, 2, 3].map(() => tafelItem(genTafel(tafelMode))));
+
+  // Umwandeln
+  let cat = 'alle';
+  panels.umw.append(h('h2', null, 'Einheiten umwandeln'),
+    h('p', {class: 'lead'}, 'Wähle ein Thema. Bei jedem Klick auf „Neue Aufgaben“ gibt es völlig neue Zahlen. Mit der Eingabetaste prüfst du eine einzelne Aufgabe.'),
+    chipGroup([['alle', 'Alles gemischt'], ['km-m', 'km ↔ m'], ['m-cm', 'm ↔ cm'], ['cm-mm', 'cm ↔ mm'], ['dm', 'mit dm'], ['m-mm', 'm ↔ mm'], ['komma', 'Ohne Komma schreiben'], ['regel', 'Regeln formulieren']], 'alle', v => { cat = v; rounds.umw.fresh(); }));
+  rounds.umw = Round(panels.umw, () => {
+    if (cat === 'komma') return Array.from({length: 6}, genNoComma);
+    if (cat === 'regel'){ const prs = shuffle(CATS.alle).slice(0, 4); return prs.map(([a, b]) => regelItem(a, b)); }
+    const seen = new Set(), out = [];
+    while (out.length < 8){ const [a, b] = pick(CATS[cat]); const n = genNum(E[a] - E[b]); const key = a + b + n; if (seen.has(key)) continue; seen.add(key); out.push(convItem(a, b, n)); }
+    return out;
+  });
+
+  // Winzige Längen
+  panels.klein.append(h('h2', null, 'Winzige Längen: mm, µm, nm'),
+    h('p', {class: 'lead'}, '1 mm = 1000 µm und 1 µm = 1000 nm. Das µ spricht man „mü“ – es ist ein griechischer Buchstabe.'));
+  rounds.klein = Round(panels.klein, () => {
+    const regs = shuffle([['mm', 'um'], ['um', 'mm'], ['um', 'nm'], ['nm', 'um'], ['mm', 'nm'], ['nm', 'mm'], ['m', 'um'], ['m', 'nm']]).slice(0, 2);
+    const zs = [zehnerItem(), zehnerItem()];
+    return [heading('a) Einheiten-Kästchen'), boxItem(),
+      heading('b) Zehnerpotenzschreibweise'), ...zs,
+      heading('c) Kommaverschiebungsregeln'), ...regs.map(([a, b]) => regelItem(a, b)),
+      heading('d) Schreibe ohne Komma'), ...shuffle(FACTKINDS).slice(0, 3).map(k => genFact(k))];
+  });
+
+  // Richtig oder falsch
+  panels.rf.append(h('h2', null, 'Richtig oder falsch?'),
+    h('p', {class: 'lead'}, 'Entscheide bei jeder Gleichung. Nach dem Prüfen siehst du immer die Begründung.'));
+  rounds.rf = Round(panels.rf, () => {
+    const seen = new Set(), out = [];
+    while (out.length < 8){ const g = genRF(); if (seen.has(g.text)) continue; seen.add(g.text); out.push(rfItem(g.text, g.truth, g.reason)); }
+    return out;
+  });
+
+  // Sachaufgaben
+  panels.sach.append(h('h2', null, 'Sachaufgaben mit Hüpfi und Metti'),
+    h('p', {class: 'lead'}, 'Rechne zuerst alles in dieselbe Einheit um. Dann rechnest du mit ganz normalen Zahlen weiter.'));
+  rounds.sach = Round(panels.sach, () => [genWord('jump'), genWord('metti'), genWord('blut'), genWord('weg')]);
+
+  renderStats();
+  showTab('erkl');
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
