@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lisas Märchenwelt – Deutsch</title>
+<style>
+:root{
+  --night:#1f1a4d; --night2:#3a2d7c; --gold:#f4b942; --rose:#e8638a; --mint:#3fb8a0;
+  --paper:#fff9ec; --ink:#2b2550; --good:#2e9e5b; --bad:#d64545; --soft:#efe8ff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;color:var(--ink);background:#f3eeff;line-height:1.5}
+h1,h2,h3{font-family:"Palatino Linotype",Palatino,Georgia,serif;margin:0 0 .4em}
+header{background:radial-gradient(circle at 20% 20%,#5a46b5 0,var(--night) 60%);color:#fff;padding:22px 16px 14px;text-align:center;position:relative;overflow:hidden}
+header h1{font-size:clamp(1.7rem,5vw,2.6rem);color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,.4)}
+header p{margin:.2em 0 .8em;opacity:.9}
+.star{position:absolute;color:#fff;opacity:.7;animation:tw 3s infinite ease-in-out;pointer-events:none}
+@keyframes tw{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.2)}}
+.hud{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:6px}
+.pill{background:rgba(255,255,255,.14);border-radius:999px;padding:4px 14px;font-weight:bold}
+.bar{width:180px;height:10px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:6px}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .5s}
+nav{position:sticky;top:0;z-index:10;background:var(--night);display:flex;overflow-x:auto;gap:4px;padding:6px 8px;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+nav button{flex:0 0 auto;background:transparent;color:#d9d2ff;border:0;padding:9px 14px;border-radius:10px;font:inherit;font-weight:bold;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--gold);color:var(--night)}
+nav button .ok{color:var(--mint);margin-left:4px}
+main{max-width:920px;margin:0 auto;padding:18px 14px 60px}
+section{display:none;animation:fade .4s}
+section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--paper);border-radius:18px;padding:18px;margin:16px 0;box-shadow:0 4px 14px rgba(40,20,100,.12);border:2px solid #e6dcff}
+.card h2{color:var(--night2)}
+.note{background:#fff3c9;border-left:6px solid var(--gold);padding:10px 14px;border-radius:10px;margin:10px 0}
+button.btn{background:var(--night2);color:#fff;border:0;border-radius:12px;padding:10px 18px;font:inherit;font-weight:bold;cursor:pointer;box-shadow:0 3px 0 var(--night)}
+button.btn:active{transform:translateY(2px);box-shadow:none}
+button.btn.gold{background:var(--gold);color:var(--night);box-shadow:0 3px 0 #c58f1f}
+button.btn.small{padding:6px 12px;font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.tile{background:#fff;border:2px solid #e6dcff;border-radius:16px;padding:14px;text-align:center;cursor:pointer;transition:.2s;font:inherit;color:inherit}
+.tile:hover{transform:translateY(-3px);border-color:var(--rose)}
+.tile .em{font-size:2.2rem;display:block}
+.tile b{display:block;margin-top:4px}
+/* flip cards */
+.flip{perspective:800px;height:190px;cursor:pointer}
+.flip .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.flip.turn .in{transform:rotateY(180deg)}
+.flip .f,.flip .b{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;padding:12px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:2px solid #e6dcff}
+.flip .f{background:#fff}
+.flip .f .em{font-size:2.6rem}
+.flip .b{background:linear-gradient(160deg,var(--night2),var(--night));color:#fff;transform:rotateY(180deg);font-size:.86rem}
+.flip .b small{color:var(--gold);font-weight:bold;display:block;margin-bottom:4px}
+.tag{display:inline-block;background:var(--soft);border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:bold;margin-bottom:4px}
+/* quiz */
+.opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid #d8cdfa;border-radius:12px;padding:10px 14px;margin:7px 0;font:inherit;color:inherit;cursor:pointer}
+.opt:hover:not([disabled]){border-color:var(--rose);background:#fff0f5}
+.opt.right{background:#d7f5e1;border-color:var(--good)}
+.opt.wrong{background:#ffdede;border-color:var(--bad)}
+.why{margin-top:8px;padding:8px 12px;background:#eef;border-radius:10px;display:none}
+.prog{font-size:.85rem;color:#6a5fa8;font-weight:bold}
+.result{text-align:center;font-size:1.1rem}
+.result .big{font-size:2.4rem}
+/* memory */
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mc{aspect-ratio:1/1;perspective:600px;cursor:pointer}
+.mc .in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.mc.up .in,.mc.done .in{transform:rotateY(180deg)}
+.mc .f,.mc .b{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;font-size:.78rem;font-weight:bold}
+.mc .f{background:linear-gradient(135deg,var(--night2),var(--rose));color:#fff;font-size:1.6rem}
+.mc .b{background:#fff;border:2px solid #d8cdfa;transform:rotateY(180deg)}
+.mc .b.emo{font-size:2rem}
+.mc.done .b{background:#d7f5e1;border-color:var(--good)}
+/* mind map */
+.mm{display:flex;flex-direction:column;align-items:center;gap:14px}
+.mm .core{background:var(--night2);color:#fff;border-radius:16px;padding:12px 26px;font-family:Georgia,serif;font-size:1.3rem;font-weight:bold;box-shadow:0 0 0 4px var(--gold)}
+.bub{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.bub button{border:0;border-radius:999px;padding:10px 16px;font:inherit;font-weight:bold;cursor:pointer;color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.bub button:nth-child(5n+1){background:#7b5fd6}.bub button:nth-child(5n+2){background:var(--rose)}.bub button:nth-child(5n+3){background:var(--mint)}.bub button:nth-child(5n+4){background:#e08a2d}.bub button:nth-child(5n+5){background:#4a8fe0}
+.bub button.seen{outline:3px solid var(--gold)}
+.detail{min-height:90px;background:#fff;border:2px dashed var(--night2);border-radius:14px;padding:12px 16px;width:100%}
+/* sort */
+.srt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:2px solid #e6dcff;border-radius:12px;padding:8px 12px;margin:6px 0}
+.srt .t{flex:1 1 200px;font-weight:bold}
+.srt.right{background:#d7f5e1;border-color:var(--good)}
+.srt.wrong{background:#ffdede;border-color:var(--bad)}
+select{font:inherit;padding:6px 8px;border-radius:10px;border:2px solid #cbbcf5;background:#fff;max-width:100%}
+svg text{font-family:"Trebuchet MS",sans-serif}
+.zone{cursor:pointer;transition:.2s}
+.zone:hover{opacity:.9}
+.slot{display:flex;gap:10px;align-items:center;background:#fff;border:2px solid #e6dcff;border-radius:12px;padding:8px 12px;margin:7px 0;cursor:pointer}
+.slot:hover{border-color:var(--rose)}
+.slot .lab{width:112px;font-size:.8rem;font-weight:bold;color:#6a5fa8;text-transform:uppercase;flex:0 0 112px}
+.slot .val{flex:1;font-weight:bold}
+.slot.roll{animation:pop .35s}
+@keyframes pop{0%{transform:scale(.96)}60%{transform:scale(1.03)}100%{transform:scale(1)}}
+textarea{width:100%;min-height:200px;border-radius:12px;border:2px solid #cbbcf5;padding:12px;font:inherit;resize:vertical}
+.chk{list-style:none;padding:0;margin:8px 0}
+.chk li{padding:5px 0}
+.chk li.ok{color:var(--good);font-weight:bold}
+footer{text-align:center;color:#6a5fa8;font-size:.85rem;padding:20px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hide{display:none}
+@media(max-width:560px){.mem{gap:6px}.slot .lab{width:80px;flex-basis:80px}}
+</style>
+</head>
+<body>
+<header>
+  <span class="star" style="left:8%;top:18%">✦</span><span class="star" style="left:22%;top:60%;animation-delay:.8s">✧</span>
+  <span class="star" style="right:12%;top:25%;animation-delay:1.4s">✦</span><span class="star" style="right:26%;top:70%;animation-delay:2s">✧</span>
+  <h1>✨ Lisas Märchenwelt ✨</h1>
+  <p>Deutsch · Thema 2: Märchen</p>
+  <div class="hud"><span class="pill">⭐ Sterne: <span id="stars">0</span></span><span class="pill">Fortschritt<span class="bar"><i id="pbar"></i></span> <span id="ptxt">0/9</span></span></div>
+</header>
+<nav id="nav"></nav>
+<main>
+
+<!-- START -->
+<section id="s-start" class="on">
+  <div class="card">
+    <h2>Willkommen in der Märchenwelt! 🏰</h2>
+    <p>Hier lernst du alles, was du aus deinem Heft zum Thema <b>Märchen</b> kennst – und noch ein bisschen mehr. Du kannst Karten umdrehen, Spiele spielen, eine Spannungskurve entdecken und am Ende sogar dein <b>eigenes Märchen</b> schreiben.</p>
+    <p>Für jede richtige Antwort bekommst du einen ⭐. Wenn du ein Thema geschafft hast, erscheint ein ✔ oben im Menü.</p>
+  </div>
+  <div class="grid" id="startTiles"></div>
+</section>
+
+<!-- BEKANNTE MÄRCHEN -->
+<section id="s-bekannt">
+  <div class="card">
+    <h2>📚 Bekannte Märchen</h2>
+    <p>Das sind die Märchen aus deinem Heft. <b>Tippe auf eine Karte</b>, um sie umzudrehen!</p>
+    <div class="grid" id="flipGrid"></div>
+    <div class="note"><b>Gut zu wissen:</b> Die <b>Brüder Grimm</b> (Jacob und Wilhelm) haben viele Märchen aufgeschrieben, die man sich früher nur erzählt hat – das sind <b>Volksmärchen</b>. Bei einem <b>Kunstmärchen</b> hat sich ein bestimmter Dichter alles selbst ausgedacht, zum Beispiel <b>Hans Christian Andersen</b> aus Dänemark.</div>
+  </div>
+  <div class="card">
+    <h2>🔎 Welches Märchen ist das?</h2>
+    <div id="quizRate"></div>
+  </div>
+  <div class="card">
+    <h2>🃏 Märchen-Memory</h2>
+    <p>Finde zu jedem Bild das passende Märchen!</p>
+    <div class="row"><button class="btn small" id="memNew">Neu mischen</button><span class="prog">Züge: <span id="memMoves">0</span> · Paare: <span id="memPairs">0</span>/8</span></div>
+    <div class="mem" id="memGrid" style="margin-top:10px"></div>
+    <p id="memMsg" class="result"></p>
+  </div>
+</section>
+
+<!-- MERKMALE -->
+<section id="s-merkmale">
+  <div class="card">
+    <h2>🧠 Merkmale von Märchen</h2>
+    <p>Woran erkennt man ein Märchen? Tippe auf die Blasen – deine Heft-Mindmap zum Anklicken!</p>
+    <div class="mm">
+      <div class="core">Merkmale von Märchen</div>
+      <div class="bub" id="bubs"></div>
+      <div class="detail" id="bubDetail">👆 Tippe eine Blase an.</div>
+      <div class="prog" id="bubProg"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>✨ Typisch Märchen – oder nicht?</h2>
+    <div id="sortM"></div>
+    <p id="sortMsg" class="result"></p>
+  </div>
+  <div class="card">
+    <h2>🔢 Zauberzahlen</h2>
+    <p>In Märchen kommen bestimmte Zahlen besonders oft vor: <b>3</b> (drei Wünsche, drei Brüder, drei Aufgaben), <b>7</b> (sieben Zwerge, sieben Geißlein, sieben Berge) und manchmal <b>12</b> (zwölf Brüder, zwölf Monate). Sie machen die Geschichte spannend, weil sich Dinge wiederholen.</p>
+  </div>
+</section>
+
+<!-- SPANNUNGSKURVE -->
+<section id="s-kurve">
+  <div class="card">
+    <h2>📈 Die Spannungskurve</h2>
+    <p>Jedes Märchen hat vier Teile. Tippe auf die farbigen Stellen!</p>
+    <svg id="curve" viewBox="0 0 800 390" width="100%" role="img" aria-label="Spannungskurve eines Märchens">
+      <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3a2d7c"/></marker></defs>
+      <rect id="z0" class="zone" x="30" y="20" width="220" height="310" rx="14" fill="#7b5fd6" opacity=".18"/>
+      <rect id="z1" class="zone" x="250" y="20" width="135" height="310" rx="14" fill="#3fb8a0" opacity=".18"/>
+      <rect id="z2" class="zone" x="385" y="20" width="105" height="310" rx="14" fill="#e8638a" opacity=".18"/>
+      <rect id="z3" class="zone" x="490" y="20" width="290" height="310" rx="14" fill="#f4b942" opacity=".22"/>
+      <line x1="30" y1="330" x2="780" y2="330" stroke="#3a2d7c" stroke-width="3" marker-end="url(#arr)"/>
+      <line x1="30" y1="330" x2="30" y2="14" stroke="#3a2d7c" stroke-width="3" marker-end="url(#arr)"/>
+      <text x="40" y="36" font-size="15" font-weight="bold" fill="#3a2d7c">Spannung</text>
+      <path id="curvePath" d="M 40 300 C 120 295, 200 270, 260 230 C 320 190, 350 120, 400 70 C 420 55, 450 55, 470 80 C 520 130, 560 250, 620 290 C 670 310, 720 310, 770 308" fill="none" stroke="#e8638a" stroke-width="6" stroke-linecap="round"/>
+      <g class="zone" id="d0"><circle cx="158" cy="278" r="14" fill="#7b5fd6"/><text x="158" y="284" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">1</text></g>
+      <g class="zone" id="d1"><circle cx="334" cy="154" r="14" fill="#3fb8a0"/><text x="334" y="160" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">2</text></g>
+      <g class="zone" id="d2"><circle cx="435" cy="60" r="14" fill="#e8638a"/><text x="435" y="66" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">3</text></g>
+      <g class="zone" id="d3"><circle cx="695" cy="307" r="14" fill="#e0a21f"/><text x="695" y="313" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">4</text></g>
+      <text x="140" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a2d7c">Einleitung</text>
+      <text x="318" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a2d7c">Hauptteil</text>
+      <text x="438" y="356" text-anchor="middle" font-size="15" font-weight="bold" fill="#3a2d7c">Höhepunkt</text>
+      <text x="635" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a2d7c">Schluss</text>
+      <text x="520" y="40" font-size="14" fill="#3a2d7c">← Wendung</text>
+    </svg>
+    <div class="detail" id="curveDetail" style="margin-top:8px">👆 Tippe auf eine Zahl oder einen Bereich in der Kurve.</div>
+  </div>
+  <div class="card">
+    <h2>🐺 Rotkäppchen in der Kurve</h2>
+    <p>Wo gehört welche Szene aus <b>Rotkäppchen</b> hin? Wähle den Teil aus.</p>
+    <div id="phaseGame"></div>
+    <p id="phaseMsg" class="result"></p>
+  </div>
+</section>
+
+<!-- ANFANG / ENDE -->
+<section id="s-sprache">
+  <div class="card">
+    <h2>📖 Anfang und Ende</h2>
+    <p>Märchen haben feste Sätze, an denen man sie sofort erkennt:</p>
+    <div class="note">🌅 <b>Anfang:</b> „Es war einmal …“<br>🌙 <b>Ende:</b> „Und wenn sie nicht gestorben sind, dann leben sie noch heute.“</div>
+    <p>Auch <b>Ort und Zeit</b> bleiben ungenau: „hinter den sieben Bergen“, „in einem Schloss“, „vor langer, langer Zeit“. Man erfährt nie genau, wo und wann es war.</p>
+  </div>
+  <div class="card">
+    <h2>✏️ Lückentext</h2>
+    <p>Wähle jeweils das passende Märchen-Stück aus.</p>
+    <div id="gaps"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="gapCheck">Prüfen</button></div>
+    <p id="gapMsg" class="result"></p>
+  </div>
+  <div class="card">
+    <h2>🧙 Gut und Böse</h2>
+    <p>In Märchen gibt es klare Rollen. Ordne zu:</p>
+    <div id="roles"></div>
+    <p id="roleMsg" class="result"></p>
+  </div>
+</section>
+
+<!-- WERKSTATT -->
+<section id="s-werkstatt">
+  <div class="card">
+    <h2>🎲 Märchen-Würfel</h2>
+    <p>Du brauchst eine Idee? Würfle dir die Zutaten für dein eigenes Märchen! Tippe auf eine Zeile, um nur diese neu zu würfeln.</p>
+    <div id="dice"></div>
+    <div class="row"><button class="btn gold" id="rollAll">🎲 Alles würfeln</button></div>
+  </div>
+  <div class="card">
+    <h2>📝 Schreibe dein Märchen</h2>
+    <p>Denk an die Spannungskurve: <b>Einleitung</b> (Held + Problem) → <b>Hauptteil</b> (Hilfe, Prüfung) → <b>Höhepunkt</b> (Wendung) → <b>Schluss</b> (Problem gelöst).</p>
+    <textarea id="story" placeholder="Es war einmal …"></textarea>
+    <div class="row" style="margin-top:8px"><span class="prog">Wörter: <span id="wc">0</span></span>
+      <button class="btn small" id="saveTxt">💾 Als Datei speichern</button>
+      <button class="btn small" id="copyTxt">📋 Kopieren</button></div>
+    <h3 style="margin-top:14px">✅ Märchen-Check</h3>
+    <ul class="chk" id="chk"></ul>
+    <p class="prog">Der Check zeigt dir nur Hinweise – ob dein Märchen wirklich gut ist, entscheidest du (und deine Lehrerin oder dein Lehrer 😉).</p>
+  </div>
+</section>
+
+<!-- ABSCHLUSS -->
+<section id="s-quiz">
+  <div class="card">
+    <h2>🏆 Abschlussquiz</h2>
+    <p>10 Fragen zu allem, was du gelernt hast. Viel Erfolg!</p>
+    <div id="quizFinal"></div>
+  </div>
+</section>
+
+</main>
+<footer>Lernseite Märchen · Deutsch · erstellt von Ingo Spaniol</footer>
+
+<script>
+/* ---------- Helfer ---------- */
+const $ = s => document.querySelector(s);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!==undefined)e.innerHTML=html;return e;}
+let stars=0; const done=new Set();
+const KEYS=['rate','memory','merk','sortm','kurve','phase','luecken','rollen','abschluss'];
+function addStar(n){stars+=(n||1);$('#stars').textContent=stars;}
+function markDone(k){if(done.has(k))return;done.add(k);$('#ptxt').textContent=done.size+'/'+KEYS.length;$('#pbar').style.width=(done.size/KEYS.length*100)+'%';updNav();}
+
+/* ---------- Navigation ---------- */
+const SECS=[['start','🏠 Start',[]],['bekannt','📚 Märchen',['rate','memory']],['merkmale','🧠 Merkmale',['merk','sortm']],['kurve','📈 Kurve',['kurve','phase']],['sprache','📖 Anfang & Ende',['luecken','rollen']],['werkstatt','🎲 Werkstatt',[]],['quiz','🏆 Quiz',['abschluss']]];
+function buildNav(){const n=$('#nav');n.innerHTML='';SECS.forEach(([id,t,ks])=>{const b=el('button',id==='start'?'on':'',t);b.dataset.id=id;b.onclick=()=>show(id);n.appendChild(b);});}
+function updNav(){document.querySelectorAll('#nav button').forEach(b=>{const s=SECS.find(x=>x[0]===b.dataset.id);b.querySelector('.ok')?.remove();if(s[2].length&&s[2].every(k=>done.has(k)))b.appendChild(el('span','ok','✔'));});}
+function show(id){document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='s-'+id));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.id===id));window.scrollTo({top:0,behavior:'smooth'});}
+buildNav();
+const tiles=[['bekannt','📚','Bekannte Märchen','Karten, Quiz, Memory'],['merkmale','🧠','Merkmale','Mindmap & Sortierspiel'],['kurve','📈','Spannungskurve','Die 4 Teile erkunden'],['sprache','📖','Anfang & Ende','Lückentext, Gut & Böse'],['werkstatt','🎲','Werkstatt','Eigenes Märchen schreiben'],['quiz','🏆','Abschlussquiz','Zeig, was du kannst']];
+tiles.forEach(([id,em,t,s])=>{const b=el('button','tile','<span class="em">'+em+'</span><b>'+t+'</b><small>'+s+'</small>');b.onclick=()=>show(id);$('#startTiles').appendChild(b);});
+
+/* ---------- Märchen-Daten ---------- */
+const TALES=[
+ ['Schneewittchen','🍎','Brüder Grimm','Eine eifersüchtige Königin, ein Zauberspiegel und sieben Zwerge.'],
+ ['Rotkäppchen','🐺','Brüder Grimm','Ein Wolf täuscht ein Mädchen im Wald. Der Jäger rettet es.'],
+ ['Die 7 Geißlein','🐐','Brüder Grimm','Der Wolf frisst sechs Geißlein. Nur das jüngste versteckt sich im Uhrenkasten.'],
+ ['Aschenputtel','👠','Brüder Grimm','Ein gutes Mädchen wird von Stiefmutter und Stiefschwestern schlecht behandelt. Tauben helfen ihm.'],
+ ['Rapunzel','🗼','Brüder Grimm','Ein Mädchen lebt in einem Turm ohne Tür. Es lässt sein langes Haar herunter.'],
+ ['Dornröschen','💤','Brüder Grimm','Ein Stich mit der Spindel, hundert Jahre Schlaf – dann kommt ein Prinz.'],
+ ['Hänsel und Gretel','🍪','Brüder Grimm','Zwei Geschwister verirren sich im Wald und finden das Knusperhäuschen einer Hexe.'],
+ ['Sterntaler','⭐','Brüder Grimm','Ein armes Mädchen schenkt alles her – und wird mit Sterntalern belohnt.'],
+ ['Die Bienenkönigin','🐝','Brüder Grimm','Der jüngste Bruder schützt Ameisen, Enten und Bienen. Später helfen sie ihm.'],
+ ['Der gestiefelte Kater','🐱','Brüder Grimm (auch Perrault)','Ein schlauer Kater verhilft seinem Herrn zu Reichtum und Glück.'],
+ ['Aladin und die Wunderlampe','🪔','„1001 Nacht“ (Orient)','Aus einer Wunderlampe kommt ein mächtiger Geist, der Wünsche erfüllt.'],
+ ['Die Schöne und das Biest','🌹','Frankreich','Die Liebe erlöst ein verzaubertes Biest.'],
+ ['Prinzessin auf der Erbse','👑','Hans Christian Andersen','Eine kleine Erbse unter vielen Matratzen zeigt, wer eine echte Prinzessin ist.'],
+ ['Das Mädchen mit den Streichhölzern','🕯️','Hans Christian Andersen','Ein armes Mädchen friert in der Silvesternacht. Ein trauriges Märchen ohne echtes Happy End.']
+];
+const fg=$('#flipGrid');
+TALES.forEach(t=>{const d=el('div','flip');d.innerHTML='<div class="in"><div class="f"><span class="em">'+t[1]+'</span><b>'+t[0]+'</b></div><div class="b"><small>'+t[2]+'</small>'+t[3]+'</div></div>';d.onclick=()=>d.classList.toggle('turn');fg.appendChild(d);});
+
+/* ---------- Quiz-Engine ---------- */
+function mountQuiz(root,qs,key,opts){
+  opts=opts||{};let i=0,ok=0;
+  function render(){
+    root.innerHTML='';
+    if(i>=qs.length){
+      const r=el('div','result');const pct=ok/qs.length;
+      const msg=pct===1?'🌟 Märchenhaft! Alles richtig!':pct>=.7?'🎉 Super gemacht!':pct>=.4?'👍 Gut! Probier es gern nochmal.':'💪 Übung macht die Meisterin – versuch es nochmal!';
+      r.innerHTML='<div class="big">'+('⭐'.repeat(Math.max(1,Math.round(pct*5))))+'</div><p><b>'+ok+' von '+qs.length+'</b> richtig</p><p>'+msg+'</p>';
+      const b=el('button','btn gold','Nochmal spielen');b.onclick=()=>{i=0;ok=0;render();};r.appendChild(b);root.appendChild(r);markDone(key);return;
+    }
+    const q=qs[i];const options=shuffle(q.o.map((t,idx)=>({t,c:idx===0})));
+    root.appendChild(el('div','prog','Frage '+(i+1)+' von '+qs.length));
+    root.appendChild(el('p','','<b>'+q.q+'</b>'));
+    const why=el('div','why',q.w||'');let answered=false;
+    options.forEach(op=>{const b=el('button','opt',op.t);b.onclick=()=>{if(answered)return;answered=true;
+      root.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      if(op.c){b.classList.add('right');ok++;addStar(1);}else{b.classList.add('wrong');root.querySelectorAll('.opt').forEach(x=>{if(options.find(o=>o.t===x.textContent&&o.c))x.classList.add('right');});}
+      if(q.w){why.style.display='block';}
+      const n=el('button','btn',i+1>=qs.length?'Ergebnis ansehen':'Weiter ➜');n.style.marginTop='10px';n.onclick=()=>{i++;render();};root.appendChild(n);
+    };root.appendChild(b);});
+    root.appendChild(why);
+  }
+  render();
+}
+
+/* Welches Märchen? */
+const RATE=[
+ ['Ein Mädchen trägt ein rotes Käppchen und trifft im Wald einen Wolf.','Rotkäppchen'],
+ ['Eine Hexe wohnt in einem Haus aus Lebkuchen und Zucker.','Hänsel und Gretel'],
+ ['Ein Mädchen sitzt in einem Turm ohne Tür und lässt sein langes Haar herunter.','Rapunzel'],
+ ['Ein Zauberspiegel, ein vergifteter Apfel und sieben Zwerge.','Schneewittchen'],
+ ['Ein Mädchen verliert beim Ball einen Schuh. Tauben helfen beim Linsen-Auslesen.','Aschenputtel'],
+ ['Eine Spindel, hundert Jahre Schlaf und eine Dornenhecke.','Dornröschen'],
+ ['Ein Kater mit Stiefeln macht seinen Herrn reich.','Der gestiefelte Kater'],
+ ['Eine kleine Erbse unter vielen Matratzen – nur eine echte Prinzessin spürt sie.','Prinzessin auf der Erbse'],
+ ['Vom Himmel fallen Sterne und werden zu Talern.','Sterntaler'],
+ ['Der Wolf frisst sechs Geißlein. Das jüngste versteckt sich im Uhrenkasten.','Die 7 Geißlein'],
+ ['Ein Mädchen friert in der Silvesternacht und zündet Streichhölzer an.','Das Mädchen mit den Streichhölzern'],
+ ['Ein Geist aus einer Lampe erfüllt Wünsche.','Aladin und die Wunderlampe'],
+ ['Durch Liebe wird ein verzaubertes Biest wieder zum Prinzen.','Die Schöne und das Biest'],
+ ['Ameisen, Enten und Bienen helfen dem jüngsten Bruder.','Die Bienenkönigin']
+];
+const names=TALES.map(t=>t[0]);
+const rateQs=shuffle(RATE).slice(0,8).map(([clue,ans])=>({q:clue+'<br><small>Welches Märchen ist das?</small>',o:[ans,...shuffle(names.filter(n=>n!==ans)).slice(0,3)],w:'Richtig: <b>'+ans+'</b>'}));
+mountQuiz($('#quizRate'),rateQs,'rate');
+
+/* Memory */
+let memFirst=null,memLock=false,memMoves=0,memPairs=0;
+function memStart(){
+  const picks=shuffle(TALES.filter(t=>['Schneewittchen','Rotkäppchen','Dornröschen','Aschenputtel','Sterntaler','Der gestiefelte Kater','Rapunzel','Hänsel und Gretel'].includes(t[0])));
+  const cards=[];picks.forEach((t,i)=>{cards.push({id:i,txt:t[1],emo:true});cards.push({id:i,txt:t[0],emo:false});});
+  const g=$('#memGrid');g.innerHTML='';memFirst=null;memLock=false;memMoves=0;memPairs=0;$('#memMoves').textContent=0;$('#memPairs').textContent=0;$('#memMsg').textContent='';
+  shuffle(cards).forEach(c=>{const d=el('div','mc','<div class="in"><div class="f">✨</div><div class="b'+(c.emo?' emo':'')+'">'+c.txt+'</div></div>');d.dataset.id=c.id;
+    d.onclick=()=>{if(memLock||d.classList.contains('up')||d.classList.contains('done'))return;d.classList.add('up');
+      if(!memFirst){memFirst=d;return;}
+      memMoves++;$('#memMoves').textContent=memMoves;
+      if(memFirst.dataset.id===d.dataset.id){memFirst.classList.replace('up','done');d.classList.replace('up','done');memFirst=null;memPairs++;$('#memPairs').textContent=memPairs;addStar(1);
+        if(memPairs===8){$('#memMsg').innerHTML='🎉 Geschafft in '+memMoves+' Zügen!';markDone('memory');}}
+      else{memLock=true;const a=memFirst;memFirst=null;setTimeout(()=>{a.classList.remove('up');d.classList.remove('up');memLock=false;},900);}
+    };g.appendChild(d);});
+}
+$('#memNew').onclick=memStart;memStart();
+
+/* ---------- Mindmap ---------- */
+const BUBS=[
+ ['👑 Figuren','Hexen, Zauberer, Prinzessin oder Prinz, König und Königin. Oft gibt es einen guten Helden und einen bösen Gegenspieler.','Beispiel: die böse Königin in Schneewittchen'],
+ ['🌅 „Es war einmal …“','So fängt ein Märchen an. Dieser Satz sagt: Jetzt beginnt eine Geschichte aus längst vergangener Zeit.','Beispiel: „Es war einmal ein König, der hatte drei Töchter …“'],
+ ['🌙 „Und wenn sie nicht gestorben sind …“','So hört ein Märchen oft auf. (In deinem Heft steht bei beiden „Anfang“ – der zweite Satz ist aber das <b>Ende</b>!)','„… dann leben sie noch heute.“'],
+ ['📍 Ort + Zeit ungenau','Man erfährt nie genau, wo und wann es war.','„hinter den sieben Bergen“, „in einem Schloss“'],
+ ['🪄 Magische Elemente','Zauberei, Wunder und Verwandlungen gehören dazu.','Zauberspiegel, Wunderlampe, verzauberte Spindel'],
+ ['😮 Spannend','Es gibt ein Problem, das gelöst werden muss. Das macht die Geschichte spannend (siehe Spannungskurve).','Wird der Held es schaffen?'],
+ ['🐺 Sprechende Tiere','Tiere und manchmal sogar Drachen können reden und handeln wie Menschen.','Der Wolf in Rotkäppchen, der gestiefelte Kater'],
+ ['😱 Oft gruselig','In Märchen passiert auch Unschönes oder Gruseliges. So wirkt das Gute am Ende noch stärker.','Die Hexe will Hänsel und Gretel essen.'],
+ ['🎉 Happy End','Am Ende wird das Problem gelöst und die Hauptfigur ist glücklich.','Aschenputtel heiratet den Prinzen.'],
+ ['💡 Lehre','Gutes wird belohnt, Böses wird bestraft. Märchen wollen uns etwas beibringen.','Sterntaler teilt alles und bekommt Reichtum.']
+];
+const seen=new Set();
+BUBS.forEach((b,i)=>{const bt=el('button','',b[0]);bt.onclick=()=>{$('#bubDetail').innerHTML='<b>'+b[0]+'</b><br>'+b[1]+'<br><i>'+b[2]+'</i>';bt.classList.add('seen');if(!seen.has(i)){seen.add(i);addStar(1);}
+  $('#bubProg').textContent='Entdeckt: '+seen.size+' von '+BUBS.length;if(seen.size===BUBS.length)markDone('merk');};$('#bubs').appendChild(bt);});
+$('#bubProg').textContent='Entdeckt: 0 von '+BUBS.length;
+
+/* ---------- Sortierspiel ---------- */
+const SORT=[['„Es war einmal …“',1],['eine böse Hexe',1],['ein sprechender Frosch',1],['ein Zauberspiegel',1],['drei Wünsche',1],['Gutes wird belohnt',1],['Smartphone-Nachricht',0],['Stau auf der Autobahn',0],['Uhrzeit: 14:37 Uhr in Hamburg',0],['ein Raumschiff',0],['Fußball-Liveticker',0],['hinter den sieben Bergen',1]];
+let sortRight=0,sortAns=0;
+shuffle(SORT).forEach(([t,v])=>{
+  const r=el('div','srt','<span class="t">'+t+'</span>');
+  const a=el('button','btn small','✨ typisch'),b=el('button','btn small gold','✖ nicht typisch');
+  function pick(x){if(r.classList.contains('right')||r.classList.contains('wrong'))return;sortAns++;
+    if(x===v){r.classList.add('right');sortRight++;addStar(1);}else r.classList.add('wrong');
+    a.disabled=b.disabled=true;
+    if(sortAns===SORT.length){$('#sortMsg').innerHTML=(sortRight>=10?'🌟':'👍')+' '+sortRight+' von '+SORT.length+' richtig!';markDone('sortm');}}
+  a.onclick=()=>pick(1);b.onclick=()=>pick(0);r.appendChild(a);r.appendChild(b);$('#sortM').appendChild(r);
+});
+
+/* ---------- Spannungskurve ---------- */
+const PH=[
+ ['1 · Einleitung','#7b5fd6','Wir lernen die <b>Hauptfigur (Held)</b> kennen. Es gibt ein <b>Problem</b> oder eine <b>schwierige Situation</b> (Hilfe nötig!). Die Spannung ist noch niedrig.'],
+ ['2 · Hauptteil','#3fb8a0','Die Spannung steigt. Der Held versucht, das Problem zu lösen. Er bekommt <b>Hilfe von einem Zauberer</b> oder muss eine <b>Aufgabe / Prüfung</b> bestehen.'],
+ ['3 · Höhepunkt (Wendung)','#e8638a','Der spannendste Moment! Hier gibt es die <b>Wendung</b>: Jetzt entscheidet sich, ob der Held es schafft.'],
+ ['4 · Schluss','#e0a21f','Das <b>Problem ist gelöst</b>, die Hauptfigur ist glücklich. Die Spannung sinkt wieder. Oft gibt es ein Happy End und eine Lehre.']
+];
+const cvSeen=new Set();
+function selPhase(i){
+  ['z0','z1','z2','z3'].forEach((z,k)=>{$('#'+z).setAttribute('opacity',k===i?'.5':(k===3?'.22':'.18'));});
+  $('#curveDetail').innerHTML='<b style="color:'+PH[i][1]+'">'+PH[i][0]+'</b><br>'+PH[i][2];
+  if(!cvSeen.has(i)){cvSeen.add(i);addStar(1);if(cvSeen.size===4)markDone('kurve');}
+}
+[0,1,2,3].forEach(i=>{$('#z'+i).onclick=()=>selPhase(i);$('#d'+i).onclick=()=>selPhase(i);});
+(function(){const p=$('#curvePath');const L=p.getTotalLength?p.getTotalLength():1200;p.style.strokeDasharray=L;p.style.strokeDashoffset=L;p.style.transition='stroke-dashoffset 2.2s ease';setTimeout(()=>{p.style.strokeDashoffset=0;},300);})();
+
+/* Rotkäppchen-Szenen */
+const SCENES=[
+ ['Rotkäppchen soll der kranken Großmutter Kuchen und Wein bringen und verspricht, nicht vom Weg abzukommen.',0],
+ ['Der Wolf lockt Rotkäppchen vom Weg ab und rennt vor zum Haus der Großmutter.',1],
+ ['Rotkäppchen soll dem Wolf, der im Bett der Großmutter liegt, auf die Fragen antworten – „Was hast du für große Ohren?“',2],
+ ['Der Jäger hört das Schnarchen, schneidet den Wolf auf und befreit Rotkäppchen und die Großmutter.',2],
+ ['Der Wolf wird bestraft. Rotkäppchen verspricht, nie wieder vom Weg abzugehen.',3],
+ ['Rotkäppchen pflückt Blumen im Wald, während der Wolf schon Pläne schmiedet.',1]
+];
+let phRight=0,phAns=0;
+shuffle(SCENES).forEach(([t,v])=>{
+  const r=el('div','srt','<span class="t">'+t+'</span>');
+  const s=el('select','','<option value="">– Teil wählen –</option><option value="0">Einleitung</option><option value="1">Hauptteil</option><option value="2">Höhepunkt / Wendung</option><option value="3">Schluss</option>');
+  s.onchange=()=>{if(s.value===''||r.dataset.d)return;r.dataset.d=1;phAns++;s.disabled=true;
+    if(+s.value===v){r.classList.add('right');phRight++;addStar(1);}else{r.classList.add('wrong');r.appendChild(el('span','','<small>→ richtig: '+['Einleitung','Hauptteil','Höhepunkt / Wendung','Schluss'][v]+'</small>'));}
+    if(phAns===SCENES.length){$('#phaseMsg').innerHTML=(phRight>=5?'🌟':'👍')+' '+phRight+' von '+SCENES.length+' richtig!';markDone('phase');}};
+  r.appendChild(s);$('#phaseGame').appendChild(r);
+});
+
+/* ---------- Lückentext ---------- */
+const GAPS=[
+ ['','Es war einmal','ein König, der hatte drei Töchter.',['Es war einmal','Gestern Nachmittag','Vor fünf Minuten']],
+ ['Er wohnte in einem Schloss','hinter den sieben Bergen','.',['hinter den sieben Bergen','in Köln-Ehrenfeld','an der Tankstelle']],
+ ['Der Held muss','drei','Aufgaben lösen.',['drei','37','null']],
+ ['Am Ende wird die böse Hexe','bestraft','.',['bestraft','befördert','eingeladen']],
+ ['Und wenn sie nicht gestorben sind, dann','leben sie noch heute','.',['leben sie noch heute','schreiben sie eine Mathearbeit','gehen sie zur Schule']],
+ ['Die Hauptfigur bekommt Hilfe von einem','Zauberer','.',['Zauberer','Busfahrer','Reporter']]
+];
+const gapSel=[];
+GAPS.forEach(([pre,ans,post,opts])=>{
+  const d=el('div','srt');d.appendChild(el('span','',pre));
+  const s=el('select','','<option value="">…</option>'+shuffle(opts).map(o=>'<option>'+o+'</option>').join(''));
+  d.appendChild(s);d.appendChild(el('span','',post));$('#gaps').appendChild(d);gapSel.push([s,ans,d]);
+});
+$('#gapCheck').onclick=()=>{let ok=0;gapSel.forEach(([s,a,d])=>{d.classList.remove('right','wrong');if(s.value===a){d.classList.add('right');ok++;}else if(s.value!=='')d.classList.add('wrong');});
+  const newOk=ok;$('#gapMsg').innerHTML=ok+' von '+GAPS.length+' richtig'+(ok===GAPS.length?' 🌟':' – verbessere die roten Lücken!');
+  if(ok===GAPS.length){if(!gapSel.awarded){gapSel.awarded=true;addStar(GAPS.length);}markDone('luecken');}};
+
+/* Rollen */
+const ROLES=[['Hexe','Böse'],['Stiefmutter','Böse'],['Wolf','Böse'],['Gute Fee','Gut'],['Der jüngste Bruder (Held)','Gut'],['Zauberer, der dem Helden hilft','Gut'],['Böse Königin','Böse'],['Sprechender Kater, der hilft','Gut']];
+let roleAns=0,roleRight=0;
+shuffle(ROLES).forEach(([t,v])=>{
+  const r=el('div','srt','<span class="t">'+t+'</span>');
+  const a=el('button','btn small','😇 Helfer / Guter'),b=el('button','btn small gold','😈 Gegenspieler / Böser');
+  function pick(x){if(r.dataset.d)return;r.dataset.d=1;roleAns++;a.disabled=b.disabled=true;
+    if(x===v){r.classList.add('right');roleRight++;addStar(1);}else r.classList.add('wrong');
+    if(roleAns===ROLES.length){$('#roleMsg').innerHTML=roleRight+' von '+ROLES.length+' richtig!';markDone('rollen');}}
+  a.onclick=()=>pick('Gut');b.onclick=()=>pick('Böse');r.appendChild(a);r.appendChild(b);$('#roles').appendChild(r);
+});
+
+/* ---------- Werkstatt ---------- */
+const DICE={
+ 'Held / Heldin':['ein armer Müllerssohn','ein mutiges Mädchen mit roten Schuhen','der jüngste von drei Brüdern','eine kluge Königstochter','ein kleiner Schneider','ein Waisenjunge mit einer Flöte'],
+ 'Ort':['in einem dunklen Wald hinter den sieben Bergen','in einem Schloss am Ende der Welt','in einem kleinen Dorf am Fluss','in einem Turm mitten im Meer','in einem Land, wo es nie Winter wird'],
+ 'Problem':['wird verzaubert','soll drei unlösbare Aufgaben erfüllen','hat sich im Zauberwald verirrt','muss einen gestohlenen Schatz zurückholen','wird von einem Drachen bedroht'],
+ 'Helfer':['ein sprechender Fuchs','eine gute Fee','ein alter Zauberer','drei weiße Tauben','eine freundliche Zwergin'],
+ 'Zauberding':['ein Zauberspiegel','ein Wunschring','goldene Schuhe','eine Tarnkappe','ein singender Apfel'],
+ 'Gegenspieler':['eine Stiefmutter','ein hungriger Wolf','ein eifersüchtiger Zauberer','ein Riese','eine Hexe']
+};
+const dv={};
+Object.keys(DICE).forEach(k=>{
+  const s=el('div','slot','<span class="lab">'+k+'</span><span class="val"></span><span>🎲</span>');
+  function roll(){dv[k]=DICE[k][Math.floor(Math.random()*DICE[k].length)];s.querySelector('.val').textContent=dv[k];s.classList.remove('roll');void s.offsetWidth;s.classList.add('roll');}
+  s.onclick=roll;s._roll=roll;$('#dice').appendChild(s);roll();
+});
+$('#rollAll').onclick=()=>document.querySelectorAll('#dice .slot').forEach(s=>s._roll());
+
+const story=$('#story');
+const CHECKS=[
+ ['Anfang mit „Es war einmal“',t=>/es war einmal/i.test(t)],
+ ['Ende mit „… dann leben sie noch heute“ (oder ähnlich)',t=>/(noch heute|gl(ü|ue)cklich|gestorben sind)/i.test(t)],
+ ['Eine Hauptfigur (Held) kommt vor',t=>/(prinz|prinzessin|könig|koenig|mädchen|maedchen|junge|bruder|schneider|müller|mueller|held|heldin)/i.test(t)],
+ ['Eine Zauberfigur oder ein Zauberding (Hexe, Fee, Zauberer, Zauber …)',t=>/(hexe|fee|zauber|drache|magisch|verzaubert|wunder)/i.test(t)],
+ ['Die Zahl drei kommt vor (drei / 3)',t=>/(\bdrei\b|\b3\b|dritte)/i.test(t)],
+ ['Mindestens 80 Wörter',t=>t.trim().split(/\s+/).filter(Boolean).length>=80]
+];
+CHECKS.forEach(([t])=>$('#chk').appendChild(el('li','','⬜ '+t)));
+let storyAward=false;
+function updStory(){
+  const t=story.value;const wc=t.trim()?t.trim().split(/\s+/).length:0;$('#wc').textContent=wc;
+  let n=0;[...$('#chk').children].forEach((li,i)=>{const ok=CHECKS[i][1](t);li.className=ok?'ok':'';li.textContent=(ok?'✅ ':'⬜ ')+CHECKS[i][0];if(ok)n++;});
+  if(n===CHECKS.length&&!storyAward){storyAward=true;addStar(5);}
+  try{localStorage.setItem('maerchen_lisa_text',t);}catch(e){}
+}
+story.addEventListener('input',updStory);
+try{const sv=localStorage.getItem('maerchen_lisa_text');if(sv)story.value=sv;}catch(e){}
+updStory();
+$('#copyTxt').onclick=async()=>{try{await navigator.clipboard.writeText(story.value);$('#copyTxt').textContent='✔ Kopiert!';}catch(e){story.select();document.execCommand('copy');$('#copyTxt').textContent='✔ Kopiert!';}setTimeout(()=>$('#copyTxt').textContent='📋 Kopieren',1500);};
+$('#saveTxt').onclick=()=>{const b=new Blob([story.value],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Mein_Maerchen.txt';document.body.appendChild(a);a.click();a.remove();};
+
+/* ---------- Abschlussquiz ---------- */
+const FINAL=[
+ {q:'Mit welchem Satz fangen viele Märchen an?',o:['„Es war einmal …“','„Gestern Abend …“','„Hallo Leute …“','„Achtung, Durchsage …“'],w:'Der Märchenanfang „Es war einmal“ ist ein festes Merkmal.'},
+ {q:'Wer hat viele deutsche Märchen gesammelt und aufgeschrieben?',o:['Die Brüder Grimm','Die Gebrüder Wright','Die Geschwister Scholl','Die Gebrüder Marx'],w:'Jacob und Wilhelm Grimm sammelten Märchen, die man sich erzählt hat.'},
+ {q:'Wie sind Ort und Zeit in Märchen meistens?',o:['ungenau („hinter den sieben Bergen“)','ganz genau mit Uhrzeit','immer in Berlin','immer im Jahr 2000'],w:'Man erfährt nie genau, wo und wann es war.'},
+ {q:'In welchem Teil der Spannungskurve werden Hauptfigur und Problem vorgestellt?',o:['Einleitung','Höhepunkt','Schluss','Wendung'],w:'In der Einleitung lernen wir den Helden und sein Problem kennen.'},
+ {q:'Was passiert am Höhepunkt?',o:['Der spannendste Moment, es gibt eine Wendung','Die Geschichte beginnt','Alle gehen nach Hause','Das Märchen wird erklärt'],w:'Am Höhepunkt ist die Spannung am größten, dann wendet sich die Geschichte.'},
+ {q:'Wer schrieb „Das Mädchen mit den Streichhölzern“?',o:['Hans Christian Andersen','Jacob Grimm','Wilhelm Busch','Astrid Lindgren'],w:'Andersen erfand seine Märchen selbst – das sind Kunstmärchen.'},
+ {q:'Was ist typisch für das Ende eines Märchens?',o:['Gutes wird belohnt, Böses bestraft','Alle Figuren sind weg','Es gibt immer eine Matheaufgabe','Es endet mitten im Satz'],w:'Meistens gibt es ein Happy End und eine Lehre.'},
+ {q:'Welche Zahl kommt in Märchen besonders oft vor?',o:['3','47','1001','0'],w:'Drei Wünsche, drei Brüder, drei Aufgaben – die Drei ist eine Zauberzahl.'},
+ {q:'Was ist ein Kunstmärchen?',o:['Ein Märchen, das sich ein bestimmter Dichter selbst ausgedacht hat','Ein Märchen, das gemalt wird','Ein Märchen ohne Worte','Ein sehr kurzes Märchen'],w:'Bei Volksmärchen kennt man den Erfinder nicht, bei Kunstmärchen schon.'},
+ {q:'Wie lange schläft Dornröschen?',o:['Hundert Jahre','Eine Woche','Zehn Minuten','Tausend Jahre'],w:'Hundert Jahre dauert der Schlaf nach dem Spindelstich.'}
+];
+mountQuiz($('#quizFinal'),shuffle(FINAL),'abschluss');
+</script>
+</body>
+</html>
