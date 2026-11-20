@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Französisch Volet 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+[hidden]:not([hidden=until-found i]){display:none!important}
+img{max-width:100%}
+/* Layout: Kopfband, links Inhaltsverzeichnis (mobil: waagerechte Leiste), rechts Merkhilfe und Übungskarten */
+:root{--bg:#EDF0F6;--surface:#FFFFFF;--surface2:#F3F5FA;--ink:#17233F;--muted:#586483;--line:#D2D9E6;--navy:#1B2D5C;--gold:#9A6F12;--goldbg:#F8EBC8;--pron:#1B4FA8;--pronbg:#DCE7FA;--verb:#A33C1F;--verbbg:#FBE2D9;--good:#17794A;--goodbg:#DDF1E6;--bad:#B3303A;--badbg:#FAE1E3;--warn:#7D5600;--warnbg:#FBEFCB;--head:"Playfair Display",Georgia,serif;--read:"Source Serif 4",Georgia,serif;--ui:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1626;--surface:#172138;--surface2:#1E2B49;--ink:#E8EDF8;--muted:#9FAECF;--line:#2C3B60;--navy:#A9BFF2;--gold:#E3B65B;--goldbg:#3A3015;--pron:#A9C6FF;--pronbg:#1F3A6C;--verb:#FFB9A3;--verbbg:#5A2B20;--good:#6AD9A0;--goodbg:#173B2B;--bad:#FF9097;--badbg:#44202A;--warn:#F0CD7A;--warnbg:#41350F;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1626;--surface:#172138;--surface2:#1E2B49;--ink:#E8EDF8;--muted:#9FAECF;--line:#2C3B60;--navy:#A9BFF2;--gold:#E3B65B;--goldbg:#3A3015;--pron:#A9C6FF;--pronbg:#1F3A6C;--verb:#FFB9A3;--verbbg:#5A2B20;--good:#6AD9A0;--goodbg:#173B2B;--bad:#FF9097;--badbg:#44202A;--warn:#F0CD7A;--warnbg:#41350F;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:120px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:17px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 110px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--navy)}
+.wrap{max-width:1080px;margin:0 auto}
+.band{margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:26px max(16px,env(safe-area-inset-left,0px)) 22px;background:var(--navy);color:#fff}
+.band .in{max-width:1080px;margin:0 auto}
+.eyebrow{font-weight:700;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:#E9C46A}
+.band h1{font-family:var(--head);font-weight:700;font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.15;margin:6px 0 8px;text-wrap:balance}
+.band p{margin:0;max-width:62ch;color:#D5DDF2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .band{background:#13203F}}
+:root[data-theme="dark"] .band{background:#13203F}
+.layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:28px;margin-top:22px;align-items:start}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.toc a{display:flex;gap:8px;align-items:baseline;padding:7px 9px;border-radius:8px;color:var(--ink);text-decoration:none;font-weight:600;font-size:.95rem}
+.toc a span.n{min-width:1.4em;color:var(--muted);font-variant-numeric:tabular-nums}
+.toc a:hover{background:var(--surface2)}
+.toc a.cur{background:var(--pronbg);color:var(--pron)}
+.toc a.done::after{content:"✓";margin-left:auto;color:var(--good);font-weight:700}
+@media (max-width:820px){.layout{grid-template-columns:minmax(0,1fr);gap:14px}.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;flex-direction:row;overflow-x:auto;border-radius:0 0 12px 12px;margin:0 -4px;padding:6px}.toc a{white-space:nowrap}.toc a.done::after{margin-left:2px}}
+main{display:flex;flex-direction:column;gap:22px;min-width:0}
+h2,h3,h4{font-family:var(--head);margin:0;color:var(--navy);text-wrap:balance}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card>h2{font-size:1.45rem;margin-bottom:12px}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ex>header{display:flex;gap:14px;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--surface2)}
+.num{flex:none;width:34px;height:34px;border-radius:8px;background:var(--navy);color:#fff;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .num{background:#2E4A8F}}
+:root[data-theme="dark"] .num{background:#2E4A8F}
+.ex h2{font-size:1.25rem}
+.ins{margin:2px 0 0;color:var(--muted)}
+.exbody{padding:18px 20px;min-width:0}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 20px 16px;border-top:1px solid var(--line)}
+.b{font:inherit;font-weight:600;font-size:.95rem;padding:8px 16px;border-radius:9px;border:1.5px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .b{background:#2E4A8F;border-color:#2E4A8F}}
+:root[data-theme="dark"] .b{background:#2E4A8F;border-color:#2E4A8F}
+.b.ghost{background:transparent;color:var(--navy);border-color:var(--line)}
+.b.ghost:hover{border-color:var(--navy)}
+.b[aria-pressed="true"],.b[aria-expanded="true"]{outline:2px solid var(--gold);outline-offset:1px}
+.res{font-weight:600;color:var(--muted)}
+.res.good{color:var(--good)}.res.bad{color:var(--bad)}
+:focus-visible{outline:3px solid #3C7DF0;outline-offset:2px}
+/* Texte */
+.txt{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.txt+.txt{margin-top:14px}
+.txt h3{font-size:1.1rem;margin-bottom:8px}
+.fr{font-family:var(--read);font-size:1.12rem;line-height:1.75;max-width:70ch}
+.trans{margin-top:12px;padding:12px 16px;border-left:4px solid var(--gold);background:var(--goldbg);border-radius:0 10px 10px 0}
+.trans h4{font-size:.95rem;margin-bottom:4px;color:var(--gold)}
+.trans p{margin:0;font-family:var(--read);max-width:70ch;line-height:1.7}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.legend{margin-top:8px;font-size:.9rem;color:var(--muted)}
+.legend .p,.legend .e{padding:0 6px}
+.p,.e{border-radius:4px}
+.hl .p{background:var(--pronbg);color:var(--pron);padding:0 3px;font-weight:600}
+.hl .e{background:var(--verbbg);color:var(--verb);padding:0 3px;font-weight:600}
+.legend .p{background:var(--pronbg);color:var(--pron);font-weight:600}.legend .e{background:var(--verbbg);color:var(--verb);font-weight:600}
+details.words{margin-top:10px}
+details summary{cursor:pointer;font-weight:600;color:var(--navy)}
+.wl{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:2px 22px;margin:8px 0 0;padding:0;list-style:none}
+.wl li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dotted var(--line);padding:3px 0}
+.wl li span{color:var(--muted);text-align:right}
+/* Tabellen */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:300px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+td.fr2{font-family:var(--read);font-size:1.08rem}
+td.de{color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.two>*{min-width:0}
+.note{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}
+.note b{color:var(--navy)}
+.chunks{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.chunks li{background:var(--goldbg);border-radius:8px;padding:6px 12px;font-family:var(--read)}
+.chunks li span{display:block;font-family:var(--ui);font-size:.85rem;color:var(--muted)}
+.say{font:inherit;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--pron);cursor:pointer;padding:0;vertical-align:middle}
+/* Eingaben */
+.in{font:inherit;font-family:var(--read);font-size:1.05rem;color:var(--ink);background:var(--surface2);border:0;border-bottom:2px solid var(--muted);border-radius:4px 4px 0 0;padding:2px 6px;text-align:center;min-width:3.5ch;max-width:100%}
+.in:focus{outline:none;border-bottom-color:#3C7DF0;background:var(--surface)}
+.in.ok,select.ok,.rf.ok,.cbs.ok{border-bottom-color:var(--good);background:var(--goodbg)}
+.in.no,select.no,.rf.no,.cbs.no{border-bottom-color:var(--bad);background:var(--badbg)}
+.in.close{border-bottom-color:#C28A00;background:var(--warnbg)}
+.mk{font-weight:700;margin-left:3px;font-style:normal}
+.mk.ok{color:var(--good)}.mk.no{color:var(--bad)}.mk.close{color:var(--warn)}
+select.sel{font:inherit;font-size:1rem;color:var(--ink);background:var(--surface2);border:1.5px solid var(--line);border-radius:7px;padding:3px 6px;max-width:100%}
+.ln{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line)}
+.ln:last-child{border-bottom:0}
+.ln .no{flex:none;width:1.8em;color:var(--muted);font-variant-numeric:tabular-nums}
+.ln .tx{font-family:var(--read);font-size:1.08rem}
+.ln .hint{flex-basis:100%;margin-left:2.4em;font-size:.9rem;color:var(--muted)}
+.rf{display:inline-flex;gap:14px;padding:3px 8px;border-radius:8px;border-bottom:2px solid transparent}
+.rf label{display:inline-flex;gap:5px;align-items:center;cursor:pointer;font-weight:600}
+.fiches{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.fiche{border:1.5px solid var(--gold);border-radius:12px;padding:14px 16px;background:var(--surface)}
+.fiche h3{font-size:1.05rem;margin-bottom:8px}
+.fiche .row{display:grid;grid-template-columns:9.5em minmax(0,1fr);gap:8px;align-items:center;padding:5px 0}
+.fiche .row .in{text-align:left;width:100%}
+.fiche .row .lbl{font-weight:600;color:var(--muted)}
+.cbs{display:flex;flex-wrap:wrap;gap:4px 14px;padding:4px 6px;border-radius:8px;border-bottom:2px solid transparent}
+.cbs label{display:inline-flex;gap:6px;align-items:center;font-family:var(--read);cursor:pointer}
+.ta{width:100%;min-height:130px;font:inherit;font-family:var(--read);color:var(--ink);background:var(--surface2);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical}
+.checks{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+.checks label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.acc{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.acc .in2{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.acc small{color:var(--muted);font-weight:600;margin-right:4px}
+.acc button{font:inherit;font-family:var(--read);font-size:1.05rem;min-width:36px;height:36px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface2);color:var(--ink);cursor:pointer;padding:0 6px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.pho{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.pho .sym{font-family:var(--read);font-size:1.6rem;font-weight:600;color:var(--pron)}
+.pho ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.pho li{display:flex;justify-content:space-between;align-items:center;font-family:var(--read);font-size:1.08rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="band"><div class="in">
+<div class="eyebrow">Unité 1 · Volet 2</div>
+<h1>Coucou, c'est nous !</h1>
+<p>Lesen, verstehen und üben: das Verb <i>être</i> und die Personalpronomen. Zu jedem Text gibt es eine deutsche Übersetzung auf Knopfdruck.</p>
+</div></div>
+<div class="layout">
+<nav class="toc" id="toc" aria-label="Inhalt"></nav>
+<main id="main"></main>
+</div>
+</div>
+<div class="acc" aria-label="Sonderzeichen"><div class="in2"><small>Sonderzeichen:</small><span id="accbtns"></span></div></div>
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const SPK='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const spk=t=>`<button class="say" type="button" aria-label="Anhören: ${esc(t)}" data-say="${esc(t)}">${SPK}</button>`;
+function say(t){try{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(t).replace(/…/g,"").replace(/\//g," "));u.lang="fr-FR";u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- Normalisierung ---------- */
+const nT=s=>String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[.,!?…«»;:]/g," ").replace(/\s+/g," ").trim();
+const fl=s=>nT(s).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/œ/g,"oe");
+
+/* ---------- Markierung in Texten ---------- */
+const mk=s=>s.replace(/\[\[p:([^\]]+)\]\]/g,'<span class="p">$1</span>').replace(/\[\[e:([^\]]+)\]\]/g,'<span class="e">$1</span>');
+const plain=s=>s.replace(/\[\[[pe]:([^\]]+)\]\]/g,"$1");
+
+/* ---------- Texte (eigene Texte im Stil der Lektion) ---------- */
+const TEXTS=[
+{id:"a",title:"Inès stellt sich vor",
+ fr:["Coucou, [[e:c'est]] [[p:moi]] !","[[p:Je]] m'appelle Inès et [[p:j']]ai douze ans.","[[p:Je]] [[e:suis]] de Lyon, mais [[p:j']]habite à Nantes depuis un an.","[[p:Je]] [[e:suis]] en cinquième.","[[p:J']]aime le tennis, la danse et les séries.","[[p:Je]] n'aime pas les spaghettis.","Ma meilleure amie, [[e:c'est]] Clara.","[[p:Elle]] [[e:est]] très sympa.","[[p:Nous]] [[e:sommes]] dans la même classe.","Le mercredi, [[p:nous]] [[e:sommes]] ensemble au club de théâtre.","Hugo et Yanis [[e:sont]] aussi dans le club.","[[p:Ils]] [[e:sont]] drôles !","Mais avec Hugo, [[e:c'est]] un peu compliqué : [[p:il]] [[e:est]] souvent en retard !"],
+ de:["Hallo, ich bin's!","Ich heiße Inès und bin zwölf Jahre alt.","Ich komme aus Lyon, wohne aber seit einem Jahr in Nantes.","Ich bin in der cinquième (7. Klasse).","Ich mag Tennis, Tanzen und Serien.","Ich mag keine Spaghetti.","Meine beste Freundin ist Clara.","Sie ist sehr nett.","Wir sind in derselben Klasse.","Mittwochs sind wir zusammen im Theaterclub.","Hugo und Yanis sind auch im Club.","Sie sind lustig!","Aber mit Hugo ist es ein bisschen kompliziert: Er kommt oft zu spät!"],
+ words:[["le tennis","Tennis"],["la série","die Serie"],["le club","der Club, die AG"],["drôle","lustig"],["souvent","oft"],["en retard","zu spät"],["meilleur(e)","beste(r)"],["le mercredi","mittwochs"],["ensemble","zusammen"],["depuis","seit"]]},
+{id:"b",title:"Théo stellt sich vor",
+ fr:["Salut, [[e:c'est]] Théo !","[[p:J']]ai onze ans et [[p:je]] [[e:suis]] en sixième.","[[p:Je]] [[e:suis]] de Marseille.","[[p:J']]aime le basket, les jeux vidéo et la pizza.","Mon ami Malik [[e:est]] dans ma classe.","[[p:Nous]] [[e:sommes]] toujours ensemble.","Ma sœur Léa [[e:est]] aussi au collège, mais [[p:elle]] [[e:est]] en quatrième.","[[p:Elle]] [[e:est]] super !","Et [[p:toi]], [[p:tu]] [[e:es]] aussi en sixième ?","Et [[p:vous]], [[p:vous]] [[e:êtes]] dans un club ?","[[p:Moi]], [[p:je]] [[e:suis]] dans le club de basket.","Les garçons du club [[e:sont]] sympa.","[[p:On]] [[e:est]] une équipe !"],
+ de:["Hallo, hier ist Théo!","Ich bin elf Jahre alt und in der sixième (6. Klasse).","Ich komme aus Marseille.","Ich mag Basketball, Videospiele und Pizza.","Mein Freund Malik ist in meiner Klasse.","Wir sind immer zusammen.","Meine Schwester Léa ist auch im Collège, aber sie ist in der quatrième (8. Klasse).","Sie ist klasse!","Und du, bist du auch in der sixième?","Und ihr, seid ihr in einem Club?","Ich bin im Basketballclub.","Die Jungs im Club sind nett.","Wir sind ein Team!"],
+ words:[["le basket","Basketball"],["le jeu vidéo","das Videospiel"],["la sœur","die Schwester"],["le collège","die Schule (Sek. I)"],["toujours","immer"],["l'équipe (f.)","das Team"],["sympa","nett"],["super","klasse"]]}
+];
+function textCard(t){
+ return `<article class="txt" id="t-${t.id}"><h3>${esc(t.title)}</h3><div class="fr" lang="fr">${t.fr.map(mk).join(" ")}</div>
+ <div class="bar"><button class="b" type="button" data-tr="${t.id}" aria-expanded="false" aria-controls="tr-${t.id}">Übersetzen</button><button class="b ghost" type="button" data-hl="${t.id}" aria-pressed="false">être und Pronomen markieren</button><button class="b ghost" type="button" data-read="${t.id}">Vorlesen</button></div>
+ <div class="legend" id="lg-${t.id}" hidden><span class="p">Personalpronomen</span> <span class="e">Formen von être</span></div>
+ <div class="trans" id="tr-${t.id}" hidden><h4>Übersetzung</h4><p>${esc(t.de.join(" "))}</p></div>
+ <details class="words"><summary>Wörter zum Text</summary><ul class="wl">${t.words.map(w=>`<li><b>${esc(w[0])}</b><span>${esc(w[1])}</span></li>`).join("")}</ul></details></article>`;
+}
+
+/* ---------- Bausteine ---------- */
+const inp=(a,w=8)=>`<input class="in" type="text" data-a="${esc(a)}" style="width:${w}ch" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Lücke">`;
+const PRON=["je","tu","il","elle","on","nous","vous","ils","elles"];
+const sel=(a,opts=PRON)=>`<select class="sel" data-a="${esc(a)}" aria-label="Auswahl"><option value="">…</option>${opts.map(o=>`<option>${esc(o)}</option>`).join("")}</select>`;
+const ex=(id,num,title,ins,body)=>`<section class="ex" id="${id}" data-ex><header><span class="num">${num}</span><div><h2>${title}</h2><p class="ins">${ins}</p></div></header><div class="exbody">${body}</div><div class="ctl"><button class="b" type="button" data-act="check">Prüfen</button><button class="b ghost" type="button" data-act="solve">Lösung anzeigen</button><button class="b ghost" type="button" data-act="reset">Zurücksetzen</button><span class="res" role="status" aria-live="polite"></span></div></section>`;
+const lines=(arr,f)=>arr.map((it,i)=>`<div class="ln"><span class="nr">${i+1}.</span>${f(it,i)}</div>`).join("");
+
+/* ---------- Inhalte ---------- */
+const sections=[];
+const add=(id,label,n,html)=>sections.push({id,label,n,html});
+/* Merkhilfe */
+add("merk","Merkhilfe","",`<section class="card" id="merk"><h2>Merkhilfe: être und die Personalpronomen</h2>
+<div class="two">
+<div><h3 style="font-size:1.05rem;margin-bottom:6px">être (sein)</h3><div class="tw"><table><thead><tr><th>Französisch</th><th>Deutsch</th><th></th></tr></thead><tbody>
+${[["je suis","ich bin"],["tu es","du bist"],["il / elle / on est","er / sie / man ist"],["nous sommes","wir sind"],["vous êtes","ihr seid / Sie sind"],["ils / elles sont","sie sind"]].map(r=>`<tr><td class="fr2"><b>${r[0]}</b></td><td class="de">${r[1]}</td><td>${spk(r[0])}</td></tr>`).join("")}
+</tbody></table></div></div>
+<div><h3 style="font-size:1.05rem;margin-bottom:6px">Personalpronomen</h3><div class="tw"><table><thead><tr><th>Pronomen</th><th>Bedeutung</th></tr></thead><tbody>
+${[["je / j'","ich (vor Vokal: j'ai, j'habite)"],["tu","du"],["il","er; auch für männliche Dinge (le club)"],["elle","sie; auch für weibliche Dinge (la classe)"],["on","man; im Alltag oft: wir"],["nous","wir"],["vous","ihr; höflich: Sie"],["ils","sie: mehrere Jungen oder gemischte Gruppe"],["elles","sie: nur Mädchen / Frauen"]].map(r=>`<tr><td class="fr2"><b>${r[0]}</b></td><td class="de">${r[1]}</td></tr>`).join("")}
+</tbody></table></div></div>
+</div>
+<p class="note"><b>Herkunft und Wohnort:</b> <i>Je suis de Lyon.</i> (Ich komme aus Lyon.) und <i>J'habite à Nantes.</i> (Ich wohne in Nantes.) Frage: <i>Tu es d'où ?</i> (Woher kommst du?)</p>
+<p class="note"><b>Klassen in Frankreich</b> werden rückwärts gezählt: <i>sixième</i> = 6. Klasse, <i>cinquième</i> = 7. Klasse, <i>quatrième</i> = 8. Klasse. Man sagt <i>Je suis en cinquième.</i></p>
+<ul class="chunks" aria-label="Wendungen"><li>c'est moi / c'est nous<span>ich bin's / wir sind's</span></li><li>dans la même classe<span>in derselben Klasse</span></li><li>c'est un peu compliqué<span>es ist ein bisschen kompliziert</span></li><li>être en retard<span>zu spät sein</span></li></ul></section>`);
+
+/* 1 Lesen */
+add("lesen","Lesen","1",`<section id="lesen"><div class="card" style="margin-bottom:14px"><h2>1 · Lesen und verstehen</h2><p class="ins" style="margin:0;color:var(--muted)">Lies die beiden Texte. Mit „Übersetzen“ siehst du die deutsche Übersetzung. Mit „markieren“ erkennst du die Pronomen und die Formen von <i>être</i>.</p></div>${TEXTS.map(textCard).join("")}</section>`);
+const RF=[["Inès wohnt seit einem Jahr in Nantes.","r"],["Inès kommt aus Nantes.","f"],["Inès und Clara sind in derselben Klasse.","r"],["Hugo kommt oft zu spät.","r"],["Théo ist in der cinquième.","f"],["Théo und Malik sind oft zusammen.","r"],["Léa ist in derselben Klasse wie Théo.","f"],["Théo ist im Basketballclub.","r"]];
+add("verstehen","Textverständnis","1",ex("verstehen","1b","Richtig oder falsch?","Entscheide nach den Texten von Inès und Théo.",lines(RF,(r,i)=>`<span class="tx" style="flex:1 1 18em">${r[0]}</span><span class="rf" data-a="${r[1]}" role="radiogroup" aria-label="Aussage ${i+1}"><label><input type="radio" name="rf${i}" value="r"> richtig</label><label><input type="radio" name="rf${i}" value="f"> falsch</label></span>`)));
+
+/* 2 Steckbrief */
+const LIKES=["le tennis","la danse","les séries","les spaghettis","le basket","les jeux vidéo","la pizza"];
+const cbs=(a)=>`<div class="cbs" data-a="${a}" role="group" aria-label="Das mag er oder sie">${LIKES.map(l=>`<label><input type="checkbox" value="${l}">${l}</label>`).join("")}</div>`;
+const row=(l,a,w)=>`<div class="row"><span class="lbl">${l}</span>${inp(a,w)}</div>`;
+add("fiche","Steckbrief","2",ex("fiche","2","Fiche d'identité","Lies die Texte noch einmal und fülle die beiden Steckbriefe aus. Bei „Aime“ setzt du Häkchen bei allem, was die Person mag.",
+`<div class="fiches"><div class="fiche"><h3>Nom : Inès</h3>${row("Âge","12|douze|12 ans|douze ans",10)}${row("Ville d'origine","Lyon",10)}${row("Habite à","Nantes",10)}${row("Classe","cinquième|la cinquième",10)}${row("Meilleure amie","Clara",10)}${row("Club","théâtre|le club de théâtre|club de théâtre",12)}<div class="row"><span class="lbl">Aime</span><span></span></div>${cbs("le tennis|la danse|les séries")}</div>
+<div class="fiche"><h3>Nom : Théo</h3>${row("Âge","11|onze|11 ans|onze ans",10)}${row("Ville d'origine","Marseille",10)}${row("Classe","sixième|la sixième",10)}${row("Meilleur ami","Malik",10)}${row("Sœur Léa en","quatrième|la quatrième",10)}${row("Club","basket|le club de basket|club de basket",12)}<div class="row"><span class="lbl">Aime</span><span></span></div>${cbs("le basket|les jeux vidéo|la pizza")}</div></div>`));
+
+/* 3 Pronomen zuordnen */
+const P3=[["Théo","il"],["Inès","elle"],["Inès et Clara","elles"],["Hugo et Yanis","ils"],["Théo et Inès","ils"],["moi","je"],["toi","tu"],["moi et mon ami","nous|on"],["toi et ton ami","vous"],["les filles","elles"],["les garçons et les filles","ils"],["Madame Martin","elle"],["le club","il"],["la classe","elle"],["les jeux vidéo","ils"]];
+add("zuordnen","Pronomen","3",ex("zuordnen","3","Welches Pronomen passt?","Wähle für jede Angabe das passende Personalpronomen. Bei „moi et mon ami“ sind zwei Antworten richtig.",lines(P3,r=>`<span class="tx" style="min-width:12em">${r[0]}</span><span>→</span>${sel(r[1])}`)));
+
+/* 4 être konjugieren */
+add("konj","être konjugieren","4",ex("konj","4","être konjugieren","Teil a: Schreibe die Formen von être. Teil b: Ergänze das passende Pronomen (manchmal sind mehrere Lösungen möglich).",
+`<div class="two"><div><h3 style="font-size:1.05rem;margin-bottom:6px">a) Die Formen</h3><table><tbody>${[["je","suis"],["tu","es"],["il / elle / on","est"],["nous","sommes"],["vous","êtes"],["ils / elles","sont"]].map(r=>`<tr><td class="fr2"><b>${r[0]}</b></td><td>${inp(r[1],9)}</td></tr>`).join("")}</tbody></table></div>
+<div><h3 style="font-size:1.05rem;margin-bottom:6px">b) Die Pronomen</h3><table><tbody>${[["es","tu"],["sommes","nous"],["êtes","vous"],["suis","je|j'"],["est","il|elle|on"],["sont","ils|elles"]].map(r=>`<tr><td>${inp(r[1],9)}</td><td class="fr2"><b>${r[0]}</b></td></tr>`).join("")}</tbody></table></div></div>`));
+
+/* 5 Lücken */
+const L5=[["Je ___ de Paris.","suis","Ich komme aus Paris."],["Tu ___ en sixième ?","es","Bist du in der sixième?"],["Inès ___ sympa.","est","Inès ist nett."],["Nous ___ dans la même classe.","sommes","Wir sind in derselben Klasse."],["Vous ___ en retard !","êtes","Ihr seid zu spät!"],["Hugo et Yanis ___ au club de théâtre.","sont","Hugo und Yanis sind im Theaterclub."],["Clara et moi, nous ___ amies.","sommes","Clara und ich, wir sind Freundinnen."],["Mes amis ___ cool.","sont","Meine Freunde sind cool."],["Ma sœur ___ en quatrième.","est","Meine Schwester ist in der quatrième."],["Tu ___ de Nantes, Théo ?","es","Du kommst aus Nantes, Théo?"],["Vous ___ ensemble depuis septembre ?","êtes","Seid ihr seit September zusammen?"],["Les garçons ___ souvent en retard.","sont","Die Jungs sind oft zu spät."]];
+add("luecken","Lücken","5",ex("luecken","5","Die richtige Form von être","Ergänze die passende Form. Achte auf die Akzente (Tasten unten).",lines(L5,r=>`<span class="tx">${r[0].replace("___",inp(r[1],7))}</span><span class="hint">${r[2]}</span>`)));
+
+/* 6 Name -> Pronomen + être */
+const L6=[["Théo est de Marseille.","Il","est","de Marseille."],["Inès est de Lyon.","Elle","est","de Lyon."],["Clara et Inès sont amies.","Elles","sont","amies."],["Malik et Théo sont dans la même classe.","Ils","sont","dans la même classe."],["Madame Martin est sympa.","Elle","est","sympa."],["Hugo et Inès sont dans le club.","Ils","sont","dans le club."],["Les filles sont cool.","Elles","sont","cool."],["Le club est super.","Il","est","super."],["La pizza est super.","Elle","est","super."],["Mes amis sont en retard.","Ils","sont","en retard."]];
+add("ersetzen","Name ersetzen","6",ex("ersetzen","6","Namen durch Pronomen ersetzen","Ersetze den fett gedruckten Teil durch ein Pronomen und schreibe die passende Form von être dazu.",lines(L6,r=>`<span class="tx" style="flex:1 1 17em"><b>${r[0]}</b></span><span class="tx">→ ${inp(r[1],6)} ${inp(r[2],6)} ${r[3]}</span>`)));
+
+/* 7 il/elle/ils/elles */
+const OPT4=["il","elle","ils","elles"];
+const L7=[["Voilà Théo. ___ est de Marseille.","il"],["Voilà Inès. ___ est de Lyon.","elle"],["Voilà Inès et Clara. ___ sont amies.","elles"],["Voilà Théo et Malik. ___ sont dans la même classe.","ils"],["Voilà Théo et Inès. ___ sont sympa.","ils"],["Voilà mes amis Hugo et Clara. ___ sont drôles.","ils"],["Voilà les garçons. ___ sont cool.","ils"],["Voilà ma sœur Léa. ___ est en quatrième.","elle"],["Madame Martin et Inès sont dans le club. ___ sont ensemble.","elles"],["Voilà le club de théâtre. ___ est super.","il"],["Voilà la classe. ___ est grande.","elle"]];
+add("ilelle","il, elle, ils, elles","7",ex("ilelle","7","il, elle, ils oder elles ?","Wähle das richtige Pronomen. Merke: Eine gemischte Gruppe heißt immer <i>ils</i>.",lines(L7,r=>`<span class="tx">${r[0].replace("___",sel(r[1],OPT4))}</span>`)));
+
+/* 8 Übersetzen DE->FR */
+const L8=[["Ich bin aus Paris.","Je suis de Paris."],["Du bist in der sixième.","Tu es en sixième.|Tu es dans la sixième."],["Er ist im Club.","Il est dans le club."],["Wir sind in derselben Klasse.","Nous sommes dans la même classe.|On est dans la même classe."],["Ihr seid zu spät.","Vous êtes en retard."],["Die Mädchen sind nett.","Elles sont sympa.|Les filles sont sympa."],["Théo und Inès sind aus Lyon.","Ils sont de Lyon.|Théo et Inès sont de Lyon."],["Inès ist meine Freundin.","Inès, c'est mon amie.|Inès est mon amie."],["Wir sind Freunde.","Nous sommes amis.|On est amis."],["Du bist sehr nett.","Tu es très sympa."]];
+add("sätze","Sätze schreiben","8",ex("saetze","8","Sätze mit être schreiben","Schreibe die Sätze auf Französisch. Groß- und Kleinschreibung und Satzzeichen werden nicht bewertet, Akzente schon.",lines(L8,r=>`<span class="tx" style="flex:1 1 100%">${r[0]}</span><span style="flex:1 1 100%;margin-left:2.4em">${inp(r[1],34)}</span>`)));
+
+/* 9 Aussprache */
+add("aussprache","Aussprache","9",`<section class="ex" id="aussprache"><header><span class="num">9</span><div><h2>Aussprache: s und z</h2><p class="ins">Höre zu und sprich nach. Zwischen Vokalen und bei der Bindung (liaison) klingt <i>s</i> wie das weiche s in „Sonne".</p></div></header><div class="exbody"><div class="cols">
+<div class="pho"><div class="sym">[s]</div><ul>${["sympa","la salade","c'est cool","nous sommes","la série","ensemble"].map(w=>`<li>${w}${spk(w)}</li>`).join("")}</ul></div>
+<div class="pho"><div class="sym">[z]</div><ul>${["la musique","le musée","la rose","vous êtes","nous aimons","les amis"].map(w=>`<li>${w}${spk(w)}</li>`).join("")}</ul></div></div></div></section>`);
+
+/* 10 Médiation */
+const MED={id:"m",title:"Eine Nachricht von Malik",
+ fr:["Salut, [[e:c'est]] Malik !","[[p:Je]] [[e:suis]] de Toulouse et [[p:j']]ai douze ans.","[[p:Je]] [[e:suis]] en cinquième.","[[p:J']]aime le foot et la musique, mais [[p:je]] n'aime pas les séries.","Mon meilleur ami s'appelle Kevin.","[[p:Nous]] [[e:sommes]] dans la même classe.","[[p:Il]] [[e:est]] drôle !","Et [[p:toi]], [[p:tu]] [[e:es]] aussi en cinquième ?","[[p:Tu]] [[e:es]] d'où ?","À plus !"],
+ de:["Hallo, hier ist Malik!","Ich komme aus Toulouse und bin zwölf Jahre alt.","Ich bin in der cinquième (7. Klasse).","Ich mag Fußball und Musik, aber ich mag keine Serien.","Mein bester Freund heißt Kevin.","Wir sind in derselben Klasse.","Er ist lustig!","Und du, bist du auch in der cinquième?","Woher kommst du?","Bis später!"],
+ words:[["le foot","Fußball"],["la musique","die Musik"],["s'appelle","heißt"],["À plus !","Bis später!"]]};
+add("mediation","Médiation","10",`<section id="mediation"><div class="card" style="margin-bottom:14px"><h2>10 · Médiation: Text übertragen</h2><p style="margin:0;color:var(--muted)">Deine Freundin Yu lernt kein Französisch. Lies Maliks Nachricht und erkläre ihr auf Deutsch, was er schreibt. Schreibe zuerst selbst, dann kannst du dir die Übersetzung ansehen.</p></div>${textCard(MED)}
+<div class="card" style="margin-top:14px"><h3 style="font-size:1.05rem;margin-bottom:8px">Deine Zusammenfassung für Yu</h3><label for="medta" style="display:none">Zusammenfassung</label><textarea id="medta" class="ta" placeholder="Malik schreibt, dass …"></textarea>
+<p class="hint" style="color:var(--muted);margin:10px 0 0">Hast du diese Punkte erwähnt? Hake sie ab.</p><ul class="checks">${["Name und Herkunft","Alter und Klasse","Was Malik mag und nicht mag","Sein bester Freund","Die Fragen an dich"].map((c,i)=>`<li><label><input type="checkbox" id="mc${i}"> ${c}</label></li>`).join("")}</ul></div></section>`);
+
+/* ---------- Aufbau ---------- */
+$("#main").innerHTML=sections.map(s=>s.html).join("");
+const nav=sections.filter((s,i,a)=>a.findIndex(x=>x.id===s.id)===i&&s.id!=="verstehen");
+$("#toc").innerHTML=nav.map(s=>`<a href="#${s.id==="sätze"?"saetze":s.id}" data-id="${s.id==="sätze"?"saetze":s.id}"><span class="n">${s.n}</span>${s.label}</a>`).join("");
+$("#accbtns").innerHTML=["é","è","ê","à","â","ù","û","ô","î","ï","ç","ë","œ","É","À"].map(a=>`<button type="button" data-ac="${a}" aria-label="Zeichen ${a}">${a}</button>`).join("");
+
+/* ---------- Interaktion ---------- */
+document.addEventListener("click",e=>{
+ const t=e.target;
+ const s=t.closest("[data-say]");if(s){say(s.dataset.say);return}
+ const tr=t.closest("[data-tr]");if(tr){const id=tr.dataset.tr,box=$("#tr-"+id),open=box.hidden;box.hidden=!open;tr.setAttribute("aria-expanded",String(open));tr.textContent=open?"Übersetzung ausblenden":"Übersetzen";return}
+ const hl=t.closest("[data-hl]");if(hl){const id=hl.dataset.hl,on=hl.getAttribute("aria-pressed")!=="true";hl.setAttribute("aria-pressed",String(on));$("#t-"+id+" .fr").classList.toggle("hl",on);$("#lg-"+id).hidden=!on;return}
+ const rd=t.closest("[data-read]");if(rd){const all=[...TEXTS,MED].find(x=>x.id===rd.dataset.read);say(all.fr.map(plain).join(" "));return}
+ const ac=t.closest("[data-ac]");if(ac&&lastInp&&document.body.contains(lastInp)){const i=lastInp,a=i.selectionStart==null?i.value.length:i.selectionStart,b=i.selectionEnd==null?a:i.selectionEnd;i.value=i.value.slice(0,a)+ac.dataset.ac+i.value.slice(b);i.focus();try{i.setSelectionRange(a+1,a+1)}catch(x){}i.dispatchEvent(new Event("input"));return}
+ const act=t.closest("[data-act]");if(act){const sec=act.closest("[data-ex]");({check,solve,reset})[act.dataset.act](sec)}
+});
+let lastInp=null;
+document.addEventListener("focusin",e=>{if(e.target.matches&&e.target.matches("input.in,textarea"))lastInp=e.target});
+document.addEventListener("mousedown",e=>{if(e.target.closest&&e.target.closest("[data-ac]"))e.preventDefault()});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches&&e.target.matches("input.in")){const sec=e.target.closest("[data-ex]");if(sec){e.preventDefault();const all=$$("input.in",sec),i=all.indexOf(e.target);if(i>-1&&i<all.length-1)all[i+1].focus();else check(sec)}}});
+
+function state(el){
+ if(el.matches("select")){if(!el.value)return "empty";return el.dataset.a.split("|").includes(el.value)?"ok":"no"}
+ if(el.matches("input.in")){const v=el.value;if(!v.trim())return "empty";const A=el.dataset.a.split("|");if(A.some(a=>nT(a)===nT(v)))return "ok";if(A.some(a=>fl(a)===fl(v)))return "close";return "no"}
+ if(el.matches(".rf")){const c=$("input:checked",el);if(!c)return "empty";return c.value===el.dataset.a?"ok":"no"}
+ if(el.matches(".cbs")){const got=$$("input:checked",el).map(i=>i.value).sort().join("|");if(!got)return "empty";return got===el.dataset.a.split("|").sort().join("|")?"ok":"no"}
+}
+function paint(el,st){
+ el.classList.remove("ok","no","close");
+ const old=el.nextElementSibling;if(old&&old.classList.contains("mk"))old.remove();
+ if(st==="empty")return;
+ el.classList.add(st);
+ const m=document.createElement("i");m.className="mk "+st;m.textContent=st==="ok"?"✓":st==="close"?"≈":"✗";m.setAttribute("aria-label",st==="ok"?"richtig":st==="close"?"fast richtig, Akzent prüfen":"falsch");
+ el.insertAdjacentElement("afterend",m);
+}
+function check(sec){
+ const items=$$("[data-a]",sec);let ok=0,open=0,close=0;
+ items.forEach(el=>{const s=state(el);paint(el,s);if(s==="ok")ok++;else if(s==="empty")open++;else if(s==="close")close++});
+ const r=$(".res",sec);const tot=items.length;
+ let msg=`${ok} von ${tot} richtig.`;if(open)msg+=` ${open} noch offen.`;if(close)msg+=` Bei ${close} Feld${close>1?"ern":""} (≈) fehlt ein Akzent oder er ist falsch.`;
+ r.textContent=ok===tot?"Alles richtig.":msg;r.className="res "+(ok===tot?"good":(open===tot?"":"bad"));
+ const a=$(`.toc a[data-id="${sec.id}"]`);if(a)a.classList.toggle("done",ok===tot);
+ if(sec.id==="verstehen"){const l=$(`.toc a[data-id="lesen"]`);if(l)l.classList.toggle("done",ok===tot)}
+}
+function solve(sec){
+ $$("[data-a]",sec).forEach(el=>{
+  if(el.matches("select"))el.value=el.dataset.a.split("|")[0];
+  else if(el.matches("input.in"))el.value=el.dataset.a.split("|")[0];
+  else if(el.matches(".rf")){$$("input",el).forEach(i=>i.checked=i.value===el.dataset.a)}
+  else if(el.matches(".cbs")){const A=el.dataset.a.split("|");$$("input",el).forEach(i=>i.checked=A.includes(i.value))}
+ });check(sec);
+}
+function reset(sec){
+ $$("[data-a]",sec).forEach(el=>{if(el.matches("select,input.in"))el.value="";else $$("input",el).forEach(i=>i.checked=false);paint(el,"empty")});
+ const r=$(".res",sec);r.textContent="";r.className="res";
+ const a=$(`.toc a[data-id="${sec.id}"]`);if(a)a.classList.remove("done");
+}
+/* aktuelle Stelle im Inhaltsverzeichnis */
+try{
+ const links=$$(".toc a");const secs=links.map(a=>$("#"+a.dataset.id));
+ const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(l=>l.classList.toggle("cur",l.dataset.id===en.target.id))}})},{rootMargin:"-20% 0px -65% 0px"});
+ secs.forEach(s=>s&&io.observe(s));
+}catch(e){}
+})();
+</script>
+</body>
+</html>
