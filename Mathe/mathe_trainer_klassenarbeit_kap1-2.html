@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathe-Trainer für Lisa – Klassenarbeit Kapitel 1 & 2</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#1b2433;--muted:#5b6678;--line:#d9e0ea;--accent:#2f6fed;--accent-soft:#e6eefe;--ok:#17894c;--ok-soft:#e2f5EA;--bad:#d03b33;--bad-soft:#fde8e6;--warn:#a65f00;--warn-soft:#fff2d8;--merke:#fff9e0;--merke-line:#e9c94f;--shadow:0 2px 10px rgba(30,50,90,.08)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1520;--card:#18202e;--ink:#e8edf5;--muted:#9aa7bb;--line:#2c3748;--accent:#6c9cff;--accent-soft:#1d2a45;--ok:#4cc88a;--ok-soft:#14301f;--bad:#ff857c;--bad-soft:#3a1c1c;--warn:#f0b04a;--warn-soft:#3a2d12;--merke:#2a2610;--merke-line:#8a7425;--shadow:0 2px 10px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:linear-gradient(135deg,#2f6fed,#7b4fe0);color:#fff;padding:18px 16px 14px}
+header .in{max-width:980px;margin:0 auto}
+header h1{margin:0 0 2px;font-size:1.55rem;line-height:1.2}
+header p{margin:0;opacity:.92;font-size:.95rem}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pill{background:rgba(255,255,255,.2);padding:4px 12px;border-radius:99px;font-weight:600;font-size:.95rem}
+main{max-width:980px;margin:0 auto;padding:12px 12px 60px}
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+nav.tabs button{flex:1 1 150px;display:flex;align-items:center;gap:8px;text-align:left;border:2px solid var(--line);background:var(--card);color:var(--ink);padding:9px 12px;border-radius:14px;font:inherit;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+nav.tabs button .e{font-size:1.4rem}
+nav.tabs button small{display:block;font-weight:500;color:var(--muted);font-size:.75rem}
+nav.tabs button[aria-selected=true]{border-color:var(--accent);background:var(--accent-soft)}
+section.panel{background:var(--card);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+section.panel[hidden]{display:none}
+h2{margin:0 0 8px;font-size:1.35rem}
+h3{margin:14px 0 6px;font-size:1.08rem}
+details.merke{background:var(--merke);border:2px solid var(--merke-line);border-radius:14px;padding:6px 14px 10px;margin:8px 0 14px}
+details.merke>summary{cursor:pointer;font-weight:700;padding:6px 0}
+details.merke p{margin:6px 0}
+details.merke ul{margin:6px 0 6px 18px;padding:0}
+.merke .kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px}
+table.t{border-collapse:collapse;margin:6px 0;max-width:100%}
+table.t th,table.t td{border:1.5px solid var(--line);padding:4px 9px;text-align:center}
+table.t th{background:var(--accent-soft)}
+table.t.wide{display:block;overflow-x:auto}
+.hl{background:var(--accent-soft);border-radius:6px;padding:0 5px}
+.red{color:var(--bad);font-weight:700}
+.demo{background:var(--accent-soft);border-radius:14px;padding:12px 14px;margin:8px 0 14px}
+.demo h4{margin:0 0 6px}
+.demoout{margin-top:8px}
+.bits{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end}
+.bit{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.85rem}
+.bit button{width:46px;height:46px;font-size:1.4rem;font-weight:700;border-radius:10px;border:2px solid var(--accent);background:var(--card);color:var(--ink);cursor:pointer}
+.bit button.on{background:var(--accent);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+.chip{border:2px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;border-radius:99px;font:inherit;font-size:.95rem;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.item{position:relative;border:2px solid var(--line);border-radius:14px;padding:12px 12px 10px 46px;margin:10px 0;background:var(--card)}
+.item .no{position:absolute;left:10px;top:10px;width:27px;height:27px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:grid;place-items:center;font-size:.9rem}
+.item .q{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:1.08rem}
+.item .q .block{flex-basis:100%}
+.item.okk{border-color:var(--ok);background:var(--ok-soft)}
+.msg{margin-top:6px;font-size:.95rem;min-height:0}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}.msg.warn{color:var(--warn)}
+input.num,input.txt{font:inherit;font-size:1.1rem;width:7.4em;padding:5px 8px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-align:center}
+input.dig{width:2.6em;padding:4px 2px}
+input.txt{width:9em;letter-spacing:.06em;text-transform:uppercase}
+input.num.ok,input.txt.ok{border-color:var(--ok);background:var(--ok-soft)}
+input.num.bad,input.txt.bad{border-color:var(--bad);background:var(--bad-soft)}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+select{font:inherit;padding:4px 6px;border-radius:8px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:8px;flex-basis:100%;margin-top:2px}
+.opt{font:inherit;font-size:1rem;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:7px 14px;cursor:pointer;text-align:left}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.kb{display:flex;gap:6px;flex-wrap:wrap;flex-basis:100%}
+.kb button{font:inherit;font-weight:700;min-width:42px;height:40px;border-radius:9px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.step{flex-basis:100%;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:10px 20px;cursor:pointer;background:var(--accent);color:#fff}
+.btn.sec{background:var(--accent-soft);color:var(--ink);border:2px solid var(--accent)}
+.sum{font-weight:700}
+table.tafel{border-collapse:collapse;margin:4px 0}
+table.tafel th,table.tafel td{border:1.5px solid var(--line);padding:3px 8px;text-align:center;min-width:52px}
+table.tafel th{background:#fff5b8;color:#222;font-weight:600}
+table.tafel td.rowh{background:#fff5b8;color:#222;font-weight:600;text-align:left}
+.hi{background:#ffd24a;color:#222;border-radius:5px;padding:0 4px;font-weight:700}
+.tally{display:inline-flex;gap:6px;align-items:center;color:var(--ink)}
+svg.chart{width:100%;max-width:520px;height:auto;display:block;color:var(--ink)}
+svg.chart .gl{stroke:var(--line);stroke-width:1}
+svg.chart text{fill:currentColor;font-size:11px}
+.fig{display:inline-flex;flex-direction:column;align-items:center;font-size:.8rem;color:var(--muted);margin:0 8px 4px 0}
+.figs{display:flex;flex-wrap:wrap;gap:14px;flex-basis:100%;align-items:flex-end}
+.pm{display:inline-flex;align-items:center;gap:6px}
+.pm button{width:34px;height:34px;border-radius:9px;border:2px solid var(--accent);background:var(--card);color:var(--ink);font-weight:700;cursor:pointer;font-size:1.1rem}
+.pm b{min-width:1.6em;text-align:center}
+.legend{flex-basis:100%;color:var(--muted);font-size:.95rem}
+footer{max-width:980px;margin:0 auto;padding:0 14px 30px;color:var(--muted);font-size:.85rem}
+@media (max-width:560px){body{font-size:16px}nav.tabs button{flex:1 1 44%}.item{padding-left:40px}input.num{width:6.6em}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="in">
+<h1>🧮 Mathe-Trainer für Lisa</h1>
+<p>Alles für die Klassenarbeit – genau nach deinem Merkheft. Jede Aufgabe wird immer wieder neu erzeugt!</p>
+<div class="stats"><span class="pill" id="sStars">⭐ 0</span><span class="pill" id="sStreak">🔥 Serie 0</span><span class="pill" id="sBest">🏆 Rekord 0</span></div>
+</div></header>
+<main>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Themen"></nav>
+<div id="panels"></div>
+</main>
+<footer>Tipp: Dezimalzahlen schreibt man mit <b>Komma</b> (35,4). Große Zahlen darfst du mit Leerzeichen schreiben (130 000). Mit der Enter-Taste prüfst du eine einzelne Aufgabe.</footer>
+<script>
+'use strict';
+/* ===== Helfer ===== */
+const $=(s,r=document)=>r.querySelector(s);
+function h(tag,attrs,...kids){
+  const e=document.createElement(tag);
+  if(attrs)for(const k in attrs){const v=attrs[k];if(v==null||v===false)continue;
+    if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else e.setAttribute(k,v===true?'':v);}
+  for(const c of kids.flat(Infinity)){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(String(c)));}
+  return e;
+}
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const sup=(b,e)=>h('span',null,String(b),h('sup',null,String(e)));
+const NB=' ';
+const grp=s=>s.length>=5?s.replace(/\B(?=(\d{3})+(?!\d))/g,NB):s;
+const fmtInt=n=>grp(String(n));
+function fmt(str){const [i,f]=String(str).split(',');return grp(i)+(f!==undefined?','+f:'');}
+const sleep=ms=>new Promise(r=>setTimeout(r,matchMedia('(prefers-reduced-motion:reduce)').matches?0:ms));
+
+/* ===== Dezimalrechnen ohne Gleitkomma ===== */
+function parseDec(s){s=String(s).trim().replace(/[\s  ]+/g,'');if(!/^\d+(,\d+)?$/.test(s))return null;const [i,f='']=s.split(',');return{m:BigInt(i+f),s:f.length};}
+function normStr(o){let m=o.m,s=o.s;while(s>0&&m%10n===0n){m/=10n;s--;}let str=m.toString();if(s>0){while(str.length<=s)str='0'+str;str=str.slice(0,-s)+','+str.slice(-s);}return str;}
+function shiftDec(o,k){let m=o.m,s=o.s-k;if(s<0){m*=10n**BigInt(-s);s=0;}return{m,s};}
+const N=x=>normStr(parseDec(String(x).replace('.',',')));
+
+/* ===== Statistik ===== */
+const store={stars:0,streak:0,best:0,topic:{}};
+try{const s=JSON.parse(localStorage.getItem('lisaMatheKap12')||'null');if(s)Object.assign(store,s);}catch(e){}
+function save(){try{localStorage.setItem('lisaMatheKap12',JSON.stringify(store));}catch(e){}}
+function renderStats(){$('#sStars').textContent='⭐ '+store.stars;$('#sStreak').textContent='🔥 Serie '+store.streak;$('#sBest').textContent='🏆 Rekord '+store.best;
+  document.querySelectorAll('[data-tstar]').forEach(el=>{const n=store.topic[el.dataset.tstar]||0;el.textContent=n?'⭐ '+n:'';});}
+function award(topic,ok){
+  if(ok){store.stars++;store.streak++;store.best=Math.max(store.best,store.streak);store.topic[topic]=(store.topic[topic]||0)+1;}
+  else store.streak=0;
+  save();renderStats();
+}
+
+/* ===== Felder (Eingaben) ===== */
+function F_num(exp,o={}){
+  exp=N(exp);
+  const inp=h('input',{class:'num '+(o.cls||''),type:'text',inputmode:o.int?'numeric':'decimal',autocomplete:'off',spellcheck:'false','aria-label':o.label||'Antwort'});
+  return{el:inp,exp,
+    eval(){const raw=inp.value.trim();if(!raw)return'empty';if(/^\d+\.\d+$/.test(raw))return'dot';const p=parseDec(raw);if(!p)return'bad';return normStr(p)===exp?'ok':'wrong';},
+    solve(){inp.value=exp;},touched(){return inp.value.trim()!=='';},
+    mark(s){inp.classList.toggle('ok',s==='ok');inp.classList.toggle('bad',s==='wrong');}};
+}
+function F_txt(exp,norm,hintFn){
+  const inp=h('input',{class:'txt',type:'text',autocomplete:'off',autocapitalize:'characters',spellcheck:'false','aria-label':'Antwort'});
+  const f={el:inp,exp,
+    eval(){const v=norm(inp.value);if(!v)return'empty';return v===exp?'ok':'wrong';},
+    solve(){inp.value=exp;},touched(){return inp.value.trim()!=='';},
+    mark(s){inp.classList.toggle('ok',s==='ok');inp.classList.toggle('bad',s==='wrong');},
+    hint(){return hintFn?hintFn(norm(inp.value)):'';}};
+  return f;
+}
+function F_choice(options,correct,o={}){
+  // options: Array aus Text/Node; correct: Index in options
+  let order=options.map((_,i)=>i);if(o.shuffle!==false)order=shuffle(order);
+  let sel=-1;
+  const btns=order.map(i=>{const b=h('button',{type:'button',class:'opt'},options[i]);b.dataset.i=i;
+    b.addEventListener('click',()=>{sel=i;btns.forEach(x=>{x.classList.toggle('sel',+x.dataset.i===i);x.classList.remove('ok','bad');});});return b;});
+  const el=h('div',{class:'opts',role:'group'},btns);
+  return{el,exp:correct,
+    eval(){return sel<0?'empty':(sel===correct?'ok':'wrong');},
+    solve(){btns.find(b=>+b.dataset.i===correct).click();},touched(){return sel>=0;},
+    mark(s){btns.forEach(b=>{b.classList.remove('ok','bad');if(+b.dataset.i===sel)b.classList.add(s==='ok'?'ok':'bad');});}};
+}
+function F_custom(o){return o;} // {el,eval,solve,touched,mark}
+
+function makeItem(q,fields,o={}){
+  const msg=h('div',{class:'msg','aria-live':'polite'});
+  const el=h('div',{class:'item'},h('div',{class:'q'},q),msg);
+  const it={el,fields,tries:0,done:false,counted:false,penal:false};
+  const say=(t,c)=>{msg.textContent=t;msg.className='msg '+(c||'');};
+  it.touched=()=>fields.some(f=>f.touched());
+  it.check=()=>{
+    const st=fields.map(f=>f.eval());
+    if(st.includes('empty')){say('Bitte fülle alle Felder aus. ✏️','warn');return{ok:null};}
+    const bad=st.find(s=>s==='dot'||s==='bad');
+    if(bad){say(bad==='dot'?'Tipp: Schreibe ein Komma statt eines Punktes (z. B. 35,4) und große Zahlen ohne Punkt.':'Das ist keine Zahl. Schreibe nur Ziffern und höchstens ein Komma.','warn');return{ok:null};}
+    fields.forEach((f,i)=>f.mark(st[i]));
+    if(st.every(s=>s==='ok')){it.done=true;el.classList.add('okk');say('✅ Richtig!'+(o.ok?' '+o.ok:''),'ok');return{ok:true};}
+    it.tries++;
+    let t='❌ Noch nicht ganz.';
+    const fh=fields.map((f,i)=>st[i]==='wrong'&&f.hint?f.hint():'').find(Boolean);
+    const hh=fh||(typeof o.hint==='function'?o.hint(st):o.hint);
+    if(hh)t+=' '+hh;
+    if(it.tries>=2&&o.sol)t+=' Lösung: '+o.sol;
+    say(t,'bad');return{ok:false};
+  };
+  it.solve=()=>fields.forEach(f=>f.solve());
+  return it;
+}
+
+/* ===== Runde ===== */
+function Round(host,makeItems,topic,o={}){
+  host.replaceChildren();
+  const items=makeItems();
+  const list=h('div',{class:'items'});
+  const sum=h('div',{class:'sum','aria-live':'polite'});
+  const answered=new Set();
+  function update(){
+    const d=items.filter(i=>i.done).length;
+    if(o.exam&&answered.size===items.length){
+      const p=Math.round(100*d/items.length);
+      sum.textContent=`Ergebnis: ${d} von ${items.length} richtig (${p} %). `+(p>=90?'🏆 Spitze – so gehst du entspannt in die Arbeit!':p>=70?'👍 Gut! Schau dir die roten Aufgaben noch einmal an.':p>=50?'🙂 Auf dem Weg – übe die roten Themen noch einmal.':'💪 Noch etwas Training – lies die Merkkästen und versuche es nochmal!');
+    } else sum.textContent=`${d} von ${items.length} richtig`+(d===items.length?' 🎉':'');
+  }
+  function evalItem(it){
+    if(it.done)return;
+    const r=it.check();
+    if(r.ok!==null)answered.add(it);
+    if(r.ok===true&&!it.counted){it.counted=true;if(!it.penal)award(topic,true);}
+    else if(r.ok===false&&!it.penal){it.penal=true;award(topic,false);}
+    update();
+  }
+  items.forEach((it,i)=>{
+    it.el.prepend(h('span',{class:'no'},String(i+1)));
+    it.el.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();evalItem(it);}});
+    list.append(it.el);
+  });
+  const bCheck=h('button',{class:'btn',type:'button',onclick:()=>{
+    const t=items.filter(i=>!i.done&&i.touched());
+    if(!t.length&&items.some(i=>!i.done)){sum.textContent='Löse zuerst eine Aufgabe, dann drücke „Prüfen“.';return;}
+    t.forEach(evalItem);}},o.exam?'Auswerten':'Prüfen');
+  const bNew=h('button',{class:'btn sec',type:'button',onclick:()=>o.again()},o.exam?'🔁 Neuer Test':'🔄 Neue Aufgaben');
+  host.append(list,h('div',{class:'actions'},bCheck,bNew,sum));
+  update();
+  return{items,evalItem};
+}
+
+/* ===== Themen-Panels ===== */
+const TOPICS=[];
+function addTopic(t){TOPICS.push(t);}
+function buildUI(){
+  const tabs=$('#tabs'),panels=$('#panels');
+  const all=TOPICS.concat([{id:'exam',emoji:'🎯',name:'Klassenarbeits-Check',sub:'gemischter Test'}]);
+  all.forEach((t,ti)=>{
+    const tab=h('button',{type:'button',role:'tab',id:'tab-'+t.id,'aria-selected':ti===0?'true':'false','aria-controls':'p-'+t.id,onclick:()=>show(t.id)},
+      h('span',{class:'e'},t.emoji),h('span',null,t.name,h('small',null,t.sub||'',' ',h('span',{'data-tstar':t.id}))));
+    tabs.append(tab);
+    const p=h('section',{class:'panel',id:'p-'+t.id,role:'tabpanel','aria-labelledby':'tab-'+t.id});
+    if(ti!==0)p.hidden=true;
+    panels.append(p);
+    if(t.id==='exam')buildExam(p);else buildTopic(p,t);
+  });
+  function show(id){all.forEach(t=>{const sel=t.id===id;$('#tab-'+t.id).setAttribute('aria-selected',sel);$('#p-'+t.id).hidden=!sel;});window.scrollTo({top:0,behavior:'smooth'});}
+}
+function buildTopic(p,t){
+  p.append(h('h2',null,t.emoji+' '+t.title));
+  p.append(h('details',{class:'merke',open:true,html:'<summary>📒 Merke – aus deinem Heft</summary>'+t.merke}));
+  if(t.demo)p.append(t.demo());
+  p.append(h('h3',null,'✏️ Üben'));
+  const chipsEl=h('div',{class:'chips',role:'group','aria-label':'Übungsart'});
+  const host=h('div');
+  p.append(chipsEl,host);
+  let cur=t.chips[0];
+  function run(){Round(host,()=>Array.from({length:cur.n||5},()=>cur.gen()),t.id,{again:run});}
+  t.chips.forEach(c=>{const b=h('button',{type:'button',class:'chip','aria-pressed':c===cur,onclick:()=>{cur=c;chipsEl.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));run();}},c.label);chipsEl.append(b);});
+  run();
+}
+function buildExam(p){
+  p.append(h('h2',null,'🎯 Klassenarbeits-Check'));
+  p.append(h('p',null,'Ein gemischter Test mit Aufgaben aus allen Themen – so ähnlich wie in der Klassenarbeit. Löse alles und drücke dann „Auswerten“.'));
+  const host=h('div');p.append(host);
+  function run(){
+    Round(host,()=>{const out=[];TOPICS.forEach(t=>{shuffle(t.chips).slice(0,2).forEach(c=>{const it=c.gen();it.topic=t.id;out.push(it);});});return out;},'exam',{again:run,exam:true});
+  }
+  let started=false;
+  document.getElementById('tab-exam').addEventListener('click',()=>{if(!started){started=true;run();}});
+}
+/* =================== 1. POTENZEN =================== */
+const SUPD={0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'};
+const mal='·', minus='−';
+function genPowWrite(){
+  let b,e;do{b=rnd(2,9);e=rnd(2,5);}while(b**e>9999);
+  const f=F_num(b,{label:'Basis'}),g=F_num(e,{label:'Exponent'}),v=F_num(b**e,{label:'Wert'});
+  const fac=Array(e).fill(b).join(' · ');
+  return makeItem(['Schreibe als Potenz und berechne:',h('span',{class:'block'},h('b',null,fac+' = '),f.el,h('sup',null,g.el),' = ',v.el)],[f,g,v],
+    {hint:'Die Basis ist der Faktor, der Exponent sagt, wie oft er vorkommt. Dann alles ausmultiplizieren.',sol:`${fac} = ${b}^${e} = ${b**e}`});
+}
+function genPowCalc(){
+  let b,e;
+  const t=Math.random();
+  if(t<.15){b=rnd(2,20);e=0;}else if(t<.25){b=rnd(2,20);e=1;}else{do{b=rnd(2,12);e=rnd(2,4);}while(b**e>20000);}
+  const f=F_num(b**e);
+  const prod=e>=2?Array(e).fill(b).join(' · '):'';
+  return makeItem(['Berechne: ',h('b',null,sup(b,e),' = '),f.el],[f],
+    {hint:e===0?'Merke: a⁰ = 1.':e===1?'Merke: a¹ = a.':`Rechne ${prod}. Achtung: ${b}${SUPD[e]} ist nicht ${b} · ${e}!`,sol:e<2?`${b}${SUPD[e]} = ${b**e}`:`${prod} = ${b**e}`});
+}
+function genPowNeq(){
+  let b,e;do{b=rnd(3,9);e=rnd(2,4);}while(b**e===b*e);
+  const f=F_num(b**e),g=F_num(b*e);
+  return makeItem(['Berechne beide Terme – sie sind nicht gleich!',h('span',{class:'block'},h('b',null,sup(b,e),' = '),f.el,h('span',{style:'margin-left:18px'},h('b',null,`${b} · ${e} = `)),g.el)],[f,g],
+    {hint:`${b}${SUPD[e]} bedeutet ${b} genau ${e}-mal als Faktor. ${b} · ${e} ist dagegen nur ${b} mal ${e}.`,sol:`${b}${SUPD[e]} = ${b**e} und ${b} · ${e} = ${b*e}`});
+}
+function genPowParts(){
+  const b=rnd(2,15),e=rnd(2,9);
+  const f=F_num(b,{label:'Basis'}),g=F_num(e,{label:'Exponent'});
+  return makeItem(['Gegeben ist die Potenz ',h('b',null,sup(b,e)),'. Welche Zahl ist die Basis, welche der Exponent?',h('span',{class:'block'},'Basis: ',f.el,'  Exponent: ',g.el)],[f,g],
+    {hint:'Die große Zahl unten ist die Basis, die kleine hochgestellte Zahl ist der Exponent.',sol:`Basis ${b}, Exponent ${e}`});
+}
+const PNAMES=[['Quadratzahlen','Exponent 2',{e:2}],['Kubikzahlen','Exponent 3',{e:3}],['2er-Potenzen','Basis 2',{b:2}],['3er-Potenzen','Basis 3',{b:3}],['10er-Potenzen','Basis 10',{b:10}]];
+function genPowSpecial(){
+  const k=rnd(0,3);
+  if(k===0){
+    const i=rnd(0,4),p=PNAMES[i];
+    const q=p[2].e?`Wie heißen Potenzen mit dem Exponenten ${p[2].e}?`:`Wie heißen Potenzen mit der Basis ${p[2].b}?`;
+    const f=F_choice(PNAMES.map(x=>x[0]),i);
+    return makeItem([q,f.el],[f],{hint:'Exponent 2 → Quadratzahlen, Exponent 3 → Kubikzahlen. Basis 2, 3, 10 → 2er-, 3er-, 10er-Potenzen.',sol:p[0]});
+  }
+  if(k===1){
+    const e=rnd(1,6),f=F_num(10**e,{int:true});
+    return makeItem(['Berechne die 10er-Potenz: ',h('b',null,sup(10,e),' = '),f.el],[f],{hint:`Hinter die 1 kommen genau ${e} Nullen.`,sol:`10^${e} = ${fmtInt(10**e)}`});
+  }
+  if(k===2){
+    const cube=Math.random()<.4,b=cube?rnd(1,6):rnd(1,12),e=cube?3:2,f=F_num(b);
+    return makeItem([h('b',null,`${b**e} = `),h('span',null,f.el,h('sup',null,e)),h('span',null,cube?'  (Kubikzahl)':'  (Quadratzahl)')],[f],{hint:`Welche Zahl mal sich selbst${cube?' mal sich selbst':''} ergibt ${b**e}?`,sol:`${b**e} = ${b}${SUPD[e]}`});
+  }
+  const kinds=[['Quadratzahlen',n=>n*n,0],['Kubikzahlen',n=>n**3,0],['2er-Potenzen',n=>2**n,0],['3er-Potenzen',n=>3**n,0]];
+  const [nm,fn,s0]=pick(kinds);const start=nm.startsWith('Quad')||nm.startsWith('Kub')?rnd(0,3):0;
+  const terms=Array.from({length:7},(_,i)=>fn(start+i));const gap=rnd(2,5);
+  const f=F_num(terms[gap]);
+  const row=[];terms.forEach((t,i)=>{if(i)row.push('; ');row.push(i===gap?f.el:h('b',null,fmtInt(t)));});
+  return makeItem(['Ergänze die fehlende Zahl (',nm,'):',h('span',{class:'block'},row)],[f],{hint:'Erkenne zuerst, welche Potenzen das sind, und rechne die fehlende nach.',sol:String(terms[gap])});
+}
+addTopic({id:'pot',emoji:'🔢',name:'Potenzen',sub:'Basis & Exponent',title:'Potenzen',
+ merke:`<p><b>Potenz</b> = abkürzende Schreibweise für ein Produkt mit gleichen Faktoren:<br>2 · 2 · 2 · 2 · 2 = 2<sup>5</sup> &nbsp;(<span class="hl">Basis</span> 2, <span class="hl">Exponent</span> 5)</p>
+ <p>Eine Potenz besteht aus einer <b>Basis</b> und einem <b>Exponenten</b>.</p>
+ <p><span class="red">Achtung:</span> 4<sup>3</sup> = 4 · 4 · 4 = 64 &nbsp;<b>≠</b>&nbsp; 4 · 3 = 12</p>
+ <p><b>Exponent 0:</b> a<sup>0</sup> = 1 &nbsp;(z. B. 2<sup>0</sup> = 1, 3<sup>0</sup> = 1, 4<sup>0</sup> = 1) &nbsp;·&nbsp; <b>Exponent 1:</b> a<sup>1</sup> = a</p>
+ <p><b>Besondere Potenzen</b></p>
+ <table class="t wide"><tr><th>Quadratzahlen (Exp. 2)</th><td>0 · 1 · 4 · 9 · 16 · 25 · 36 …</td></tr>
+ <tr><th>Kubikzahlen (Exp. 3)</th><td>0 · 1 · 8 · 27 · 64 · 125 · 216 …</td></tr>
+ <tr><th>2er-Potenzen (Basis 2)</th><td>1 · 2 · 4 · 8 · 16 · 32 · 64 …</td></tr>
+ <tr><th>3er-Potenzen (Basis 3)</th><td>1 · 3 · 9 · 27 · 81 · 243 · 729 …</td></tr>
+ <tr><th>10er-Potenzen (Basis 10)</th><td>1 · 10 · 100 · 1000 · 10 000 · 100 000 · 1 000 000 …</td></tr></table>`,
+ demo(){
+  const box=h('div',{class:'demo'},h('h4',null,'🪜 Warum ist a⁰ = 1? – Die Potenz-Treppe'));
+  const sel=h('select',{'aria-label':'Basis'},[2,3,10].map(b=>h('option',{value:b},'Basis '+b)));
+  const out=h('div',{class:'demoout'});let tok=0;
+  const go=h('button',{class:'btn sec',type:'button'},'▶ Treppe abwärts');
+  async function run(){const my=++tok;out.replaceChildren();const b=+sel.value;
+    for(let e=5;e>=0;e--){if(my!==tok)return;const row=h('div',null,h('b',null,sup(b,e),' = ',fmtInt(b**e)));
+      if(e<5)row.append(h('span',{style:'color:var(--muted)'},`   (Exponent −1 → Ergebnis : ${b})`));
+      out.append(row);await sleep(550);}
+    if(my===tok)out.append(h('p',null,h('b',null,`Wenn der Exponent um 1 sinkt, wird durch ${b} geteilt. Darum ist ${b}⁰ = 1.`)));}
+  go.addEventListener('click',run);sel.addEventListener('change',()=>{tok++;out.replaceChildren();});
+  box.append(sel,' ',go,out);return box;},
+ chips:[{label:'Als Potenz schreiben',gen:genPowWrite},{label:'Potenz berechnen',gen:genPowCalc},{label:'4³ ≠ 4·3',gen:genPowNeq},{label:'Basis & Exponent',gen:genPowParts},{label:'Besondere Potenzen',gen:genPowSpecial}]});
+
+/* =================== 2. POTENZ VOR PUNKT VOR STRICH =================== */
+function powPE(){const e=pick([2,2,3]);const p=e===2?rnd(2,9):rnd(2,5);return[p,e];}
+function genExpr(){
+  const T=rnd(0,3),[p,e]=powPE(),P=p**e;let nodes,steps;
+  if(T===0){const c=rnd(2,5),d=rnd(10,60),pr=P*c,a=pr+rnd(5,80);
+    nodes=[a,' − ',sup(p,e),' · ',c,' + ',d];steps=[[[sup(p,e),' = '],P],[[`${P} · ${c} = `],pr],[[`${a} − ${pr} + ${d} = `],a-pr+d]];}
+  else if(T===1){const a=rnd(2,9),b=rnd(2,9),c=rnd(2,5);let d=rnd(5,40);const tot=a*b+c*P;if(d>=tot)d=rnd(1,tot-1);
+    nodes=[a,' · ',b,' + ',c,' · ',sup(p,e),' − ',d];steps=[[[sup(p,e),' = '],P],[[`${a} · ${b} = `],a*b],[[`${c} · ${P} = `],c*P],[[`${a*b} + ${c*P} − ${d} = `],tot-d]];}
+  else if(T===2){const a=rnd(2,9),b=rnd(2,9);let d=rnd(3,30);const tot=P+a*b;if(d>=tot)d=rnd(1,tot-1);
+    nodes=[sup(p,e),' + ',a,' · ',b,' − ',d];steps=[[[sup(p,e),' = '],P],[[`${a} · ${b} = `],a*b],[[`${P} + ${a*b} − ${d} = `],tot-d]];}
+  else{const b=rnd(2,9),c=rnd(2,9),a=P+rnd(1,40);
+    nodes=[a,' + ',b,' · ',c,' − ',sup(p,e)];steps=[[[sup(p,e),' = '],P],[[`${b} · ${c} = `],b*c],[[`${a} + ${b*c} − ${P} = `],a+b*c-P]];}
+  return{nodes,steps};
+}
+function genVorfahrtGuided(){
+  const {nodes,steps}=genExpr();
+  const fs=steps.map(s=>F_num(s[1]));
+  const labs=['1. Potenz','2. Punkt','3. Punkt','4. Strich'];
+  const rows=steps.map((s,i)=>{const lab=steps.length===3?['1. Potenz','2. Punkt','3. Strich'][i]:labs[i];return h('div',{class:'step'},h('span',{class:'hl'},lab),h('span',null,...s[0]),fs[i].el);});
+  const last=steps[steps.length-1][1];
+  return makeItem([h('b',null,...nodes,' = ?'),h('span',{class:'block'},'Rechne Schritt für Schritt: Potenz vor Punkt vor Strich.'),rows],fs,
+    {hint:'Zuerst die Potenz, dann Mal/Geteilt, zuletzt Plus/Minus (von links nach rechts).',sol:`Ergebnis ${last}`});
+}
+function genVorfahrtShort(){
+  const {nodes,steps}=genExpr();const f=F_num(steps[steps.length-1][1]);
+  return makeItem(['Berechne: ',h('b',null,...nodes,' = '),f.el],[f],{hint:'Potenz vor Punkt vor Strich!',sol:String(steps[steps.length-1][1])});
+}
+function genVorfahrtOrder(){
+  const [p,e]=powPE(),a=rnd(2,9),b=rnd(2,9),c=rnd(2,9);
+  const f=F_choice([sup(p,e),h('span',null,`${a} + ${b}`),h('span',null,`${b} · `,sup(p,e)),h('span',null,sup(p,e),` − ${c}`)],0);
+  return makeItem(['In der Aufgabe ',h('b',null,a,' + ',b,' · ',sup(p,e),' − ',c),' – was rechnest du ',h('b',null,'zuerst'),'?',f.el],[f],{hint:'Potenz vor Punkt vor Strich: Die Potenz kommt ganz zuerst dran.',sol:`${p}^${e}`});
+}
+addTopic({id:'vor',emoji:'⚖️',name:'Vorfahrtsregeln',sub:'Potenz vor Punkt vor Strich',title:'Erweiterung der Vorfahrtsregeln',
+ merke:`<p style="font-size:1.15rem"><b>Potenz</b> vor <b>Punkt</b> vor <b>Strich</b>.</p>
+ <p>Und was noch nicht zum Rechnen dran ist, das <b>schreibe unverändert ab</b>.</p>
+ <table class="t"><tr><td style="text-align:left">102 − 5<sup>2</sup> · 3 + 34<br>= 102 − 25 · 3 + 34 &nbsp;<span class="hl">Potenz</span><br>= 102 − 75 + 34 &nbsp;<span class="hl">Punkt</span><br>= 27 + 34<br>= 61 &nbsp;<span class="hl">Strich</span></td>
+ <td style="text-align:left">6 · 8 + 2 · 4<sup>3</sup> − 87<br>= 6 · 8 + 2 · 64 − 87 &nbsp;<span class="hl">Potenz</span><br>= 48 + 128 − 87 &nbsp;<span class="hl">Punkt</span><br>= 176 − 87<br>= 89 &nbsp;<span class="hl">Strich</span></td></tr></table>`,
+ chips:[{label:'Schritt für Schritt',n:4,gen:genVorfahrtGuided},{label:'Nur Ergebnis',gen:genVorfahrtShort},{label:'Was zuerst?',gen:genVorfahrtOrder}]});
+
+/* =================== 7. GRÖSSEN =================== */
+const GR=[
+ {n:'Länge',u:['m','km','cm','mm','dm']},
+ {n:'Masse (Gewicht)',u:['kg','mg','t','g']},
+ {n:'Zeitspanne',u:['s','min','h','ms','d']},
+ {n:'Geldwert',u:['€','ct']},
+ {n:'Speicherplatz',u:['B','MB','GB','TB','kB']},
+ {n:'Temperatur',u:['°C']}];
+const ALLU=GR.flatMap(g=>g.u);
+function genGrSplit(){
+  const g=pick(GR),u=pick(g.u),n=rnd(2,99);
+  const fz=F_num(n,{label:'Maßzahl'});
+  const others=shuffle(ALLU.filter(x=>x!==u)).slice(0,3);const opts=[u,...others];
+  const fe=F_choice(opts,0);
+  return makeItem(['Die Größe ',h('b',null,`${n} ${u}`),' besteht aus Maßzahl und Maßeinheit.',h('span',{class:'block'},'Maßzahl: ',fz.el),h('span',{class:'block'},'Maßeinheit:'),fe.el],[fz,fe],
+    {hint:'Die Zahl ist die Maßzahl, die Einheit dahinter (z. B. km) ist die Maßeinheit.',sol:`Maßzahl ${n}, Maßeinheit ${u}`});
+}
+function genGrKind(){
+  const gi=rnd(0,GR.length-1),g=GR[gi],u=pick(g.u),n=rnd(1,99);
+  const f=F_choice(GR.map(x=>x.n),gi);
+  return makeItem(['Zu welcher Größe gehört ',h('b',null,`${n} ${u}`),'?',f.el],[f],{hint:'Überlege, was man mit dieser Einheit misst.',sol:g.n});
+}
+function genGrOdd(){
+  const g=pick(GR.filter(x=>x.u.length>=4)),own=shuffle(g.u).slice(0,3);
+  const other=pick(ALLU.filter(x=>!g.u.includes(x)));
+  const f=F_choice([...own,other],3);
+  return makeItem(['Welche Einheit gehört ',h('b',null,'nicht'),' zur Größe „',g.n,'“?',f.el],[f],{hint:`Die Einheit, die man nicht zum Messen von „${g.n}“ benutzt.`,sol:other});
+}
+function genGrMal(){
+  const n=rnd(2,60),u=pick(['km','m','cm','kg','g','h','€']);
+  const f=F_choice([`${n} · 1 ${u}`,`${n} + 1 ${u}`,`${n} : 1 ${u}`,`${n} · 10 ${u}`],0);
+  return makeItem([`Die Schreibweise ${n} ${u} bedeutet eigentlich …`,f.el],[f],{hint:'Maßzahl und Maßeinheit stehen für ein Produkt: Zahl mal Einheit.',sol:`${n} · 1 ${u}`});
+}
+const GDEF=[
+ ['Eine messbare Eigenschaft physikalischer Objekte nennt man …','Größe',['Maßzahl','Maßeinheit','Exponent']],
+ ['Jede Größe besteht aus einer … und einer …','Maßzahl und Maßeinheit',['Basis und Exponent','Zahl und Ziffer','Glied und Folge']],
+ ['Bei 12 km ist die 12 die …','Maßzahl',['Maßeinheit','Größe','Basis']],
+ ['Bei 12 km ist das km die …','Maßeinheit',['Maßzahl','Größe','Potenz']],
+ ['Die Grundeinheit der Länge ist der …','Meter',['Kilometer','Zentimeter','Millimeter']],
+ ['Die ganze Angabe „12 km“ nennt man …','Größe',['Maßzahl','Maßeinheit','Zahlenfolge']]];
+function genGrDef(){const [q,c,w]=pick(GDEF);const f=F_choice([c,...w],0);return makeItem([q,f.el],[f],{hint:'Schau in deinem Merkkasten „Größen“ nach.',sol:c});}
+addTopic({id:'gro',emoji:'🌡️',name:'Größen',sub:'Maßzahl & Maßeinheit',title:'Kapitel 2: Größen',
+ merke:`<p>Eine messbare Eigenschaft physikalischer Objekte nennt man <b>Größe</b>.<br>Jede Größe besteht aus einer <span class="hl">Maßzahl</span> und einer <span class="hl">Maßeinheit</span>.</p>
+ <p>Beispiel: <b>12 km</b> – 12 ist die Maßzahl, km die Maßeinheit. Die Schreibweise 12 km bedeutet eigentlich <b>12 · 1 km</b>.</p>
+ <table class="t wide"><tr><th>Größe</th><th>Beispiele</th></tr>
+ <tr><td>Länge</td><td><b class="red">1 m</b>; 5 km; 2 cm; 72 mm; 18 dm</td></tr>
+ <tr><td>Masse (Gewicht)</td><td><b class="red">1 kg</b>; 18 mg; 8 t; 378 g</td></tr>
+ <tr><td>Zeitspanne</td><td><b class="red">1 s</b>; 34 min; 18 h; 2 ms; 4 d</td></tr>
+ <tr><td>Geldwert</td><td><b class="red">1 €</b>; 56 €; 99 ct</td></tr>
+ <tr><td>Speicherplatz</td><td><b class="red">1 B</b>; 64 MB; 1 GB; 2 TB; 368 kB</td></tr>
+ <tr><td>Temperatur</td><td><b class="red">1 °C</b>; 25 °C; −6 °C</td></tr></table>`,
+ chips:[{label:'Maßzahl & Maßeinheit',gen:genGrSplit},{label:'Welche Größe?',gen:genGrKind},{label:'Welche Einheit passt nicht?',gen:genGrOdd},{label:'12 km = 12 · 1 km',gen:genGrMal},{label:'Wissen',gen:genGrDef}]});
+
+/* =================== 8. LÄNGEN =================== */
+const LU=['km','hm','dam','m','dm','cm','mm'];
+const LE={km:3,hm:2,dam:1,m:0,dm:-1,cm:-2,mm:-3};
+function convData(o={}){
+  for(let t=0;t<500;t++){
+    const a=pick(LU),b=pick(LU);if(a===b)continue;
+    const k=LE[a]-LE[b];
+    if(o.near&&Math.abs(k)!==1)continue;
+    if(o.far&&Math.abs(k)<3)continue;
+    let str;
+    const dec=o.dec||Math.random()<.2;
+    if(dec){const d=pick([1,2,2,3]);let n=rnd(11,999);if(n%10===0)n++;str=normStr({m:BigInt(n),s:d});}
+    else if(k>0){str=String(rnd(1,99)*(Math.random()<.2?10:1));}
+    else{str=String(rnd(1,99)*10**rnd(0,Math.abs(k)+1));}
+    const res=normStr(shiftDec(parseDec(str),k));
+    if(res.replace(',','').length>10)continue;
+    if(/^0,0{3,}/.test(res))continue;
+    return{a,b,str,res,k};
+  }
+  return{a:'m',b:'dm',str:'54',res:'540',k:1};
+}
+function genConv(o){
+  const d=convData(o),f=F_num(d.res);
+  const dirTxt=d.k>0?`Von ${d.a} nach ${d.b}: ${d.k} Schritt${d.k>1?'e':''} zur kleineren Einheit → mal ${fmtInt(10**d.k)} (Komma ${d.k} Stelle${d.k>1?'n':''} nach rechts).`:`Von ${d.a} nach ${d.b}: ${-d.k} Schritt${-d.k>1?'e':''} zur größeren Einheit → durch ${fmtInt(10**-d.k)} (Komma ${-d.k} Stelle${-d.k>1?'n':''} nach links).`;
+  return makeItem([h('b',null,`${fmt(d.str)} ${d.a} = `),f.el,h('b',null,d.b)],[f],{hint:dirTxt,sol:`${fmt(d.res)} ${d.b}`});
+}
+const VOR=[['Kilo','k','1000'],['Hekto','h','100'],['Deka','da','10'],['Dezi','d','Zehntel'],['Zenti','c','Hundertstel'],['Milli','m','Tausendstel']];
+function genVorsilbe(){
+  const k=rnd(0,2),i=rnd(0,5),v=VOR[i];
+  if(k===0){const f=F_choice(VOR.map(x=>x[2]),i);return makeItem([`Was bedeutet die Vorsilbe „${v[0]}“ (${v[1]})?`,f.el],[f],{hint:'Kilo 1000 · Hekto 100 · Deka 10 · Dezi Zehntel · Zenti Hundertstel · Milli Tausendstel.',sol:v[2]});}
+  if(k===1){const f=F_choice(VOR.map(x=>x[0]),i);return makeItem([`Welche Vorsilbe bedeutet „${v[2]}“?`,f.el],[f],{hint:'Schau in den Merkkasten.',sol:v[0]});}
+  const f=F_choice(VOR.map(x=>x[0]),i);
+  return makeItem([`Wofür steht der Buchstabe „${v[1]}“ in „${v[1]}m“?`,f.el],[f],{hint:'k = Kilo, h = Hekto, da = Deka, d = Dezi, c = Zenti, m = Milli.',sol:v[0]});
+}
+function genRichtung(){
+  const i=rnd(0,5),small=Math.random()<.5,a=LU[small?i:i+1],b=LU[small?i+1:i];
+  const opts=['Mal 10 – das Komma wandert 1 Stelle nach rechts','Durch 10 – das Komma wandert 1 Stelle nach links','Mal 10 – das Komma wandert 1 Stelle nach links','Durch 10 – das Komma wandert 1 Stelle nach rechts'];
+  const f=F_choice(opts,small?0:1);
+  return makeItem([`Du wechselst von ${a} in die ${small?'nächstkleinere':'nächstgrößere'} Einheit ${b}. Was passiert mit der Maßzahl?`,f.el],[f],
+    {hint:small?'Kleinere Einheit → man braucht mehr davon → mal 10.':'Größere Einheit → man braucht weniger davon → durch 10.',sol:opts[small?0:1]});
+}
+const MFACTS=[
+ ['Längen werden in vielen Ländern in der Grundeinheit Meter (m) gemessen.',true],
+ ['Ein Meter wurde als der 10-millionste Teil der Entfernung vom Äquator zum Nordpol festgelegt.',true],
+ ['Es gab einen „Urmeter“ aus Platin in Paris.',true],
+ ['Der Urmeter war ein Holzstab und stand in Berlin.',false],
+ ['Früher hat man häufig Körpermaße wie 1 Fuß oder 1 Elle zum Messen benutzt.',true],
+ ['Ein Nachteil der Körpermaße: Jeder Mensch hat andere Körpermaße.',true],
+ ['Ein Vorteil der Körpermaße ist, dass sie bei jedem Menschen gleich lang sind.',false],
+ ['Ein Meter ist der 10-millionste Teil der Entfernung vom Südpol zum Nordpol.',false],
+ ['Heute ist ein Meter die Strecke, die das Licht in einer gewissen Zeitspanne zurücklegt.',true],
+ ['1 km = 10 hm',true],['1 hm = 10 dam',true],['1 dam = 10 m',true],['1 m = 10 dm',true],['1 dm = 10 cm',true],['1 cm = 10 mm',true],
+ ['1 dam = 100 m',false],['1 m = 10 cm',false],['1 hm = 10 m',false],['1 km = 100 hm',false],['1 cm = 100 mm',false]];
+function genMFact(){
+  const [t,v]=pick(MFACTS);const f=F_choice(['Wahr','Falsch'],v?0:1,{shuffle:false});
+  return makeItem([h('b',null,t),f.el],[f],{hint:'Schau noch einmal in dein Heft: Seite „Länge“ und „Umrechnen von Längeneinheiten“.',sol:v?'Wahr':'Falsch'});
+}
+addTopic({id:'len',emoji:'📏',name:'Längen',sub:'km · hm · dam · m · dm · cm · mm',title:'Längen und Umrechnen von Längeneinheiten',
+ merke:`<table class="t"><tr><th colspan="2">Bedeutung der Vorsilben</th></tr>
+ <tr><td>Kilo (k) = 1000</td><td>Dezi (d) = Zehntel</td></tr><tr><td>Hekto (h) = 100</td><td>Zenti (c) = Hundertstel</td></tr><tr><td>Deka (da) = 10</td><td>Milli (m) = Tausendstel</td></tr></table>
+ <p><b>Grundeinheit</b> der Länge: <b>Meter (m)</b>. Die Umrechnungszahl der Längen ist <b>10</b>.</p>
+ <p style="font-size:1.1rem"><b>km&nbsp; hm&nbsp; dam&nbsp; m&nbsp; dm&nbsp; cm&nbsp; mm</b><br>→ jeweils <span class="hl">· 10</span> &nbsp;·&nbsp; ← jeweils <span class="hl">: 10</span></p>
+ <ul><li>Wechselt man in die <b>nächstkleinere Einheit</b>, so <b>multipliziert</b> man die Maßzahl mit 10 (Komma um eine Stelle nach <b>rechts</b>).</li>
+ <li>Wechselt man in die <b>nächstgrößere Einheit</b>, so <b>dividiert</b> man die Maßzahl durch 10 (Komma um eine Stelle nach <b>links</b>).</li></ul>
+ <p>1 km = 10 hm · 1 hm = 10 dam · 1 dam = 10 m · 1 m = 10 dm · 1 dm = 10 cm · 1 cm = 10 mm</p>
+ <p>Früher nutzte man Körpermaße (1 Fuß, 1 Elle) – Nachteil: jeder Mensch hat andere Maße. Ein Meter wurde als der 10-millionste Teil der Strecke Äquator–Nordpol festgelegt („Urmeter“ aus Platin in Paris).</p>`,
+ demo(){
+  const A=h('select',{'aria-label':'Von'}),B=h('select',{'aria-label':'Nach'});
+  LU.forEach(u=>{A.append(h('option',{value:u},u));B.append(h('option',{value:u},u));});A.value='m';B.value='cm';
+  const num=h('input',{class:'num',value:'3,54',inputmode:'decimal','aria-label':'Zahl'});const out=h('div',{class:'demoout'});
+  function upd(){const p=parseDec(num.value);if(!p){out.textContent='Schreibe eine Zahl mit Komma, z. B. 3,54.';return;}
+    const k=LE[A.value]-LE[B.value],r=normStr(shiftDec(p,k));let t;
+    if(k===0)t='Gleiche Einheit – es ändert sich nichts.';
+    else if(k>0)t=`${k} Schritt${k>1?'e':''} zur kleineren Einheit → · ${fmtInt(10**k)} → Komma ${k} Stelle${k>1?'n':''} nach rechts (fehlende Stellen mit Nullen füllen).`;
+    else t=`${-k} Schritt${-k>1?'e':''} zur größeren Einheit → : ${fmtInt(10**-k)} → Komma ${-k} Stelle${-k>1?'n':''} nach links.`;
+    out.replaceChildren(h('b',null,`${fmt(normStr(p))} ${A.value} = ${fmt(r)} ${B.value}`),h('br'),t);}
+  [A,B,num].forEach(x=>x.addEventListener('input',upd));upd();
+  return h('div',{class:'demo'},h('h4',null,'🔧 Umrechner zum Ausprobieren'),num,' ',A,' → ',B,out);},
+ chips:[{label:'Nachbareinheiten',gen:()=>genConv({near:true})},{label:'Gemischt',gen:()=>genConv({})},{label:'Mit Komma',gen:()=>genConv({dec:true})},{label:'Weit auseinander',gen:()=>genConv({far:true})},{label:'Vorsilben',gen:genVorsilbe},{label:'Komma-Regel',gen:genRichtung},{label:'Meter & Wissen',gen:genMFact}]});
+/* =================== 3. STELLENWERTSYSTEME =================== */
+const DZ=['ZT','T','H','Z','E'];
+function dezNumber(){const d=[rnd(1,9),rnd(0,9),rnd(0,9),rnd(0,9),rnd(0,9)];if(Math.random()<.5)d[rnd(1,3)]=0;return d;}
+function genDezTafel(){
+  const d=dezNumber(),fs=d.map(x=>F_num(x,{cls:'dig',int:true}));
+  const tbl=h('table',{class:'tafel'},
+    h('tr',null,h('td',{class:'rowh'},'Stelle'),[5,4,3,2,1].map(n=>h('th',null,n+'.'))),
+    h('tr',null,h('td',{class:'rowh'},'Name'),DZ.map(n=>h('th',null,n))),
+    h('tr',null,h('td',{class:'rowh'},'Stellenwert'),[4,3,2,1,0].map(e=>h('th',null,sup(10,e)))),
+    h('tr',null,h('td',{class:'rowh'},'Stufenzahl'),['10 000','1000','100','10','1'].map(s=>h('th',null,s))),
+    h('tr',null,h('td',{class:'rowh'},'Ziffer'),fs.map(f=>h('td',null,f.el))));
+  return makeItem(['Trage die Zahl ',h('b',null,fmtInt(d.join(''))),' in die Stellenwerttafel ein.',h('div',{class:'block',style:'overflow-x:auto'},tbl)],fs,
+    {hint:'Von links: Zehntausender, Tausender, Hunderter, Zehner, Einer. Eine leere Stelle ist eine 0.',sol:d.join(' – ')});
+}
+function genDezWert(){
+  const d=dezNumber();let pos;do{pos=rnd(0,4);}while(d[pos]===0);
+  const e=4-pos,stu=10**e,f1=F_num(stu),f2=F_num(d[pos]*stu);
+  const numNodes=d.map((x,i)=>i===pos?h('span',{class:'hi'},x):String(x));
+  return makeItem(['In der Zahl ',h('b',null,...numNodes),' ist eine Ziffer markiert.',h('span',{class:'block'},'Stufenzahl der Stelle: ',f1.el),h('span',{class:'block'},'Wert der Ziffer: ',f2.el)],[f1,f2],
+    {hint:'Die Stufenzahl hängt von der Stelle ab (1, 10, 100, 1000, 10 000). Wert = Ziffer · Stufenzahl.',sol:`Stufenzahl ${stu}, Wert ${d[pos]*stu}`});
+}
+function genDezSumme(){
+  const d=dezNumber(),f=F_num(d.join(''));
+  const parts=[];d.forEach((x,i)=>{if(i)parts.push(' + ');parts.push(h('span',null,`${x} · `,sup(10,4-i)));});
+  return makeItem(['Welche Zahl ist das?',h('span',{class:'block'},h('b',null,parts,' = '),f.el)],[f],{hint:'Stufenzahlen: 10⁴ = 10 000, 10³ = 1000, 10² = 100, 10¹ = 10, 10⁰ = 1.',sol:d.join('')});
+}
+function dualTable(bits,withVals){
+  const n=bits.length,pos=Array.from({length:n},(_,i)=>n-i);
+  const rows=[h('tr',null,h('td',{class:'rowh'},'Stelle'),pos.map(p=>h('th',null,p+'.')))];
+  if(withVals){rows.push(h('tr',null,h('td',{class:'rowh'},'Stellenwert'),pos.map(p=>h('th',null,sup(2,p-1)))));
+    rows.push(h('tr',null,h('td',{class:'rowh'},'Stufenzahl'),pos.map(p=>h('th',null,2**(p-1)))));}
+  rows.push(h('tr',null,h('td',{class:'rowh'},'Ziffer'),bits.map(b=>h('td',null,b))));
+  return h('table',{class:'tafel'},rows);
+}
+function genBinDez(o={}){
+  const n=o.hard?rnd(6,7):rnd(4,5);let bits=[1];for(let i=1;i<n;i++)bits.push(rnd(0,1));
+  const val=parseInt(bits.join(''),2),f=F_num(val);
+  const parts=bits.map((b,i)=>`${b} · ${2**(n-1-i)}`).join(' + ');
+  return makeItem(['Rechne die Dualzahl ins Dezimalsystem um: ',h('b',null,'(',bits.join(''),')',h('sub',null,'2')),' = ',f.el,
+    h('div',{class:'block',style:'overflow-x:auto'},o.hard?null:dualTable(bits,true))],[f],
+    {hint:'Jede 1 zählt mit ihrer Stufenzahl (…, 16, 8, 4, 2, 1), jede 0 zählt nichts. Alles addieren.',sol:`${parts} = ${val}`});
+}
+function genDecBin(o={}){
+  const val=o.hard?rnd(32,127):rnd(3,31);const exp=val.toString(2);
+  const f=F_txt(exp,s=>s.replace(/[()₂\s\u00A0]|_2/g,'').replace(/^0+(?=.)/,''),
+    v=>/[^01]/.test(v)?'Im Dualsystem gibt es nur die Ziffern 0 und 1.':'');
+  f.el.style.textTransform='none';f.el.inputMode='numeric';
+  const n=exp.length;const parts=exp.split('').map((b,i)=>`${b} · ${2**(n-1-i)}`).join(' + ');
+  return makeItem(['Rechne die Zahl ins Dualsystem um: ',h('b',null,String(val),' = ('),f.el,h('b',null,')',h('sub',null,'2')),
+    h('span',{class:'block legend'},'Stufenzahlen: 64 · 32 · 16 · 8 · 4 · 2 · 1 – welche brauchst du?')],[f],
+    {hint:'Suche die größte Stufenzahl, die in die Zahl passt (1 schreiben), ziehe sie ab und mache mit dem Rest weiter. Nicht benutzte Stufenzahlen bekommen eine 0.',sol:`${val} = ${parts} → (${exp})₂`});
+}
+function genStufen2(){
+  const e=rnd(0,8),f=F_num(2**e);
+  return makeItem(['Berechne die 2er-Potenz: ',h('b',null,sup(2,e),' = '),f.el],[f],{hint:'2⁰ = 1, 2¹ = 2, 2² = 4, 2³ = 8, 2⁴ = 16 … immer verdoppeln.',sol:String(2**e)});
+}
+function genDualWissen(){
+  const k=rnd(0,5);let q,opts,c;
+  if(k===0){q='Welche Ziffern gibt es im Dualsystem?';opts=['0 und 1','0 bis 9','1 und 2','0 bis 2'];c=0;}
+  else if(k===1){q='Wie heißt das Dualsystem noch?';opts=['2er-System','10er-System','5er-System','8er-System'];c=0;}
+  else if(k===2){q='Wie heißt das Dezimalsystem noch?';opts=['10er-System','2er-System','12er-System','100er-System'];c=0;}
+  else if(k===3){q='Wo spielt das Dualsystem eine große Rolle?';opts=['In der Informatik','In der Kunst','Beim Sport','Beim Backen'];c=0;}
+  else if(k===4){q='Von welcher Zahl hängt die Bedeutung einer Ziffer im Stellenwertsystem ab?';opts=['Von der Stelle, an der sie steht','Von der Farbe','Von der Größe der Schrift','Von der Anzahl der Ziffern davor und dahinter gleichzeitig'];c=0;}
+  else{const bits=Array.from({length:5},()=>rnd(0,1));bits[0]=1;const good=bits.join('');
+    const bad=()=>{const b=bits.slice();b[rnd(0,4)]=rnd(2,9);return b.join('');};
+    const set=new Set([good]);while(set.size<4)set.add(bad());
+    opts=[good,...[...set].filter(x=>x!==good)];q='Welche dieser Zahlen ist eine Dualzahl?';c=0;}
+  const f=F_choice(opts,c);return makeItem([q,f.el],[f],{hint:'Dualsystem = 2er-System mit nur 0 und 1.',sol:opts[c]});
+}
+addTopic({id:'sys',emoji:'💻',name:'Dezimal & Dual',sub:'Stellenwertsysteme',title:'Stellenwertsysteme: Dezimal- und Dualsystem',
+ merke:`<p><b>Dezimalsystem (10er-System):</b> Ziffern 0 bis 9. Die Bedeutung einer Ziffer hängt von der <b>Stelle</b> ab, an der sie steht.</p>
+ <table class="tafel"><tr><td class="rowh">Stelle</td><th>5.</th><th>4.</th><th>3.</th><th>2.</th><th>1.</th></tr>
+ <tr><td class="rowh">Name</td><th>ZT</th><th>T</th><th>H</th><th>Z</th><th>E</th></tr>
+ <tr><td class="rowh">Stellenwert</td><th>10<sup>4</sup></th><th>10<sup>3</sup></th><th>10<sup>2</sup></th><th>10<sup>1</sup></th><th>10<sup>0</sup></th></tr>
+ <tr><td class="rowh">Stufenzahl</td><th>10 000</th><th>1000</th><th>100</th><th>10</th><th>1</th></tr>
+ <tr><td class="rowh">Zahl 10 457</td><td>1</td><td>0</td><td>4</td><td>5</td><td>7</td></tr></table>
+ <p>(10457) = 1 · 10<sup>4</sup> + 0 · 10<sup>3</sup> + 4 · 10<sup>2</sup> + 5 · 10<sup>1</sup> + 7 · 10<sup>0</sup> = 1 · 10000 + 0 · 1000 + 4 · 100 + 5 · 10 + 7 · 1 = 10457<br>Wir können jede natürliche Zahl im Dezimalsystem darstellen.</p>
+ <p><b>Dualsystem (2er-System):</b> nur die Ziffern <b>0 und 1</b>. In der Informatik spielt es eine große Rolle. Stellenwerte sind Potenzen mit der Basis 2.</p>
+ <table class="tafel"><tr><td class="rowh">Stelle</td><th>5.</th><th>4.</th><th>3.</th><th>2.</th><th>1.</th></tr>
+ <tr><td class="rowh">Stellenwert</td><th>2<sup>4</sup></th><th>2<sup>3</sup></th><th>2<sup>2</sup></th><th>2<sup>1</sup></th><th>2<sup>0</sup></th></tr>
+ <tr><td class="rowh">Stufenzahl</td><th>16</th><th>8</th><th>4</th><th>2</th><th>1</th></tr>
+ <tr><td class="rowh">(10110)<sub>2</sub></td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td></tr></table>
+ <p>(10110)<sub>2</sub> = 1·16 + 0·8 + 1·4 + 1·2 + 0·1 = 16 + 0 + 4 + 2 + 0 = <b>22</b><br>Umgekehrt: 23 = 1·16 + 0·8 + 1·4 + 1·2 + 1·1 = (10111)<sub>2</sub></p>`,
+ demo(){
+  const vals=[32,16,8,4,2,1],st=vals.map(()=>0),out=h('div',{class:'demoout'}),bw=h('div',{class:'bits'});
+  function upd(){const s=vals.reduce((a,v,i)=>a+v*st[i],0);const parts=vals.map((v,i)=>st[i]?v:null).filter(x=>x!=null);
+    out.replaceChildren(h('b',null,`(${st.join('')})`,h('sub',null,'2'),parts.length>1?` = ${parts.join(' + ')} = ${s}`:` = ${s}`));}
+  vals.forEach((v,i)=>{const b=h('button',{type:'button','aria-label':'Stufenzahl '+v,onclick:()=>{st[i]=1-st[i];b.textContent=st[i];b.classList.toggle('on',!!st[i]);upd();}},'0');bw.append(h('div',{class:'bit'},h('span',null,v),b));});
+  upd();return h('div',{class:'demo'},h('h4',null,'💡 Dual-Schalter: Tippe auf die Ziffern!'),bw,out);},
+ chips:[{label:'Dezimal: Tafel',gen:genDezTafel},{label:'Dezimal: Stellenwert',gen:genDezWert},{label:'Dezimal: Summe',gen:genDezSumme},{label:'Dual → Dezimal',gen:()=>genBinDez()},{label:'Dezimal → Dual',gen:()=>genDecBin()},{label:'Dual (schwerer)',gen:()=>Math.random()<.5?genBinDez({hard:true}):genDecBin({hard:true})},{label:'2er-Potenzen',gen:genStufen2},{label:'Wissen',gen:genDualWissen}]});
+
+/* =================== 4. RÖMISCHE ZAHLEN =================== */
+const RV=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+function toRoman(n){let s='';for(const[v,r]of RV)while(n>=v){s+=r;n-=v;}return s;}
+const RMAP={I:1,V:5,X:10,L:50,C:100,D:500,M:1000};
+function fromRoman(s){let t=0;for(let i=0;i<s.length;i++){const a=RMAP[s[i]],b=RMAP[s[i+1]]||0;t+=a<b?-a:a;}return t;}
+const normRom=s=>s.toUpperCase().replace(/[^A-Z]/g,'');
+function romKb(f){
+  const kb=h('div',{class:'kb','aria-label':'Römische Zeichen'});
+  'MDCLXV I'.replace(' ','I').split('').forEach(ch=>kb.append(h('button',{type:'button',onclick:()=>{f.el.value+=ch;f.el.focus();}},ch)));
+  kb.append(h('button',{type:'button','aria-label':'Löschen',onclick:()=>{f.el.value=f.el.value.slice(0,-1);f.el.focus();}},'⌫'));
+  return kb;
+}
+function genRomToArab(lv){
+  const n=lv==='hard'?rnd(100,3999):lv==='mid'?rnd(20,999):rnd(2,60);
+  const f=F_num(n,{int:true});
+  return makeItem(['Übersetze die römische Zahl in arabische Ziffern:',h('span',{class:'block'},h('b',null,toRoman(n),' = '),f.el)],[f],
+    {hint:'Gehe von links nach rechts. Steht ein kleineres Zeichen vor einem größeren (IV, IX, XL, XC, CD, CM), wird abgezogen – sonst addiert.',sol:String(n)});
+}
+function genArabToRom(lv){
+  const n=lv==='hard'?rnd(100,3999):lv==='mid'?rnd(20,999):rnd(2,60);
+  const exp=toRoman(n);
+  const f=F_txt(exp,normRom,v=>{if(!v)return'';if(/[^IVXLCDM]/.test(v))return'Benutze nur M, D, C, L, X, V, I.';
+    if(fromRoman(v)===n)return'Der Wert stimmt, aber die Schreibweise verstößt gegen die Regeln (z. B. höchstens 3-mal dasselbe Zeichen hintereinander; D, L, V nur 1-mal).';
+    return'Zerlege die Zahl in Tausender, Hunderter, Zehner und Einer und schreibe jeden Teil römisch.';});
+  return makeItem(['Schreibe mit römischen Zahlzeichen, damit Gaius Numerus dich versteht:',h('span',{class:'block'},h('b',null,`${n} = `),f.el),romKb(f)],[f],
+    {sol:exp});
+}
+function genRomZeichen(){
+  const k=rnd(0,1),ks=Object.keys(RMAP);
+  if(k===0){const c=pick(ks),f=F_num(RMAP[c],{int:true});return makeItem(['Welchen Wert hat das Zeichen ',h('b',null,c),'?  ',f.el],[f],{hint:'M = 1000, D = 500, C = 100, L = 50, X = 10, V = 5, I = 1.',sol:String(RMAP[c])});}
+  const c=pick(ks),f=F_choice(ks,ks.indexOf(c));
+  return makeItem(['Welches römische Zeichen steht für ',h('b',null,String(RMAP[c])),'?',f.el],[f],{hint:'M = 1000, D = 500, C = 100, L = 50, X = 10, V = 5, I = 1.',sol:c});
+}
+const ROK=['IV','IX','XL','XC','CD','CM','XIV','XXIX','XLIX','XCIX','CDXLIV','MCMXC','DCCC','MMXXVI','VIII','XXXIX','CCC','LXVI'];
+const RBAD=[['IIII','I darf höchstens 3-mal hintereinander stehen. Richtig: IV.'],['VV','V darf höchstens 1-mal vorkommen. Richtig: X.'],['VX','V darf nicht subtrahiert werden (nur I, X, C dürfen vorangestellt werden). 5 wäre V.'],
+ ['IC','I darf nur von V und X subtrahiert werden. 99 = XCIX.'],['XM','X darf nur von L und C subtrahiert werden. 990 = CMXC.'],['IIX','Es darf nur ein Zeichen vorangestellt werden. 8 = VIII.'],
+ ['XXXX','X darf höchstens 3-mal hintereinander stehen. 40 = XL.'],['LL','L darf höchstens 1-mal vorkommen. 100 = C.'],['DD','D darf höchstens 1-mal vorkommen. 1000 = M.'],
+ ['IL','I darf nur von V und X subtrahiert werden. 49 = XLIX.'],['XD','X darf nur von L und C subtrahiert werden. 490 = CDXC.'],['MMMM','M darf höchstens 3-mal hintereinander stehen.'],['VIV','V darf nur 1-mal vorkommen und nicht subtrahiert werden. 9 = IX.']];
+function genRomRegel(){
+  const ok=Math.random()<.5;let t,why;
+  if(ok){t=pick(ROK);why='Diese Schreibweise folgt allen Regeln.';}else{[t,why]=pick(RBAD);}
+  const f=F_choice(['erlaubt','nicht erlaubt'],ok?0:1,{shuffle:false});
+  return makeItem(['Ist die Schreibweise ',h('b',null,t),' nach den Regeln erlaubt?',f.el],[f],{hint:why,sol:ok?'erlaubt':'nicht erlaubt – '+why});
+}
+addTopic({id:'rom',emoji:'🏛️',name:'Römische Zahlen',sub:'M D C L X V I',title:'Römische Zahlen',
+ merke:`<table class="t"><tr><th>Zeichen</th><td><b>M</b></td><td><b>D</b></td><td><b>C</b></td><td><b>L</b></td><td><b>X</b></td><td><b>V</b></td><td><b>I</b></td></tr>
+ <tr><th>Wert</th><td>1000</td><td>500</td><td>100</td><td>50</td><td>10</td><td>5</td><td>1</td></tr></table>
+ <p><b>Regeln</b></p><ol style="margin:4px 0 4px 20px;padding:0">
+ <li>Steht das <b>größere</b> Zeichen <b>vor</b> dem kleineren, wird <b>addiert</b>: VI = 5 + 1 = 6.</li>
+ <li>Steht das <b>kleinere</b> Zeichen <b>vor</b> dem größeren, wird <b>subtrahiert</b>: IV = 5 − 1 = 4.<ul>
+  <li>Es darf immer nur <b>ein</b> Zeichen vorangestellt werden. Erlaubt sind: I, X und C.</li>
+  <li>I darf nur von V und X subtrahiert werden: <b>IV, IX</b>.</li><li>X darf nur von L und C subtrahiert werden: <b>XL, XC</b>.</li><li>C darf nur von D und M subtrahiert werden: <b>CD, CM</b>.</li></ul></li>
+ <li>M, C, X und I dürfen <b>höchstens 3-mal</b> hintereinander stehen, D, L und V <b>höchstens 1-mal</b>.</li></ol>
+ <p>Beispiele: XCIX = 90 + 9 = 99 · CXVII = 100 + 10 + 7 = 117 · XCVI = 96 · DCXXXIX = 639</p>`,
+ chips:[{label:'Römisch → Zahl (leicht)',gen:()=>genRomToArab('easy')},{label:'Zahl → Römisch (leicht)',gen:()=>genArabToRom('easy')},{label:'Römisch → Zahl',gen:()=>genRomToArab('mid')},{label:'Zahl → Römisch',gen:()=>genArabToRom('mid')},{label:'Profi bis 3999',gen:()=>Math.random()<.5?genRomToArab('hard'):genArabToRom('hard')},{label:'Zeichen-Werte',gen:genRomZeichen},{label:'Erlaubt oder nicht?',gen:genRomRegel}]});
+
+/* =================== 5. ZAHLENFOLGEN =================== */
+function seqData(type){
+  let terms,rule,wrong,g=4;
+  if(type==='add'){const d=rnd(2,9),s=rnd(1,15);terms=Array.from({length:8},(_,i)=>s+d*i);rule=`immer +${d} rechnen`;wrong=[`immer +${d+1} rechnen`,`immer ·${d} rechnen`,`immer −${d} rechnen`];}
+  else if(type==='sub'){const d=rnd(3,9),s=d*9+rnd(0,6);terms=Array.from({length:8},(_,i)=>s-d*i);rule=`immer −${d} rechnen`;wrong=[`immer +${d} rechnen`,`immer −${d+1} rechnen`,`immer :${d} rechnen`];}
+  else if(type==='mul'){const f=pick([2,2,3]),s=rnd(1,4);terms=[s];while(terms.length<8)terms.push(terms[terms.length-1]*f);rule=`immer ·${f} rechnen`;wrong=[`immer +${f} rechnen`,`immer ·${f+1} rechnen`,`immer +${s} rechnen`];}
+  else if(type==='alt'){const a=rnd(1,3),b=a+rnd(1,3);let s=rnd(2,8);terms=[s];for(let i=1;i<10;i++)terms.push(terms[i-1]+(i%2?-a:b));g=6;rule=`abwechselnd −${a} und +${b} rechnen`;wrong=[`abwechselnd +${a} und −${b} rechnen`,`immer +${b-a} rechnen`,`immer −${a} rechnen`];}
+  else if(type==='sq'){const k=rnd(1,3);terms=Array.from({length:8},(_,i)=>(k+i)**2);rule='Es sind Quadratzahlen';wrong=['immer +3 rechnen','immer ·2 rechnen','Es sind Kubikzahlen'];}
+  else if(type==='cube'){terms=Array.from({length:8},(_,i)=>(1+i)**3);rule='Es sind Kubikzahlen';wrong=['Es sind Quadratzahlen','immer +9 rechnen','immer ·3 rechnen'];}
+  else{const a=rnd(1,3),b=rnd(1,4);terms=[a,b];while(terms.length<9)terms.push(terms[terms.length-1]+terms[terms.length-2]);g=5;rule='Man addiert immer die beiden letzten Zahlen';wrong=[`immer +${a+b} rechnen`,'immer ·2 rechnen','Es sind Quadratzahlen'];}
+  return{terms,rule,wrong,g};
+}
+function genSeqNext(types){
+  const d=seqData(pick(types)),given=d.terms.slice(0,d.g),next=d.terms.slice(d.g,d.g+4);
+  const fs=next.map(x=>F_num(x)),fr=F_choice([d.rule,...d.wrong],0);
+  const row=[h('b',null,given.map(fmtInt).join('; '),'; ')];fs.forEach((f,i)=>{row.push(f.el);row.push(i<3?'; ':' …');});
+  return makeItem(['Ergänze jeweils die nächsten vier Zahlen und gib eine Regel an:',h('span',{class:'block'},row),h('span',{class:'block'},'Regel:'),fr.el],[...fs,fr],
+    {hint:'Schaue, was von einer Zahl zur nächsten passiert (plus? mal? abwechselnd?). Prüfe die Regel an allen Zahlen.',sol:`${next.join('; ')} – ${d.rule}`});
+}
+function genSeqGap(){
+  const d=seqData(pick(['add','sub','mul','sq','alt'])),n=Math.min(7,d.terms.length),t=d.terms.slice(0,Math.max(n,d.g+1));
+  const gap=rnd(2,t.length-2),f=F_num(t[gap]);const row=[];t.forEach((x,i)=>{if(i)row.push('; ');row.push(i===gap?f.el:h('b',null,fmtInt(x)));});
+  return makeItem(['Welche Zahl fehlt?',h('span',{class:'block'},row)],[f],{hint:`Regel der Folge: ${d.rule}.`,sol:String(t[gap])});
+}
+function figSvg(kind,g){
+  const s=11,gp=1,W=(kind==='pyr'?2*g-1:g)*(s+gp),H=g*(s+gp);
+  let sv=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${g}. Glied">`;
+  for(let r=1;r<=g;r++){const cnt=kind==='pyr'?2*r-1:r,off=kind==='pyr'?(g-r)*(s+gp):0;
+    for(let c=0;c<cnt;c++)sv+=`<rect x="${off+c*(s+gp)}" y="${(r-1)*(s+gp)}" width="${s}" height="${s}" fill="var(--accent)"/>`;}
+  return h('span',{class:'fig',html:sv+`</svg><span>${g}. Glied</span>`});
+}
+function genSeqMuster(){
+  const kind=pick(['pyr','tri']),cnt=g=>kind==='pyr'?g*g:g*(g+1)/2;
+  const f4=F_num(cnt(4)),f5=F_num(cnt(5));
+  const opts=kind==='pyr'?['Quadratzahlen','Es wird immer 3 addiert','Es wird immer verdoppelt','Kubikzahlen']:['Es wird erst 2, dann 3, dann 4, … addiert','Es wird immer 2 addiert','Quadratzahlen','Es wird immer verdoppelt'];
+  const fr=F_choice(opts,0);
+  return makeItem(['Ergänze die Musterfolge: Wie viele Kästchen sind im 4. und 5. Glied gefärbt?',h('div',{class:'figs'},[1,2,3].map(g=>figSvg(kind,g))),
+    h('span',{class:'block'},'4. Glied: ',f4.el,'  5. Glied: ',f5.el),h('span',{class:'block'},'Welche Regel passt?'),fr.el],[f4,f5,fr],
+    {hint:'Zähle die Kästchen im 1., 2., 3. Glied und suche, wie sie wachsen.',sol:`${cnt(4)} und ${cnt(5)} – ${opts[0]}`});
+}
+const SWISS=[['Die einzelnen Zahlen einer Zahlenfolge heißen …','Glieder der Folge',['Basis der Folge','Exponenten','Stufenzahlen']],
+ ['Das Bildungsgesetz einer Zahlenfolge ist …','die Regel, nach der die Folge gebildet wird',['die letzte Zahl der Folge','die Summe aller Zahlen','die Anzahl der Zahlen']],
+ ['Stehen mehrere Zahlen in einer Reihe hintereinander, spricht man von einer …','Zahlenfolge',['Potenz','Strichliste','Größe']],
+ ['Wenn das Bildungsgesetz bekannt ist, kann man …','die Glieder der Folge leicht berechnen',['nichts mehr rechnen','nur das erste Glied angeben','die Folge nicht fortsetzen']],
+ ['Manchmal werden Zahlenfolgen auch als … angegeben.','Musterfolge',['Strichliste','Säulendiagramm','Stellenwerttafel']]];
+function genSeqWissen(){const [q,c,w]=pick(SWISS);const f=F_choice([c,...w],0);return makeItem([q,f.el],[f],{hint:'Lies noch einmal „Def 7: Zahlenfolge“ im Merkkasten.',sol:c});}
+addTopic({id:'fol',emoji:'🔗',name:'Zahlenfolgen',sub:'Regeln finden',title:'Zahlenfolgen',
+ merke:`<p>Stehen mehrere Zahlen in einer Reihe hintereinander, so sprechen wir von einer <b>Zahlenfolge</b>. Die einzelnen Zahlen heißen <b>Glieder der Folge</b>.</p>
+ <p>Ist das <b>Bildungsgesetz</b> (= die Regel) bekannt, kann man die Glieder der Folge leicht berechnen. Manchmal werden Zahlenfolgen auch als <b>Musterfolge</b> angegeben.</p>
+ <table class="t"><tr><td style="text-align:left">a) 1; 4; 7; 10; <b>13; 16; 19; 22</b> …</td><td>Regel: immer +3 rechnen</td></tr>
+ <tr><td style="text-align:left">b) 3; 6; 12; 24; <b>48; 96; 192; 384</b> …</td><td>Regel: immer · 2 rechnen</td></tr>
+ <tr><td style="text-align:left">c) 2; 1; 3; 2; 4; 3; 5; <b>4; 6; 5; 7</b> …</td><td>Regel: abwechselnd −1 und +2</td></tr></table>
+ <p>Muster: 1, 4, 9, 16, 25 – das sind <b>Quadratzahlen</b> (oder: zu jedem weiteren Glied wird die nächste ungerade Zahl addiert).</p>`,
+ chips:[{label:'Einfache Folgen',gen:()=>genSeqNext(['add','sub','mul'])},{label:'Knifflige Folgen',gen:()=>genSeqNext(['alt','sq','cube','fib'])},{label:'Lücke füllen',gen:genSeqGap},{label:'Musterfolgen',n:3,gen:genSeqMuster},{label:'Wissen',gen:genSeqWissen}]});
+/* =================== 6. DATEN UND DIAGRAMME =================== */
+const DS=[
+ {t:'Verkaufte Eissorten',u:'Bällchen',cats:['Schoko','Erdbeer','Vanille','Pistazie','Zitrone']},
+ {t:'Lieblings-Haustiere der Klasse',u:'Kinder',cats:['Hund','Katze','Hase','Fisch','Vogel']},
+ {t:'Lieblingsfächer der Klasse',u:'Stimmen',cats:['Mathe','Sport','Kunst','Musik','Deutsch']},
+ {t:'Verkaufte Obstsorten',u:'Stück',cats:['Apfel','Banane','Birne','Kirsche','Traube']}];
+const BC=['#8b2c2c','#c8479a','#f08a2a','#3d7a3a','#d9b92a'];
+function chartSvg({cats,cells,unit,orient,max=10}){
+  const C=22,slot=3,n=cats.length,v=orient==='v';
+  const m=v?{l:58,t:10,r:8,b:26}:{l:66,t:10,r:14,b:26};
+  const gw=v?n*slot*C:max*C,gh=v?max*C:n*slot*C,W=m.l+gw+m.r,H=m.t+gh+m.b;
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${v?'Säulendiagramm':'Balkendiagramm'}">`;
+  for(let i=0;i<=gw/C;i++)s+=`<line class="gl" x1="${m.l+i*C}" y1="${m.t}" x2="${m.l+i*C}" y2="${m.t+gh}"/>`;
+  for(let j=0;j<=gh/C;j++)s+=`<line class="gl" x1="${m.l}" y1="${m.t+j*C}" x2="${m.l+gw}" y2="${m.t+j*C}"/>`;
+  cells.forEach((c,i)=>{const col=BC[i%BC.length];
+    if(v){const x=m.l+(i*slot+.5)*C,hh=c*C;if(c>0)s+=`<rect x="${x}" y="${m.t+gh-hh}" width="${2*C}" height="${hh}" fill="${col}" stroke="#222" stroke-width="1"/>`;
+      s+=`<text x="${x+C}" y="${m.t+gh+17}" text-anchor="middle">${cats[i]}</text>`;}
+    else{const y=m.t+(i*slot+.5)*C,ww=c*C;if(c>0)s+=`<rect x="${m.l}" y="${y}" width="${ww}" height="${2*C}" fill="${col}" stroke="#222" stroke-width="1"/>`;
+      s+=`<text x="${m.l-6}" y="${y+C+4}" text-anchor="end">${cats[i]}</text>`;}});
+  s+=`<line x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${m.t+gh}" stroke="currentColor" stroke-width="2"/><line x1="${m.l}" y1="${m.t+gh}" x2="${m.l+gw}" y2="${m.t+gh}" stroke="currentColor" stroke-width="2"/>`;
+  for(let k=0;k<=max;k++){
+    if(v)s+=`<text x="${m.l-6}" y="${m.t+gh-k*C+4}" text-anchor="end">${fmtInt(k*unit)}</text>`;
+    else if(k%2===0)s+=`<text x="${m.l+k*C}" y="${m.t+gh+17}" text-anchor="middle">${fmtInt(k*unit)}</text>`;}
+  return s+'</svg>';
+}
+function distinctCells(n,max=10){return shuffle(Array.from({length:max},(_,i)=>i+1)).slice(0,n);}
+function chartSetup(){
+  const ds=pick(DS),n=pick([4,5]),cats=shuffle(ds.cats).slice(0,n),orient=pick(['v','h']),unit=pick([2,5,10,20,50,100]);
+  const cells=distinctCells(n);
+  const view=h('div',{class:'block',html:chartSvg({cats,cells,unit,orient})});
+  const legend=h('div',{class:'legend'},`${ds.t} – 1 Kästchen ≙ ${unit} ${ds.u}`);
+  return{ds,cats,cells,unit,orient,view,legend,n};
+}
+function genChart(){
+  const c=chartSetup(),k=rnd(0,4),{cats,cells,unit,ds}=c;
+  const wrap=[c.legend,c.view];
+  const note='Zähle die Kästchen und multipliziere mit der Einheit.';
+  if(k===0){const mx=cells.indexOf(Math.max(...cells)),f=F_choice(cats,mx);
+    return makeItem([`Welcher Wert ist am größten (${ds.t})?`,...wrap,f.el],[f],{hint:'Die längste Säule bzw. der längste Balken.',sol:cats[mx]});}
+  if(k===1){const i=rnd(0,cats.length-1),f=F_num(cells[i]*unit,{int:true});
+    return makeItem([`Wie viele ${ds.u} gehören zu „${cats[i]}“?`,...wrap,h('span',{class:'block'},f.el)],[f],{hint:note,sol:`${cells[i]} · ${unit} = ${cells[i]*unit}`});}
+  if(k===2){const idx=shuffle(cats.map((_,i)=>i));let a=idx[0],b=idx[1];if(cells[a]<cells[b])[a,b]=[b,a];
+    const f=F_num((cells[a]-cells[b])*unit,{int:true});
+    return makeItem([`Wie viele ${ds.u} mehr hat „${cats[a]}“ als „${cats[b]}“?`,...wrap,h('span',{class:'block'},f.el)],[f],{hint:'Lies beide Werte ab und ziehe voneinander ab.',sol:`${cells[a]*unit} − ${cells[b]*unit} = ${(cells[a]-cells[b])*unit}`});}
+  if(k===3){const tot=cells.reduce((x,y)=>x+y,0)*unit,f=F_num(tot,{int:true});
+    return makeItem([`Wie viele ${ds.u} sind es insgesamt?`,...wrap,h('span',{class:'block'},f.el)],[f],{hint:'Lies alle Werte ab und addiere.',sol:String(tot)});}
+  const f=F_choice(['Säulendiagramm','Balkendiagramm'],c.orient==='v'?0:1,{shuffle:false});
+  return makeItem(['Wie heißt diese Art von Diagramm?',...wrap,f.el],[f],{hint:'Senkrechte Säulen → Säulendiagramm; waagerechte Balken → Balkendiagramm.',sol:c.orient==='v'?'Säulendiagramm':'Balkendiagramm'});
+}
+function tally(n){
+  const w=h('span',{class:'tally','aria-label':n+' Striche'});if(n===0){w.textContent='–';return w;}
+  const stroke=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`;
+  for(let g=0;g<Math.floor(n/5);g++){let s='<svg width="30" height="22" viewBox="0 0 30 22">';for(let i=0;i<4;i++)s+=stroke(3+i*6,2,3+i*6,20);s+=stroke(0,17,27,5)+'</svg>';w.insertAdjacentHTML('beforeend',s);}
+  const r=n%5;if(r){let s=`<svg width="${r*6+4}" height="22" viewBox="0 0 ${r*6+4} 22">`;for(let i=0;i<r;i++)s+=stroke(3+i*6,2,3+i*6,20);w.insertAdjacentHTML('beforeend',s+'</svg>');}
+  return w;
+}
+function genStrich(){
+  const ds=pick(DS),cats=ds.cats,counts=cats.map(()=>rnd(0,12));counts[rnd(0,4)]=0;
+  const fs=counts.map(c=>F_num(c,{cls:'dig',int:true}));
+  const tbl=h('table',{class:'t'},h('tr',null,h('th',null,'Sorte'),h('th',null,'Strichliste'),h('th',null,'Anzahl')),
+    cats.map((c,i)=>h('tr',null,h('td',null,c),h('td',{style:'text-align:left'},tally(counts[i])),h('td',null,fs[i].el))));
+  return makeItem([`Zähle die Striche (${ds.t}) und schreibe die Anzahl auf.`,h('div',{class:'block',style:'overflow-x:auto'},tbl)],fs,
+    {hint:'Ein Bündel mit dem Querstrich sind 5 Striche. Zähle in Fünferschritten: 5, 10, 15 …',sol:counts.join(', ')});
+}
+function genRundenMm(){
+  const ds=pick(DS),cats=shuffle(ds.cats).slice(0,4),hund=Math.random()<.35;const step=hund?100:10,un=hund?'cm':'mm';
+  const raw=cats.map(()=>{let r;do{r=rnd(100,999);}while(r%step===step/2);return r;});
+  const rd=raw.map(r=>Math.round(r/step)*step),hh=rd.map(r=>r/step);
+  const f1=rd.map(r=>F_num(r,{int:true})),f2=hh.map(x=>F_num(x,{int:true}));
+  const tbl=h('table',{class:'t'},h('tr',null,h('th',null,''),cats.map(c=>h('th',null,c))),
+    h('tr',null,h('td',null,'verkauft'),raw.map(r=>h('td',null,r))),
+    h('tr',null,h('td',null,hund?'Runde auf Hunderter':'Runde auf Zehner'),f1.map(f=>h('td',null,f.el))),
+    h('tr',null,h('td',null,`Höhe Säule / Breite Balken in ${un}`),f2.map(f=>h('td',null,f.el))));
+  return makeItem([`${ds.t} (in ${ds.u}): Runde die Zahlen und berechne die Höhe der Säule bzw. die Breite des Balkens. Einheit: `,h('b',null,`1 ${un} ≙ ${step} ${ds.u}`),h('div',{class:'block',style:'overflow-x:auto'},tbl)],[...f1,...f2],
+    {hint:`Runde auf ${hund?'Hunderter':'Zehner'} (ab 5 aufrunden). Dann teile die gerundete Zahl durch ${step}.`,sol:`gerundet: ${rd.join(', ')}; ${un}: ${hh.join(', ')}`});
+}
+function genEinheit(){
+  const M=rnd(100,9999),pw=[1,10,100,1000,10000];
+  const ci=pw.findIndex(u=>M/u>=3&&M/u<30);
+  const idxs=shuffle(pw.map((_,i)=>i).filter(i=>i!==ci)).slice(0,3);const opts=[ci,...idxs].map(i=>`1 Kästchen ≙ ${fmtInt(pw[i])}`);
+  const f=F_choice(opts,0);
+  return makeItem([`In deinem Heft hast du etwa 25 Kästchen Platz für die Säulen. Der größte Wert ist ${fmtInt(M)}. Welche Einheit wählst du geschickt?`,f.el],[f],
+    {hint:'Die größte Säule soll zwischen etwa 5 und 25 Kästchen hoch werden – nicht winzig und nicht zu hoch für die Seite.',sol:opts[0]+` (${fmtInt(M)} : ${fmtInt(pw[ci])} ≈ ${Math.round(M/pw[ci])} Kästchen)`});
+}
+function genKaest(){
+  const u=pick([50,100,250,500,1000,10000,250000]),k=rnd(2,12),v=k*u,rev=Math.random()<.4;
+  if(!rev){const f=F_num(k,{int:true});
+    return makeItem([`Es wurde die Einheit gewählt: 1 Kästchen ≙ ${fmtInt(u)} Menschen. Wie viele Kästchen hoch zeichnest du die Säule für ${fmtInt(v)} Menschen?`,f.el],[f],{hint:`${fmtInt(v)} : ${fmtInt(u)} rechnen.`,sol:`${k} Kästchen`});}
+  const f=F_num(v,{int:true});
+  return makeItem([`1 Kästchen ≙ ${fmtInt(u)} Menschen. Eine Säule ist ${k} Kästchen hoch. Für wie viele Menschen steht sie?`,f.el],[f],{hint:`${k} · ${fmtInt(u)} rechnen.`,sol:fmtInt(v)});
+}
+function genDraw(){
+  const ds=pick(DS),cats=shuffle(ds.cats).slice(0,4),orient=pick(['v','h']);
+  const raw=cats.map(()=>{let r;do{r=rnd(100,999);}while(Math.abs(r%100-50)<8);return r;});
+  const tg=raw.map(r=>Math.round(r/100)),st=cats.map(()=>0);
+  const svgHost=h('div',{class:'block'}),vals=[];
+  const draw=()=>{svgHost.innerHTML=chartSvg({cats,cells:st,unit:100,orient,max:10});vals.forEach((b,i)=>b.textContent=st[i]);};
+  const ctrl=h('div',{class:'block'},cats.map((c,i)=>{const b=h('b',null,'0');vals.push(b);
+    return h('span',{class:'pm',style:'margin-right:14px'},h('span',null,c+':'),h('button',{type:'button','aria-label':c+' kleiner',onclick:()=>{st[i]=Math.max(0,st[i]-1);draw();}},'−'),b,h('button',{type:'button','aria-label':c+' größer',onclick:()=>{st[i]=Math.min(10,st[i]+1);draw();}},'+'));}));
+  const f=F_custom({el:svgHost,eval:()=>st.every(x=>x===0)?'empty':st.every((x,i)=>x===tg[i])?'ok':'wrong',solve(){st.forEach((_,i)=>st[i]=tg[i]);draw();},touched:()=>st.some(x=>x>0),
+    mark(s){svgHost.style.outline=s==='ok'?'3px solid var(--ok)':s==='wrong'?'3px solid var(--bad)':'';svgHost.style.borderRadius='8px';}});
+  draw();
+  const tbl=h('table',{class:'t'},h('tr',null,cats.map(c=>h('th',null,c))),h('tr',null,raw.map(r=>h('td',null,r))));
+  return makeItem([`${ds.t} (in ${ds.u}): Runde auf Hunderter und zeichne ein ${orient==='v'?'Säulendiagramm':'Balkendiagramm'} mit 1 Kästchen ≙ 100 ${ds.u}. Stelle die Höhe mit − und + ein.`,h('div',{class:'block',style:'overflow-x:auto'},tbl),ctrl,svgHost],[f],
+    {hint:'Erst runden (z. B. 387 ≈ 400), dann durch 100 teilen: so viele Kästchen.',sol:`gerundet: ${raw.map(r=>Math.round(r/100)*100).join(', ')} → Kästchen: ${tg.join(', ')}`});
+}
+const DWI=[['Wie nennt man ein Diagramm mit senkrechten Säulen?','Säulendiagramm',['Balkendiagramm','Strichliste','Stellenwerttafel']],
+ ['Wie nennt man ein Diagramm mit waagerechten Balken?','Balkendiagramm',['Säulendiagramm','Strichliste','Zahlenfolge']],
+ ['Wofür ist eine Strichliste vor allem sinnvoll?','Zur Auszählung von Umfragen',['Zum Zeichnen von Potenzen','Zum Umrechnen von Längen','Zum Schreiben römischer Zahlen']],
+ ['Woran kannst du dich beim Zeichnen eines Diagramms im Heft orientieren?','An den Rechenkästchen',['An der Seitenzahl','An der Schriftgröße','An der Farbe des Stiftes']],
+ ['Was solltest du bei den Achsen eines Diagramms tun?','Sie beschriften',['Sie weglassen','Sie in Rot malen','Sie doppelt zeichnen']],
+ ['Warum rundet man Zahlen vor dem Zeichnen oft sinnvoll?','Damit man sie gut eintragen kann',['Damit sie größer werden','Damit man nicht mehr zählen muss','Das macht man nie']],
+ ['Was liefern Säulen- und Balkendiagramme?','Auf den ersten Blick einen schnellen Überblick',['Nur genaue Nachkommastellen','Die Lösung jeder Rechenaufgabe','Nur Zahlenfolgen']],
+ ['Wie viele Striche stehen in einem Bündel mit Querstrich?','5',['4','6','10']]];
+function genDiaWissen(){const [q,c,w]=pick(DWI);const f=F_choice([c,...w],0);return makeItem([q,f.el],[f],{hint:'Lies „Bem. 16“ und „Bem. 17 Hinweise“ im Merkkasten.',sol:c});}
+addTopic({id:'dia',emoji:'📊',name:'Daten & Diagramme',sub:'Strichliste, Säulen, Balken',title:'Daten und Diagramme',
+ merke:`<p>Vor allem zur Auszählung von Umfragen ist eine <b>Strichliste</b> sehr sinnvoll. Um die Daten grafisch darzustellen, eignen sich <b>Säulen- und Balkendiagramme</b>. Sie liefern auf den ersten Blick einen schnellen Überblick.</p>
+ <p><b>Säulendiagramm</b> = <u>senkrechte</u> Säulen &nbsp;·&nbsp; <b>Balkendiagramm</b> = <u>waagerechte</u> Balken</p>
+ <p>Beispiel Eis (gerundet): Schoko 810, Erdbeer 390, Vanille 540, Pistazie 120 &nbsp;→ <b>1 mm ≙ 10 Bällchen</b>: 81 mm, 39 mm, 54 mm, 12 mm</p>
+ <div style="display:flex;flex-wrap:wrap;gap:10px">
+ <div style="flex:1 1 220px">${chartSvg({cats:['Schoko','Erdbeer','Vanille','Pistazie'],cells:[8,4,5,1],unit:100,orient:'v'})}</div>
+ <div style="flex:1 1 220px">${chartSvg({cats:['Schoko','Erdbeer','Vanille','Pistazie'],cells:[8,4,5,1],unit:100,orient:'h'})}</div></div>
+ <p><b>Hinweise:</b></p><ul><li>Orientiere dich beim Zeichnen an den <u>Rechenkästchen</u> im Heft.</li><li>Wähle die <u>Einheit</u> geschickt (z. B. 1 Kästchen ≙ 250 000 Menschen).</li><li><u>Runde</u> die Zahlen sinnvoll, um sie eintragen zu können.</li><li><u>Beschrifte</u> die Achsen.</li></ul>`,
+ chips:[{label:'Diagramm lesen',gen:genChart},{label:'Strichliste',n:3,gen:genStrich},{label:'Runden & Höhe',n:2,gen:genRundenMm},{label:'Einheit wählen',gen:genEinheit},{label:'Kästchen rechnen',gen:genKaest},{label:'Selber zeichnen',n:2,gen:genDraw},{label:'Wissen',gen:genDiaWissen}]});
+const ORDER=['pot','vor','sys','rom','fol','dia','gro','len'];
+TOPICS.sort((a,b)=>ORDER.indexOf(a.id)-ORDER.indexOf(b.id));
+buildUI();renderStats();
+</script></body></html>
