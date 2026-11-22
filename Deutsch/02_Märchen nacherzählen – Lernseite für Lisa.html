@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Märchen nacherzählen – Lernseite für Lisa</title>
+<style>
+:root{--p:#5b3a8c;--p2:#7d57b8;--g:#e8b631;--bg:#f6f1fb;--ok:#2e8b57;--no:#c0392b;--card:#fff;--tx:#2b2238}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.5}
+header{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:26px 18px 18px;text-align:center}
+header h1{margin:0;font-size:1.9rem}
+header p{margin:6px 0 0;opacity:.9}
+.stars{margin-top:10px;font-size:1.2rem;letter-spacing:3px}
+nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:12px;background:#fff;position:sticky;top:0;z-index:5;box-shadow:0 2px 6px #0001}
+nav button{border:2px solid var(--p2);background:#fff;color:var(--p);border-radius:20px;padding:7px 14px;font-size:.95rem;cursor:pointer;font-weight:600}
+nav button.act{background:var(--p);color:#fff;border-color:var(--p)}
+nav button.done::after{content:" ⭐"}
+main{max-width:820px;margin:0 auto;padding:16px}
+section{display:none}
+section.act{display:block}
+h2{color:var(--p);margin-top:6px}
+.card{background:var(--card);border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 8px #0001}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.flip{background:var(--card);border:2px solid var(--g);border-radius:14px;padding:16px;min-height:130px;cursor:pointer;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:6px;font-size:1rem}
+.flip b{color:var(--p);font-size:1.05rem}
+.flip.open{background:#fff8dc}
+.flip small{color:#7a6a99}
+.opt,.btn{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border-radius:10px;border:2px solid #d9cdee;background:#fff;font-size:1rem;cursor:pointer;font-family:inherit;color:var(--tx)}
+.btn{text-align:center;width:auto;display:inline-block;background:var(--p);color:#fff;border-color:var(--p);font-weight:600}
+.opt:hover{border-color:var(--p2)}
+.opt.right{background:#dff3e6;border-color:var(--ok)}
+.opt.wrong{background:#fbe0dc;border-color:var(--no)}
+.fb{margin-top:6px;font-size:.95rem;min-height:1.2em}
+.score{font-weight:700;color:var(--p)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#efe7fa;border-radius:16px;padding:5px 12px;font-weight:600;color:var(--p)}
+.chip.gold{background:#fdf0c4;color:#7a5b00}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:8px 4px;cursor:pointer;border-bottom:1px solid #eee}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--p)}
+.bar{height:14px;background:#e6dcf5;border-radius:8px;overflow:hidden;margin:8px 0}
+.bar div{height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--ok));transition:width .3s}
+.ord{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid #d9cdee;border-radius:10px;padding:8px 10px;margin:6px 0}
+.ord span{flex:1}
+.ord button{border:none;background:#efe7fa;border-radius:8px;width:34px;height:34px;font-size:1.1rem;cursor:pointer}
+.ord.right{border-color:var(--ok);background:#dff3e6}
+.ord.wrong{border-color:var(--no);background:#fbe0dc}
+.example{background:#fff8dc;border-left:5px solid var(--g);padding:12px 14px;border-radius:8px;font-style:italic}
+.gap{margin:14px 0}
+.gap .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.gap .opts button{border:2px solid #d9cdee;background:#fff;border-radius:16px;padding:5px 14px;font-size:1rem;cursor:pointer;font-family:inherit}
+.gap .opts button.right{background:#dff3e6;border-color:var(--ok)}
+.gap .opts button.wrong{background:#fbe0dc;border-color:var(--no)}
+.gap u{color:var(--p);font-weight:700;text-decoration-style:dotted}
+footer{text-align:center;color:#8a7aa6;font-size:.85rem;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏰 Märchen nacherzählen</h1>
+  <p>Deutsch · Klasse 5 · Lernseite für Lisa</p>
+  <div class="stars" id="stars">☆☆☆☆☆</div>
+</header>
+<nav id="nav"></nav>
+<main>
+
+<section id="s0">
+  <h2>Merkmale von Märchen</h2>
+  <p>Woran erkennst du ein Märchen? Tippe auf eine Karte, um ein Beispiel zu sehen. Hast du alle sieben aufgedeckt, bekommst du einen Stern.</p>
+  <div class="grid" id="flips"></div>
+  <p class="score" id="flipinfo"></p>
+  <div class="card"><b>Üben:</b> Welches Merkmal passt?</div>
+  <div id="quiz1"></div>
+</section>
+
+<section id="s1">
+  <h2>Tipps zum Märchenschreiben</h2>
+  <p>Hake ab, woran du in deinem Märchen gedacht hast. So wird es spannend!</p>
+  <div class="card check" id="tips"></div>
+  <div class="bar"><div id="tipbar"></div></div>
+  <p class="score" id="tipinfo"></p>
+  <div class="card">💡 <b>Wichtig:</b> Lege dir vor dem Schreiben einen <b>Stichwortzettel</b> an!</div>
+</section>
+
+<section id="s2">
+  <h2>Was ist eine Nacherzählung?</h2>
+  <div class="card">
+    Eine Nacherzählung schreibst du, <b>nachdem</b> du eine Geschichte (z. B. ein Märchen) gehört oder gelesen hast. Dann erzählst du sie <b>mit eigenen Worten</b> nach.
+  </div>
+  <div class="card">
+    <b>Merkmale:</b>
+    <ul>
+      <li>Die <b>wichtigsten Erzählschritte</b> werden nacherzählt, Unwichtiges bleibt weg.</li>
+      <li>Die Geschichte darf <b>nicht verändert</b> werden – nichts Neues ergänzen (Figuren, Orte).</li>
+      <li>Die <b>Form bleibt</b>: Ich-Perspektive im Original → auch du schreibst in der Ich-Form.</li>
+      <li>Die <b>Sprache ist ähnlich</b>: eigene Formulierungen, aber ähnlicher Stil wie das Original.</li>
+      <li>Zeitform: <b>Präteritum</b>.</li>
+    </ul>
+  </div>
+  <div class="card"><b>Richtig oder falsch?</b></div>
+  <div id="quiz2"></div>
+</section>
+
+<section id="s3">
+  <h2>Der Aufbau einer Nacherzählung</h2>
+  <p>Du baust deine Nacherzählung genauso auf wie die Vorlage. Bringe die Bausteine mit ▲ ▼ in die richtige Reihenfolge und klicke auf „Prüfen“.</p>
+  <div id="ord"></div>
+  <button class="btn" id="ordcheck">Prüfen</button>
+  <p class="fb" id="ordfb"></p>
+  <div class="card">
+    <b>Merke:</b> Erzähle alle Handlungsschritte von der Ausgangslage bis zum Schluss <b>in derselben Reihenfolge</b> – aber mit eigenen Formulierungen!
+  </div>
+</section>
+
+<section id="s4">
+  <h2>Starke Verben statt „sagen“ und „gehen“</h2>
+  <p>Wenn du immer nur „sagte“ und „ging“ schreibst, wird es für den Leser schnell langweilig. Nimm lieber starke Verben!</p>
+  <div class="card">
+    <b>Statt „sagen“:</b>
+    <div class="chips" style="margin:8px 0 14px" id="say"></div>
+    <b>Statt „gehen“:</b>
+    <div class="chips" style="margin-top:8px" id="go"></div>
+  </div>
+  <div class="example">Als die kleine Prinzessin ganz allein am Weiher saß, <u>schlich</u> sich auf einmal ein kleines Männlein von hinten an sie heran und <u>flüsterte</u>: „Weine nicht, mein Kind …“ Da sprang die Prinzessin hoch, <u>flitzte</u> zur Eiche und <u>sauste</u> zu dem Männlein zurück.</div>
+  <div class="card"><b>Übung:</b> Welches Verb passt am besten?</div>
+  <div id="gaps"></div>
+  <p class="score" id="gapinfo"></p>
+</section>
+
+</main>
+<footer>Zusammengefasst nach kapiert.de · „Ein Märchen nacherzählen“ (Deutsch, Klasse 5/6)</footer>
+
+<script>
+(function(){
+var titles=["Märchenmerkmale","Tipps","Nacherzählung","Aufbau","Starke Verben"];
+var done=[false,false,false,false,false];
+
+var nav=document.getElementById("nav");
+titles.forEach(function(t,i){
+  var b=document.createElement("button");
+  b.textContent=t;b.id="nb"+i;
+  b.onclick=function(){show(i)};
+  nav.appendChild(b);
+});
+function show(i){
+  titles.forEach(function(_,k){
+    document.getElementById("s"+k).classList.toggle("act",k===i);
+    document.getElementById("nb"+k).classList.toggle("act",k===i);
+  });
+  window.scrollTo(0,0);
+}
+function finish(i){
+  if(done[i])return;
+  done[i]=true;
+  document.getElementById("nb"+i).classList.add("done");
+  var n=done.filter(Boolean).length;
+  var s="";
+  for(var k=0;k<5;k++)s+=k<n?"⭐":"☆";
+  document.getElementById("stars").textContent=s;
+}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+/* 1: Merkmale */
+var merk=[
+ ["Ort und Zeit sind unbestimmt","„Es war einmal vor langer, langer Zeit …“"],
+ ["Allgemeine Figurenbezeichnungen","Prinzessin, Zwerg, Königin, Prinz"],
+ ["Gegensätzliche Figuren","arm und reich, schön und hässlich, intelligent und dumm"],
+ ["Magie spielt eine große Rolle","Tiere und Pflanzen sprechen, magische Zahlen und Gegenstände"],
+ ["Die Hauptfigur löst Aufgaben","Drachen besiegen, ein Rätsel lösen, einen Berg erklimmen"],
+ ["Formelhafte Sprüche","„Abrakadabra“, „Es war einmal …“"],
+ ["Das Gute siegt über das Böse","Am Ende wird das Böse besiegt oder bestraft"]
+];
+var opened={};
+var fl=document.getElementById("flips");
+merk.forEach(function(m,i){
+  var d=document.createElement("div");
+  d.className="flip";
+  d.innerHTML="<b>"+(i+1)+". "+m[0]+"</b><small>👆 antippen</small>";
+  d.onclick=function(){
+    opened[i]=true;
+    d.classList.add("open");
+    d.innerHTML="<b>"+m[0]+"</b><span>"+m[1]+"</span>";
+    var n=Object.keys(opened).length;
+    document.getElementById("flipinfo").textContent=n+" von 7 Merkmalen entdeckt"+(n===7?" 🎉":"");
+  };
+  fl.appendChild(d);
+});
+
+/* generic quiz */
+function quiz(id,items,idx,total){
+  var box=document.getElementById(id);
+  var score=0,answered=0;
+  var info=document.createElement("p");info.className="score";
+  function upd(){info.textContent="Punkte: "+score+" von "+items.length;
+    if(answered===items.length){
+      info.textContent+=score===items.length?" – perfekt! 🌟":" – wiederhole die Karten oben und versuche es nochmal.";
+      if(score>=Math.ceil(items.length*0.7))finish(idx);
+    }}
+  items.forEach(function(it,n){
+    var c=document.createElement("div");c.className="card";
+    var q=document.createElement("div");q.innerHTML="<b>"+(n+1)+".</b> "+it.q;
+    c.appendChild(q);
+    var fb=document.createElement("div");fb.className="fb";
+    var btns=[];
+    it.opts.forEach(function(o,k){
+      var b=document.createElement("button");b.className="opt";b.textContent=o;
+      b.onclick=function(){
+        if(c.dataset.done)return;
+        c.dataset.done=1;answered++;
+        if(k===it.ok){b.classList.add("right");score++;fb.textContent="✅ Richtig! "+(it.e||"")}
+        else{b.classList.add("wrong");btns[it.ok].classList.add("right");fb.textContent="❌ Nicht ganz. "+(it.e||"")}
+        upd();
+      };
+      btns.push(b);c.appendChild(b);
+    });
+    c.appendChild(fb);box.appendChild(c);
+  });
+  box.appendChild(info);
+  var re=document.createElement("button");re.className="btn";re.textContent="Nochmal versuchen";
+  re.onclick=function(){box.innerHTML="";quiz(id,build1(),idx)};
+  if(id==="quiz1"){box.appendChild(re);re.onclick=function(){box.innerHTML="";quiz("quiz1",build1(),0)}}
+}
+function build1(){
+  var ex=[
+   ["„In einem fernen Land lebte einmal ein König …“",0],
+   ["„Die Prinzessin und der Zwerg gingen zusammen los.“",1],
+   ["Ein armer Müllerssohn trifft einen reichen, hochmütigen König.",2],
+   ["Ein Frosch fängt an zu sprechen und eine Kutsche wird aus einem Kürbis.",3],
+   ["Der Prinz muss drei Rätsel lösen, um die Prinzessin zu befreien.",4],
+   ["„Abrakadabra!“, rief die Fee.",5],
+   ["Am Ende wird die böse Hexe bestraft und alle feiern ein Fest.",6]
+  ];
+  return shuffle(ex).slice(0,6).map(function(e){
+    var wrong=shuffle(merk.map(function(_,i){return i}).filter(function(i){return i!==e[1]})).slice(0,3);
+    var all=shuffle([e[1]].concat(wrong));
+    return {q:e[0],opts:all.map(function(i){return merk[i][0]}),ok:all.indexOf(e[1]),e:"Merkmal: "+merk[e[1]][0]+"."};
+  });
+}
+quiz("quiz1",build1(),0);
+
+/* 2: Tipps */
+var tips=[
+ "Ich denke an die Merkmale von Märchen.",
+ "Mein roter Faden ist klar: Ich weiß, was das Kernthema ist.",
+ "Ich verwende passende, abwechslungsreiche Verben (nicht nur „sagte“).",
+ "Ich benutze wörtliche Rede – Tiere und Pflanzen dürfen sprechen!",
+ "Ich benutze anschauliche Adjektive (grässlich, winzig, schillernd).",
+ "Ich schreibe im Präteritum (einfache Vergangenheit).",
+ "Ich schreibe die Gedanken und Gefühle der Figuren auf.",
+ "Ich habe mir vorher einen Stichwortzettel gemacht."
+];
+var tp=document.getElementById("tips");
+function updTips(){
+  var n=tp.querySelectorAll("input:checked").length;
+  document.getElementById("tipbar").style.width=(n/tips.length*100)+"%";
+  document.getElementById("tipinfo").textContent=n+" von "+tips.length+" Tipps beachtet"+(n===tips.length?" – dein Märchen ist bereit! 🎉":"");
+  if(n===tips.length)finish(1);
+}
+tips.forEach(function(t){
+  var l=document.createElement("label");
+  l.innerHTML='<input type="checkbox"><span>'+t+'</span>';
+  l.querySelector("input").onchange=updTips;
+  tp.appendChild(l);
+});
+updTips();
+
+/* 3: Nacherzählung true/false */
+var tf=[
+ ["Ich erzähle die wichtigsten Erzählschritte nach.",true,"Genau – das ist der Kern einer Nacherzählung."],
+ ["Ich darf neue Figuren oder Orte dazuerfinden.",false,"Die Geschichte darf nicht verändert werden."],
+ ["Ich schreibe im Präteritum.",true,"Die Zeitform ist das Präteritum."],
+ ["Unwichtiges lasse ich weg.",true,"Nur das Wichtige wird nacherzählt."],
+ ["Ist das Original in der Ich-Form, schreibe ich in der Er-/Sie-Form.",false,"Die Form bleibt erhalten: Ich-Form bleibt Ich-Form."],
+ ["Ich benutze eigene Formulierungen, aber einen ähnlichen Sprachstil.",true,"Eigene Worte, ähnliche Sprache."],
+ ["Ich darf die Reihenfolge der Handlung frei ändern.",false,"Du erzählst in derselben Reihenfolge wie die Vorlage."]
+];
+quiz("quiz2",tf.map(function(t){return {q:t[0],opts:["Richtig","Falsch"],ok:t[1]?0:1,e:t[2]}}),2);
+
+/* 4: Aufbau */
+var steps=[
+ "Einleitung: Titel und Autor des Märchens nennen",
+ "Ausgangslage: Welche Not wird beschrieben? Welche Aufgabe ist zu erledigen?",
+ "Handlungsabschnitte: Überschriften formulieren und mit eigenen Worten nacherzählen",
+ "Schluss: Das Ende der Geschichte erzählen"
+];
+var order=[0,1,2,3];
+while(order.join()==="0,1,2,3")order=shuffle(order);
+var od=document.getElementById("ord");
+function drawOrd(res){
+  od.innerHTML="";
+  order.forEach(function(s,pos){
+    var d=document.createElement("div");d.className="ord"+(res?(s===pos?" right":" wrong"):"");
+    d.innerHTML="<b>"+(pos+1)+".</b><span>"+steps[s]+"</span>";
+    var up=document.createElement("button");up.textContent="▲";
+    var dn=document.createElement("button");dn.textContent="▼";
+    up.onclick=function(){if(pos>0){var t=order[pos];order[pos]=order[pos-1];order[pos-1]=t;drawOrd(false);document.getElementById("ordfb").textContent=""}};
+    dn.onclick=function(){if(pos<3){var t=order[pos];order[pos]=order[pos+1];order[pos+1]=t;drawOrd(false);document.getElementById("ordfb").textContent=""}};
+    d.appendChild(up);d.appendChild(dn);od.appendChild(d);
+  });
+}
+drawOrd(false);
+document.getElementById("ordcheck").onclick=function(){
+  drawOrd(true);
+  var ok=order.every(function(s,p){return s===p});
+  document.getElementById("ordfb").textContent=ok?"✅ Super, genau so baust du deine Nacherzählung auf!":"❌ Noch nicht ganz – die roten Felder stehen an der falschen Stelle.";
+  if(ok)finish(3);
+};
+
+/* 5: Verben */
+["schreien","rufen","stottern","behaupten","verneinen","zischen","flüstern","sprechen","fragen"].forEach(function(v){
+  var s=document.createElement("span");s.className="chip";s.textContent=v;document.getElementById("say").appendChild(s)});
+["schlendern","laufen","flitzen","huschen","sausen","schleichen","schießen","trödeln","rasen"].forEach(function(v){
+  var s=document.createElement("span");s.className="chip gold";s.textContent=v;document.getElementById("go").appendChild(s)});
+var gaps=[
+ ["„Hilfe!“, ___ das Mädchen so laut, dass der ganze Wald es hörte.","schreien",["schreien","schleichen","flüstern","trödeln"]],
+ ["Ganz leise ___ der Zwerg: „Pssst, der Drache schläft!“","flüstern",["rasen","flüstern","flitzen","verneinen"]],
+ ["„Das stimmt nicht!“, ___ der Wolf.","verneinen",["huschen","trödeln","verneinen","sausen"]],
+ ["„Wer bist du?“, ___ die Königin neugierig.","fragen",["rasen","schleichen","zischen","fragen"]],
+ ["Der Dieb ___ auf Zehenspitzen durch das Schloss, damit ihn niemand hörte.","schleichen",["rasen","rufen","schleichen","sausen"]],
+ ["Das Eichhörnchen ___ blitzschnell den Baum hinauf.","flitzen",["trödeln","schlendern","flüstern","flitzen"]],
+ ["Die Prinzessin ___ gemütlich durch den Garten.","schlendern",["schlendern","rasen","sausen","schreien"]],
+ ["„Gib mir den Schlüssel!“, ___ die Hexe böse.","zischen",["trödeln","huschen","zischen","fragen"]]
+];
+var gs=0,ga=0;
+var gb=document.getElementById("gaps");
+gaps.forEach(function(g,n){
+  var d=document.createElement("div");d.className="card gap";
+  d.innerHTML="<b>"+(n+1)+".</b> "+g[0].replace("___","<u>_____</u>");
+  var o=document.createElement("div");o.className="opts";
+  var fb=document.createElement("div");fb.className="fb";
+  var bs=[];
+  g[2].forEach(function(v,k){
+    var b=document.createElement("button");b.textContent=v;
+    b.onclick=function(){
+      if(d.dataset.done)return;d.dataset.done=1;ga++;
+      if(v===g[1]){b.classList.add("right");gs++;fb.textContent="✅ Passt!"}
+      else{b.classList.add("wrong");bs.forEach(function(x){if(x.textContent===g[1])x.classList.add("right")});fb.textContent="❌ Besser passt: "+g[1]}
+      var inf=document.getElementById("gapinfo");
+      inf.textContent="Punkte: "+gs+" von "+gaps.length;
+      if(ga===gaps.length&&gs>=6)finish(4);
+    };
+    bs.push(b);o.appendChild(b);
+  });
+  d.appendChild(o);d.appendChild(fb);gb.appendChild(d);
+});
+show(0);
+})();
+</script>
+</body>
+</html>
