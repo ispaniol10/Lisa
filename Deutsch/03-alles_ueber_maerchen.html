@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klassenarbeit Märchen – Lernseite</title>
+<style>
+:root{--night:#1f1a4d;--night2:#3a2d7c;--gold:#f4b942;--rose:#e8638a;--mint:#3fb8a0;--paper:#fff9ec;--ink:#2b2550;--good:#2e9e5b;--bad:#d64545;--soft:#efe8ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;color:var(--ink);background:#f3eeff;line-height:1.5}
+h1,h2,h3{font-family:"Palatino Linotype",Palatino,Georgia,serif;margin:0 0 .4em}
+header{background:radial-gradient(circle at 20% 20%,#5a46b5 0,var(--night) 60%);color:#fff;padding:20px 16px 14px;text-align:center}
+header h1{font-size:clamp(1.6rem,5vw,2.4rem);color:var(--gold)}
+header p{margin:.2em 0 .6em;opacity:.9}
+.hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.14);border-radius:999px;padding:4px 14px;font-weight:bold}
+.bar{width:160px;height:10px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:6px}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .5s}
+nav{position:sticky;top:0;z-index:10;background:var(--night);display:flex;overflow-x:auto;gap:4px;padding:6px 8px;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+nav button{flex:0 0 auto;background:transparent;color:#d9d2ff;border:0;padding:9px 14px;border-radius:10px;font:inherit;font-weight:bold;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--gold);color:var(--night)}
+nav .ok{color:var(--mint);margin-left:4px}
+main{max-width:920px;margin:0 auto;padding:18px 14px 60px}
+section{display:none;animation:fade .4s}section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--paper);border-radius:18px;padding:18px;margin:16px 0;box-shadow:0 4px 14px rgba(40,20,100,.12);border:2px solid #e6dcff}
+.card h2{color:var(--night2)}
+.note{background:#fff3c9;border-left:6px solid var(--gold);padding:10px 14px;border-radius:10px;margin:10px 0}
+.tip{background:#e3f6f1;border-left:6px solid var(--mint);padding:10px 14px;border-radius:10px;margin:10px 0}
+button.btn{background:var(--night2);color:#fff;border:0;border-radius:12px;padding:10px 18px;font:inherit;font-weight:bold;cursor:pointer;box-shadow:0 3px 0 var(--night)}
+button.btn:active{transform:translateY(2px);box-shadow:none}
+button.btn.gold{background:var(--gold);color:var(--night);box-shadow:0 3px 0 #c58f1f}
+button.btn.small{padding:6px 12px;font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.tile{background:#fff;border:2px solid #e6dcff;border-radius:16px;padding:14px;text-align:center;cursor:pointer;font:inherit;color:inherit;transition:.2s}
+.tile:hover{transform:translateY(-3px);border-color:var(--rose)}
+.tile .em{font-size:2.2rem;display:block}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid #d8cdfa;border-radius:12px;padding:10px 14px;margin:7px 0;font:inherit;color:inherit;cursor:pointer}
+.opt:hover:not([disabled]){border-color:var(--rose);background:#fff0f5}
+.opt.right{background:#d7f5e1;border-color:var(--good)}.opt.wrong{background:#ffdede;border-color:var(--bad)}
+.why{margin-top:8px;padding:8px 12px;background:#eef;border-radius:10px;display:none}
+.prog{font-size:.85rem;color:#6a5fa8;font-weight:bold}
+.result{text-align:center;font-size:1.1rem}.result .big{font-size:2.2rem}
+.srt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:2px solid #e6dcff;border-radius:12px;padding:8px 12px;margin:6px 0}
+.srt .t{flex:1 1 220px;font-weight:bold}
+.srt.right{background:#d7f5e1;border-color:var(--good)}.srt.wrong{background:#ffdede;border-color:var(--bad)}
+select{font:inherit;padding:6px 8px;border-radius:10px;border:2px solid #cbbcf5;background:#fff;max-width:100%}
+textarea{width:100%;min-height:180px;border-radius:12px;border:2px solid #cbbcf5;padding:12px;font:inherit;resize:vertical}
+.chk{list-style:none;padding:0;margin:8px 0}.chk li{padding:4px 0}.chk li.ok{color:var(--good);font-weight:bold}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.text{background:#fff;border:2px solid #e6dcff;border-radius:14px;padding:12px 14px}
+.sent{display:block;padding:6px 10px;margin:4px 0;border-radius:10px;cursor:pointer;border:2px solid transparent}
+.sent:hover{background:#fff0f5}
+.sent.sel{background:#ffe9a8;border-color:var(--gold)}
+.sent.right{background:#d7f5e1;border-color:var(--good)}.sent.wrong{background:#ffdede;border-color:var(--bad)}
+.sent b{color:#6a5fa8;margin-right:6px}
+.task{background:#fff;border:2px solid #e6dcff;border-radius:12px;padding:8px 12px;margin:8px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap;cursor:pointer}
+.task.act{border-color:var(--rose);background:#fff0f5}
+.task.right{background:#d7f5e1;border-color:var(--good)}.task.wrong{background:#ffdede;border-color:var(--bad)}
+.ord{display:flex;gap:8px;align-items:center;background:#fff;border:2px solid #e6dcff;border-radius:12px;padding:8px 10px;margin:6px 0}
+.ord span{flex:1}.ord.right{background:#d7f5e1;border-color:var(--good)}.ord.wrong{background:#ffdede;border-color:var(--bad)}
+table{border-collapse:collapse;width:100%;background:#fff;border-radius:12px;overflow:hidden}
+td,th{border:1px solid #e0d6fb;padding:8px 10px;text-align:left;vertical-align:top}th{background:var(--soft)}
+label.cb{display:block;padding:6px 0;cursor:pointer}
+footer{text-align:center;color:#6a5fa8;font-size:.85rem;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>📝 Klassenarbeit Märchen</h1>
+  <p>Deutsch · Infos &amp; Übungen zu A1 bis A4</p>
+  <div class="hud"><span class="pill">⭐ Sterne: <span id="stars">0</span></span><span class="pill">Fortschritt<span class="bar"><i id="pbar"></i></span> <span id="ptxt">0/8</span></span></div>
+</header>
+<nav id="nav"></nav>
+<main>
+
+<section id="s-start" class="on">
+  <div class="card">
+    <h2>Das kommt in der Arbeit dran</h2>
+    <table>
+      <tr><th>Teil</th><th>Thema</th><th>Was wird gefragt?</th></tr>
+      <tr><td><b>A1</b></td><td>Wissen über Märchen</td><td>Brüder Grimm und Märchen weltweit · Methode: Märchen nacherzählen</td></tr>
+      <tr><td><b>A2</b></td><td>Märcheninhalt</td><td>Hörverstehen: Fragen zum Inhalt beantworten</td></tr>
+      <tr><td><b>A3</b></td><td>Märchenmerkmale</td><td>Leseverstehen: Merkmale in einem Märchen nachweisen</td></tr>
+      <tr><td><b>A4</b></td><td>Märchenaufbau</td><td>Leseverstehen: Einleitung, Hauptteil, Schluss (Spannungskurve)</td></tr>
+    </table>
+  </div>
+  <div class="grid" id="startTiles"></div>
+  <div class="card">
+    <h2>🎧 Märchen anhören</h2>
+    <p>Zum Üben fürs Hörverstehen: <a href="https://www.youtube.com/@DeineM%C3%A4rchenwelt" target="_blank" rel="noopener"><b>YouTube-Kanal „Deine Märchenwelt“</b></a> mit vielen Märchen zum Zuhören.</p>
+  </div>
+  <div class="card">
+    <h2>✅ Meine Checkliste</h2>
+    <p class="prog">Hake ab, was du schon kannst. (Wird auf diesem Gerät gespeichert.)</p>
+    <div id="mychecks"></div>
+  </div>
+</section>
+
+<!-- A1 -->
+<section id="s-a1">
+  <div class="card">
+    <h2>A1 · Die Brüder Grimm</h2>
+    <ul>
+      <li><b>Jacob</b> (geboren 1785) und <b>Wilhelm Grimm</b> (geboren 1786) waren zwei Brüder aus Deutschland. Sie wurden in Hanau geboren.</li>
+      <li>Sie waren <b>Sprachforscher</b> und Bibliothekare. Sie haben <b>Märchen gesammelt</b>, die sich die Menschen früher nur <b>mündlich erzählt</b> haben, und sie aufgeschrieben.</li>
+      <li>Ihre Sammlung heißt <b>„Kinder- und Hausmärchen“</b>. Der erste Band erschien 1812.</li>
+      <li>Die Märchen der Grimms sind <b>Volksmärchen</b>: Man weiß nicht, wer sie ursprünglich erfunden hat.</li>
+    </ul>
+    <div class="note">Die Brüder Grimm haben die Märchen <b>nicht selbst erfunden</b>, sondern <b>gesammelt und aufgeschrieben</b>. Das ist ein beliebter Prüfungsfehler!</div>
+  </div>
+  <div class="card">
+    <h2>A1 · Märchen weltweit</h2>
+    <p>Märchen gibt es in <b>allen Ländern</b> der Welt. Oft ähneln sich die Geschichten, zum Beispiel gibt es überall Märchen von armen, guten Helden, die belohnt werden.</p>
+    <table>
+      <tr><th>Land / Region</th><th>Wer / Was</th><th>Beispiele</th></tr>
+      <tr><td>Deutschland</td><td>Brüder Grimm (Sammler)</td><td>Rotkäppchen, Schneewittchen, Sterntaler, Hänsel und Gretel</td></tr>
+      <tr><td>Dänemark</td><td>Hans Christian Andersen (Dichter, Kunstmärchen)</td><td>Das Mädchen mit den Streichhölzern, Prinzessin auf der Erbse</td></tr>
+      <tr><td>Frankreich</td><td>Charles Perrault (Sammler und Dichter)</td><td>Der gestiefelte Kater, Aschenputtel, Dornröschen</td></tr>
+      <tr><td>Orient</td><td>„Tausendundeine Nacht“ (Sammlung)</td><td>Aladin und die Wunderlampe</td></tr>
+    </table>
+    <div class="tip"><b>Merke:</b> <b>Volksmärchen</b> = Erfinder unbekannt, mündlich weitererzählt. <b>Kunstmärchen</b> = ein bestimmter Dichter hat es selbst erfunden.</div>
+    <h3>Übung: Woher kommt das?</h3>
+    <div id="gWelt"></div><p class="result" id="mWelt"></p>
+  </div>
+  <div class="card">
+    <h2>A1 · Methode: Märchen nacherzählen</h2>
+    <table>
+      <tr><th>Regel</th><th>So geht es</th></tr>
+      <tr><td>1 · Zeitform</td><td>Immer in der <b>Vergangenheit (Präteritum)</b>: „ging“, „sagte“, „fand“ …</td></tr>
+      <tr><td>2 · Reihenfolge</td><td>Die Handlung bleibt in der <b>richtigen Reihenfolge</b>.</td></tr>
+      <tr><td>3 · Einleitung</td><td>Wer ist die Hauptfigur? Wo und wann spielt es? Was ist das Problem?</td></tr>
+      <tr><td>4 · Hauptteil</td><td>Die <b>wichtigsten</b> Ereignisse, nicht jede Kleinigkeit. Mit Verbindungswörtern: <i>zuerst, dann, danach, plötzlich, schließlich</i>.</td></tr>
+      <tr><td>5 · Schluss</td><td>Wie wird das Problem gelöst? Wie geht es aus?</td></tr>
+      <tr><td>6 · Eigene Worte</td><td>Nicht abschreiben, <b>mit eigenen Worten</b> erzählen. Möglichst keine wörtliche Rede, keine eigene Meinung.</td></tr>
+    </table>
+    <div class="note"><b>Beispiel (Sterntaler, kurz nacherzählt):</b> Ein armes Waisenmädchen besaß nur noch ein Stück Brot und die Kleider, die es trug. Es gab das Brot einem hungrigen Mann. Danach schenkte es frierenden Kindern seine Mütze, sein Jäckchen und sein Röckchen. Schließlich gab es im dunklen Wald sogar sein Hemdchen her. Da fielen Sterne vom Himmel und wurden zu Talern. Das Mädchen war nun für immer reich.</div>
+    <h3>Übung 1: Bringe die Sätze in die richtige Reihenfolge</h3>
+    <p>Eine Nacherzählung von <b>Hänsel und Gretel</b>. Mit ⬆️ und ⬇️ verschieben.</p>
+    <div id="ordGame"></div>
+    <div class="row"><button class="btn" id="ordCheck">Prüfen</button></div><p class="result" id="ordMsg"></p>
+    <h3>Übung 2: Erzähle selbst nach</h3>
+    <p>Wähle ein Märchen, das du gut kennst, und erzähle es <b>in 6–10 Sätzen</b> nach.</p>
+    <textarea id="nach" placeholder="Es war einmal …"></textarea>
+    <ul class="chk" id="nachChk"></ul>
+    <p class="prog">Der Check findet nur Hinweise im Text. Lies deine Nacherzählung zum Schluss selbst noch einmal durch.</p>
+  </div>
+</section>
+
+<!-- A2 -->
+<section id="s-a2">
+  <div class="card">
+    <h2>A2 · Hörverstehen: Fragen zum Inhalt beantworten</h2>
+    <div class="tip"><b>So gehst du vor:</b>
+      <ol>
+        <li><b>Vor dem Hören:</b> Lies zuerst die Fragen und überlege, worauf du achten musst.</li>
+        <li><b>Beim Hören:</b> Mach dir kurze <b>Stichworte</b> (Wer? Wo? Was? Wann? Warum?). Schreibe keine ganzen Sätze.</li>
+        <li><b>Nach dem Hören:</b> Antworte in <b>ganzen Sätzen</b> und nur mit dem, was im Text steht.</li>
+      </ol>
+    </div>
+<div class="tip">🎧 <b>Noch mehr Märchen zum Anhören:</b> Auf dem YouTube-Kanal <a href="https://www.youtube.com/@DeineM%C3%A4rchenwelt" target="_blank" rel="noopener"><b>Deine Märchenwelt</b></a> findest du viele Märchen zum Zuhören – perfekt zum Üben fürs Hörverstehen. Höre dir ein Märchen an, mache Stichworte und beantworte dir selbst die W-Fragen (Wer? Wo? Was? Wie endet es?).</div>
+    <div class="note">Typische W-Fragen: <b>Wer</b> ist die Hauptfigur? <b>Wo</b> spielt es? <b>Was</b> ist das Problem? <b>Wer</b> hilft? <b>Wie</b> endet es?</div>
+  </div>
+  <div class="card">
+    <h2>🎧 Übung: Hören und antworten</h2>
+    <div class="row"><label>Märchen: <select id="hoerSel"></select></label>
+      <button class="btn small" id="hoerPlay">▶ Vorlesen</button>
+      <button class="btn small gold" id="hoerStop">⏹ Stopp</button>
+      <button class="btn small" id="hoerShow">📄 Text anzeigen</button></div>
+    <p class="prog" id="hoerHint"></p>
+    <div class="text hide" id="hoerText" style="display:none"></div>
+    <p><i>Tipp: Höre zuerst, ohne den Text anzuzeigen – so wie in der Arbeit! Wenn dein Gerät nicht vorlesen kann, lass dir den Text von jemandem vorlesen.</i></p>
+    <div id="hoerQuiz"></div>
+  </div>
+</section>
+
+<!-- A3 -->
+<section id="s-a3">
+  <div class="card">
+    <h2>A3 · Märchenmerkmale nachweisen</h2>
+    <table>
+      <tr><th>Merkmal</th><th>Woran erkennst du es im Text?</th></tr>
+      <tr><td>Märchenanfang</td><td>„Es war einmal …“</td></tr>
+      <tr><td>Märchenschluss</td><td>„Und wenn sie nicht gestorben sind, dann leben sie noch heute.“</td></tr>
+      <tr><td>Ort und Zeit ungenau</td><td>„hinter den sieben Bergen“, „in einem Schloss“, „vor langer Zeit“</td></tr>
+      <tr><td>Typische Figuren</td><td>König, Königin, Prinz, Prinzessin, Hexe, Zauberer, Fee</td></tr>
+      <tr><td>Magische Elemente</td><td>Zauberring, Verwandlung, Drache, Wunder</td></tr>
+      <tr><td>Sprechende Tiere</td><td>Ein Fuchs, Wolf oder Kater spricht</td></tr>
+      <tr><td>Zauberzahlen</td><td>3 (drei Aufgaben, dreimal), 7, 12</td></tr>
+      <tr><td>Happy End / Lehre</td><td>Gutes wird belohnt, Böses bestraft</td></tr>
+    </table>
+    <div class="tip"><b>So weist du ein Merkmal nach:</b> Nenne das <b>Merkmal</b>, schreibe die <b>Textstelle</b> und die <b>Zeile</b> auf und erkläre kurz.<br>
+    <i>Beispiel:</i> „Man erkennt, dass es ein Märchen ist, weil <b>Ort und Zeit ungenau</b> sind. In Zeile 1 steht: ‚hinter den sieben Bergen‘. Man erfährt nicht, wo das genau ist.“</div>
+    <p><b>Satzbausteine:</b> „Ein Merkmal von Märchen ist …“ · „Das sieht man in Zeile … , dort steht …“ · „Das ist typisch für ein Märchen, weil …“</p>
+  </div>
+  <div class="card">
+    <h2>🔍 Übung: Merkmale finden</h2>
+    <p>Lies das Märchen. <b>Tippe eine Aufgabe an</b> und dann die <b>Zeile(n)</b>, die das Merkmal zeigen. Danach „Prüfen“.</p>
+    <div class="text" id="a3text"></div>
+    <h3 style="margin-top:14px">Aufgaben</h3>
+    <div id="a3tasks"></div>
+    <div class="row"><button class="btn" id="a3check">Prüfen</button></div>
+    <p class="result" id="a3msg"></p>
+  </div>
+</section>
+
+<!-- A4 -->
+<section id="s-a4">
+  <div class="card">
+    <h2>A4 · Märchenaufbau</h2>
+    <table>
+      <tr><th>Teil</th><th>Was passiert?</th><th>Spannung</th></tr>
+      <tr><td><b>Einleitung</b></td><td>Hauptfigur (Held) und Ort werden vorgestellt. Es gibt ein <b>Problem</b> oder eine schwierige Situation.</td><td>niedrig</td></tr>
+      <tr><td><b>Hauptteil</b></td><td>Der Held versucht, das Problem zu lösen: <b>Hilfe</b> von Zauberer oder Tier, <b>Aufgabe / Prüfung</b>. Die Spannung steigt bis zum <b>Höhepunkt</b> (Wendung).</td><td>steigt</td></tr>
+      <tr><td><b>Schluss</b></td><td>Das Problem ist gelöst, die Hauptfigur ist glücklich (Happy End). Oft gibt es eine Lehre.</td><td>sinkt</td></tr>
+    </table>
+    <svg viewBox="0 0 800 330" width="100%" role="img" aria-label="Spannungskurve" style="margin-top:10px">
+      <rect x="30" y="20" width="220" height="260" rx="12" fill="#7b5fd6" opacity=".18"/>
+      <rect x="250" y="20" width="240" height="260" rx="12" fill="#3fb8a0" opacity=".18"/>
+      <rect x="490" y="20" width="290" height="260" rx="12" fill="#f4b942" opacity=".25"/>
+      <line x1="30" y1="280" x2="780" y2="280" stroke="#3a2d7c" stroke-width="3"/><line x1="30" y1="280" x2="30" y2="14" stroke="#3a2d7c" stroke-width="3"/>
+      <path d="M 40 255 C 120 250, 200 230, 260 195 C 320 160, 350 100, 400 55 C 420 42, 450 42, 470 65 C 520 110, 560 210, 620 245 C 670 262, 720 262, 770 260" fill="none" stroke="#e8638a" stroke-width="6" stroke-linecap="round"/>
+      <text x="40" y="38" font-size="15" font-weight="bold" fill="#3a2d7c">Spannung</text>
+      <text x="140" y="308" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a2d7c">Einleitung</text>
+      <text x="370" y="308" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a2d7c">Hauptteil</text>
+      <text x="635" y="308" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a2d7c">Schluss</text>
+      <text x="435" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="#c0305c">Höhepunkt / Wendung</text>
+    </svg>
+    <div class="note">Die Kurve steigt in der Einleitung langsam an, erreicht im Hauptteil den <b>Höhepunkt</b> und fällt im Schluss wieder ab.</div>
+  </div>
+  <div class="card">
+    <h2>🧩 Übung: Ordne die Zeilen zu</h2>
+    <p>Lies das Märchen aus A3 noch einmal. In welchen Teil gehört jede Zeile?</p>
+    <div id="a4sort"></div><p class="result" id="a4msg"></p>
+    <h3>Und der Höhepunkt?</h3>
+    <div id="a4hoch"></div>
+  </div>
+</section>
+
+<!-- PROBE -->
+<section id="s-probe">
+  <div class="card">
+    <h2>🏆 Probe-Klassenarbeit</h2>
+    <p>12 Fragen aus allen Teilen (A1–A4). Danach siehst du eine ungefähre Note.</p>
+    <div id="probe"></div>
+  </div>
+</section>
+
+</main>
+<footer>Lernseite Klassenarbeit Märchen · Deutsch · erstellt von Ingo Spaniol</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function el(t,c,h){const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e;}
+let stars=0;const done=new Set();const KEYS=['welt','ord','nach','hoer','a3','a4','a4h','probe'];
+function addStar(n){stars+=(n||1);$('#stars').textContent=stars;}
+function markDone(k){if(done.has(k))return;done.add(k);$('#ptxt').textContent=done.size+'/'+KEYS.length;$('#pbar').style.width=(done.size/KEYS.length*100)+'%';updNav();}
+
+const SECS=[['start','🏠 Überblick',[]],['a1','A1 Wissen',['welt','ord','nach']],['a2','A2 Hören',['hoer']],['a3','A3 Merkmale',['a3']],['a4','A4 Aufbau',['a4','a4h']],['probe','🏆 Probe',['probe']]];
+SECS.forEach(([id,t])=>{const b=el('button',id==='start'?'on':'',t);b.dataset.id=id;b.onclick=()=>show(id);$('#nav').appendChild(b);});
+function updNav(){document.querySelectorAll('#nav button').forEach(b=>{const s=SECS.find(x=>x[0]===b.dataset.id);b.querySelector('.ok')?.remove();if(s[2].length&&s[2].every(k=>done.has(k)))b.appendChild(el('span','ok','✔'));});}
+function show(id){document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='s-'+id));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.id===id));window.scrollTo({top:0,behavior:'smooth'});}
+[['a1','📚','A1 Wissen über Märchen','Grimm, weltweit, Nacherzählen'],['a2','🎧','A2 Märcheninhalt','Hörverstehen üben'],['a3','🔍','A3 Märchenmerkmale','Merkmale nachweisen'],['a4','📈','A4 Märchenaufbau','Spannungskurve & Aufbau'],['probe','🏆','Probe-Klassenarbeit','12 Fragen mit Note']].forEach(([id,em,t,s])=>{const b=el('button','tile','<span class="em">'+em+'</span><b>'+t+'</b><br><small>'+s+'</small>');b.onclick=()=>show(id);$('#startTiles').appendChild(b);});
+
+/* Checkliste */
+const MY=['Ich weiß, was die Brüder Grimm gemacht haben (gesammelt, nicht erfunden).','Ich kann Märchen aus anderen Ländern zuordnen (Andersen, Perrault, 1001 Nacht).','Ich kann ein Märchen nacherzählen (Präteritum, richtige Reihenfolge, eigene Worte).','Ich kann beim Hören Stichworte machen und Fragen beantworten.','Ich kenne die Märchenmerkmale und kann sie mit Zeile und Textstelle nachweisen.','Ich kann Einleitung, Hauptteil und Schluss erkennen.','Ich kann die Spannungskurve erklären (Höhepunkt = Wendung).'];
+let saved={};try{saved=JSON.parse(localStorage.getItem('maerchenKA_checks')||'{}');}catch(e){}
+MY.forEach((t,i)=>{const l=el('label','cb','<input type="checkbox"> '+t);const c=l.querySelector('input');c.checked=!!saved[i];c.onchange=()=>{saved[i]=c.checked;try{localStorage.setItem('maerchenKA_checks',JSON.stringify(saved));}catch(e){}};$('#mychecks').appendChild(l);});
+
+/* Quiz-Engine (richtige Antwort steht an erster Stelle) */
+function mountQuiz(root,qs,key,after){let i=0,ok=0;
+  function render(){root.innerHTML='';
+    if(i>=qs.length){const r=el('div','result');const p=ok/qs.length;
+      r.innerHTML='<div class="big">'+'⭐'.repeat(Math.max(1,Math.round(p*5)))+'</div><p><b>'+ok+' von '+qs.length+'</b> richtig</p>'+(after?after(ok,qs.length):'');
+      const b=el('button','btn gold','Nochmal');b.onclick=()=>{i=0;ok=0;render();};r.appendChild(b);root.appendChild(r);markDone(key);return;}
+    const q=qs[i];const ops=shuffle(q.o.map((t,k)=>({t,c:k===0})));let ans=false;
+    root.appendChild(el('div','prog','Frage '+(i+1)+' von '+qs.length));root.appendChild(el('p','','<b>'+q.q+'</b>'));
+    const why=el('div','why',q.w||'');
+    ops.forEach(op=>{const b=el('button','opt',op.t);b.onclick=()=>{if(ans)return;ans=true;root.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      if(op.c){b.classList.add('right');ok++;addStar(1);}else{b.classList.add('wrong');root.querySelectorAll('.opt').forEach(x=>{if(ops.find(o=>o.c&&o.t===x.textContent))x.classList.add('right');});}
+      if(q.w)why.style.display='block';
+      const n=el('button','btn',i+1>=qs.length?'Ergebnis':'Weiter ➜');n.style.marginTop='10px';n.onclick=()=>{i++;render();};root.appendChild(n);};root.appendChild(b);});
+    root.appendChild(why);}
+  render();}
+
+/* Auswahl-Spiel: items [text,index], opts [labels] */
+function selGame(root,items,opts,msg,key){let ans=0,right=0;
+  shuffle(items).forEach(([t,v])=>{const r=el('div','srt','<span class="t">'+t+'</span>');
+    const s=el('select','','<option value="">– wählen –</option>'+opts.map((o,i)=>'<option value="'+i+'">'+o+'</option>').join(''));
+    s.onchange=()=>{if(s.value===''||r.dataset.d)return;r.dataset.d=1;s.disabled=true;ans++;
+      if(+s.value===v){r.classList.add('right');right++;addStar(1);}else{r.classList.add('wrong');r.appendChild(el('small','','→ richtig: '+opts[v]));}
+      if(ans===items.length){msg.innerHTML=right+' von '+items.length+' richtig'+(right===items.length?' 🌟':'');markDone(key);}};
+    r.appendChild(s);root.appendChild(r);});}
+
+/* A1 */
+selGame($('#gWelt'),[['Schneewittchen',0],['Das Mädchen mit den Streichhölzern',1],['Prinzessin auf der Erbse',1],['Aladin und die Wunderlampe',3],['Charles Perrault (Autor)',2],['Hänsel und Gretel',0]],['Deutschland (Brüder Grimm)','Dänemark (Andersen)','Frankreich (Perrault)','Orient („Tausendundeine Nacht“)'],$('#mWelt'),'welt');
+
+const ORD=['Hänsel und Gretel lebten mit ihrem Vater und der Stiefmutter in großer Armut.','Die Stiefmutter wollte die Kinder im Wald zurücklassen, doch Hänsel fand mit Kieselsteinen den Weg nach Hause.','Beim zweiten Mal streute er Brotkrumen, aber die Vögel fraßen sie auf.','Die Kinder verirrten sich und entdeckten ein Haus aus Brot und Zucker.','Dort sperrte die Hexe Hänsel ein, weil sie ihn essen wollte.','Gretel stieß die Hexe in den Ofen und befreite ihren Bruder.','Mit den Schätzen der Hexe kehrten sie zum Vater zurück und waren glücklich.'];
+let ordArr=shuffle(ORD.map((t,i)=>({t,i})));
+function drawOrd(res){const g=$('#ordGame');g.innerHTML='';ordArr.forEach((o,k)=>{const d=el('div','ord'+(res?(o.i===k?' right':' wrong'):''),'<span>'+o.t+'</span>');
+  const u=el('button','btn small','⬆️'),dn=el('button','btn small','⬇️');
+  u.onclick=()=>{if(k>0){[ordArr[k-1],ordArr[k]]=[ordArr[k],ordArr[k-1]];drawOrd();}};dn.onclick=()=>{if(k<ordArr.length-1){[ordArr[k+1],ordArr[k]]=[ordArr[k],ordArr[k+1]];drawOrd();}};
+  d.appendChild(u);d.appendChild(dn);g.appendChild(d);});}
+drawOrd();
+let ordAward=false;
+$('#ordCheck').onclick=()=>{drawOrd(true);const n=ordArr.filter((o,k)=>o.i===k).length;$('#ordMsg').innerHTML=n+' von '+ORD.length+' Sätzen stehen richtig'+(n===ORD.length?' 🌟':' – verschiebe die roten Sätze und prüfe nochmal.');
+  if(n===ORD.length){if(!ordAward){ordAward=true;addStar(5);}markDone('ord');}};
+
+const NC=[['Es gibt einen Einleitungssatz (Hauptfigur, Ort, Zeit, z. B. „Es war einmal …“)',t=>/(es war einmal|lebte|lebten|vor langer zeit)/i.test(t)],
+ ['Verbindungswörter (zuerst, dann, danach, plötzlich, schließlich …)',t=>/(zuerst|dann|danach|plötzlich|ploetzlich|schließlich|schliesslich|später|spaeter|eines tages)/i.test(t)],
+ ['Vergangenheitsformen gefunden (war, ging, sagte, fand, nahm …)',t=>/\b(war|waren|wurde|wurden|ging|kam|sagte|nahm|fand|lebte|lebten|hatte|hatten|gab|sah|ließ|lief|trafen|traf)\b/i.test(t)],
+ ['Kein „ich“ (du erzählst in der 3. Person)',t=>t.trim().length>0&&!/\bich\b/i.test(t)],
+ ['Mindestens 60 Wörter',t=>t.trim().split(/\s+/).filter(Boolean).length>=60],
+ ['Es gibt einen Schluss (Problem gelöst / Happy End)',t=>/(glücklich|gluecklich|noch heute|belohnt|gelöst|geloest|befreit|endlich|am ende|schließlich|schliesslich)/i.test(t)]];
+NC.forEach(([t])=>$('#nachChk').appendChild(el('li','','⬜ '+t)));
+let ncAward=false;
+$('#nach').addEventListener('input',()=>{const t=$('#nach').value;let n=0;[...$('#nachChk').children].forEach((li,i)=>{const ok=NC[i][1](t);li.className=ok?'ok':'';li.textContent=(ok?'✅ ':'⬜ ')+NC[i][0];if(ok)n++;});
+  if(n===NC.length&&!ncAward){ncAward=true;addStar(5);markDone('nach');}});
+
+/* A2 Hörtexte */
+const HOER=[
+ {name:'Sterntaler',txt:'Es war einmal ein kleines Mädchen, dessen Vater und Mutter gestorben waren. Es war so arm, dass es kein Zimmer mehr hatte und kein Bett. Es besaß nur die Kleider, die es am Leib trug, und ein Stück Brot in der Hand. Das Mädchen war aber gut und hilfsbereit. Auf dem Feld traf es einen armen Mann, der bat: „Ach, gib mir etwas zu essen, ich bin so hungrig.“ Da reichte es ihm das ganze Stück Brot. Dann kam ein Kind, das jammerte: „Mich friert so an meinem Kopf.“ Da gab ihm das Mädchen seine Mütze. Später trafen es noch zwei weitere frierende Kinder, und es schenkte ihnen sein Jäckchen und sein Röckchen. Schließlich kam es in einen dunklen Wald, und dort bat noch ein Kind um ein Hemdchen. Das Mädchen dachte: Es ist dunkel, niemand sieht mich. Und es gab auch das Hemd her. Plötzlich fielen Sterne vom Himmel, und es waren lauter blanke Taler. Das Mädchen bekam ein neues Hemd aus feinstem Leinen und war für sein ganzes Leben reich.',
+  qs:[
+   {q:'Was besaß das Mädchen am Anfang außer seinen Kleidern?',o:['Ein Stück Brot','Einen Korb mit Äpfeln','Eine Laterne','Einen Geldbeutel']},
+   {q:'Wem gab das Mädchen zuerst etwas?',o:['Einem hungrigen Mann','Einem frierenden Kind','Einem Jäger','Einer alten Frau']},
+   {q:'Was schenkte es dem ersten Kind?',o:['Seine Mütze','Sein Hemd','Sein Brot','Seine Schuhe']},
+   {q:'Wo war das Mädchen, als die Sterne vom Himmel fielen?',o:['In einem dunklen Wald','Auf dem Feld','In einem Schloss','Am Fluss']},
+   {q:'Was wurde aus den Sternen?',o:['Blanke Taler','Schmetterlinge','Edelsteine','Brotkrumen']},
+   {q:'Welche Lehre hat das Märchen?',o:['Wer gut und hilfsbereit ist, wird belohnt','Wer reich ist, ist glücklich','Man soll nie in den Wald gehen','Brot ist das Wichtigste']}]},
+ {name:'Hänsel und Gretel',txt:'Es war einmal ein armer Holzfäller, der lebte mit seiner zweiten Frau und seinen Kindern Hänsel und Gretel in einer Hütte am Waldrand. Weil sie nichts mehr zu essen hatten, wollte die Stiefmutter die Kinder im Wald zurücklassen. Hänsel hatte das gehört und füllte seine Taschen mit weißen Kieselsteinen. Auf dem Weg warf er sie heimlich auf den Boden, und so fanden die Kinder wieder nach Hause. Beim zweiten Mal hatte Hänsel nur ein Stück Brot und streute Krumen. Doch die Vögel pickten sie alle auf. Die Kinder irrten im Wald umher, bis sie ein Häuschen aus Brot, Kuchen und Zucker entdeckten. Darin wohnte eine böse Hexe, die Hänsel in einen Stall sperrte, um ihn dick zu machen und zu essen. Als die Hexe nachsehen wollte, ob der Ofen heiß genug war, schubste Gretel sie hinein. Die Kinder fanden Perlen und Edelsteine, liefen nach Hause und lebten mit ihrem Vater glücklich weiter.',
+  qs:[
+   {q:'Wo wohnte die Familie?',o:['In einer Hütte am Waldrand','In einem Schloss','In einer Stadt','Auf einem Bauernhof']},
+   {q:'Womit markierte Hänsel beim ersten Mal den Weg?',o:['Mit weißen Kieselsteinen','Mit Brotkrumen','Mit Blumen','Mit Bändern']},
+   {q:'Warum fanden die Kinder beim zweiten Mal nicht zurück?',o:['Die Vögel hatten die Brotkrumen aufgepickt','Es war Nacht','Hänsel hatte keine Steine','Der Vater holte sie nicht ab']},
+   {q:'Woraus bestand das Häuschen im Wald?',o:['Aus Brot, Kuchen und Zucker','Aus Holz und Stroh','Aus Eis','Aus Stein']},
+   {q:'Was wollte die Hexe mit Hänsel tun?',o:['Ihn dick machen und essen','Ihn zum Diener machen','Ihn nach Hause schicken','Ihn verzaubern']},
+   {q:'Wie rettete Gretel ihren Bruder?',o:['Sie schubste die Hexe in den Ofen','Sie lief heimlich weg','Sie bat den Vater um Hilfe','Sie fand einen Zauberspruch']},
+   {q:'Wie endet das Märchen?',o:['Mit Schätzen kehren sie heim und sind glücklich','Die Kinder bleiben im Wald','Die Hexe überlebt','Die Stiefmutter wird Königin']}]}
+];
+const hs=$('#hoerSel');HOER.forEach((h,i)=>hs.appendChild(el('option','',h.name)).value=i);
+function loadHoer(){const h=HOER[+hs.value];$('#hoerText').innerHTML=h.txt;$('#hoerText').style.display='none';$('#hoerShow').textContent='📄 Text anzeigen';
+  mountQuiz($('#hoerQuiz'),shuffle(h.qs),'hoer');speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();}
+hs.onchange=loadHoer;loadHoer();
+const canSpeak='speechSynthesis' in window;
+$('#hoerHint').textContent=canSpeak?'':'Dieses Gerät kann nicht vorlesen – bitte „Text anzeigen“ benutzen oder dir den Text vorlesen lassen.';
+$('#hoerPlay').onclick=()=>{if(!canSpeak){$('#hoerHint').textContent='Vorlesen geht hier nicht. Nutze „Text anzeigen“.';return;}
+  speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(HOER[+hs.value].txt);u.lang='de-DE';u.rate=.9;speechSynthesis.speak(u);};
+$('#hoerStop').onclick=()=>{if(canSpeak)speechSynthesis.cancel();};
+$('#hoerShow').onclick=()=>{const t=$('#hoerText');const vis=t.style.display!=='none';t.style.display=vis?'none':'block';$('#hoerShow').textContent=vis?'📄 Text anzeigen':'🙈 Text verbergen';};
+
+/* A3 / A4: Text */
+const TXT=['Es war einmal ein armer Schneider, der lebte in einem kleinen Haus hinter den sieben Bergen.','Eines Tages bedrohte ein feuerspeiender Drache das Land des Königs.','Der König versprach demjenigen seine Tochter, der den Drachen besiegt.','Der Schneider machte sich auf den Weg und traf im Wald einen sprechenden Fuchs.','„Ich helfe dir“, sagte der Fuchs, „wenn du dreimal klug antwortest.“','Der Fuchs gab ihm einen Zauberring, der ihn unsichtbar machte.','Dreimal musste der Schneider ein Rätsel lösen, und dreimal fand er die richtige Antwort.','Da verlor der Drache seine Kraft und floh für immer.','Der König hielt sein Versprechen, und der Schneider heiratete die Königstochter.','Und wenn sie nicht gestorben sind, dann leben sie noch heute.'];
+const a3t=$('#a3text');const sel=new Set();let act=null;
+TXT.forEach((s,i)=>{const d=el('span','sent','<b>Z. '+(i+1)+'</b>'+s);d.dataset.n=i+1;d.onclick=()=>{if(act===null)return;const k=act;sel.has(k+'_'+(i+1))?sel.delete(k+'_'+(i+1)):sel.add(k+'_'+(i+1));draw();};a3t.appendChild(d);});
+const T3=[['Märchenanfang',[1]],['Ort und Zeit sind ungenau',[1]],['Sprechendes Tier',[4,5]],['Magisches Element',[2,6]],['Zauberzahl (drei)',[5,7]],['Typische Märchenfiguren (König, Königstochter)',[3,9]],['Happy End / Märchenschluss',[9,10]]];
+function draw(res){
+  document.querySelectorAll('#a3tasks .task').forEach((t,k)=>{t.classList.toggle('act',act===k&&!res);});
+  const mine=act===null?[]:[...sel].filter(x=>x.startsWith(act+'_')).map(x=>+x.split('_')[1]);
+  document.querySelectorAll('#a3text .sent').forEach(s=>{s.classList.remove('sel');s.classList.toggle('sel',mine.includes(+s.dataset.n));});
+  document.querySelectorAll('#a3tasks .task small').forEach((sm,k)=>{const m=[...sel].filter(x=>x.startsWith(k+'_')).map(x=>x.split('_')[1]);sm.textContent=m.length?'Gewählt: Z. '+m.join(', '):'';});}
+T3.forEach(([t],k)=>{const d=el('div','task','<b>'+(k+1)+'. '+t+'</b> <small></small>');d.onclick=()=>{act=k;draw();};$('#a3tasks').appendChild(d);});
+let a3Award=false;
+$('#a3check').onclick=()=>{let ok=0;document.querySelectorAll('#a3tasks .task').forEach((t,k)=>{t.classList.remove('right','wrong','act');
+  const m=[...sel].filter(x=>x.startsWith(k+'_')).map(x=>+x.split('_')[1]);const good=m.length>0&&m.every(n=>T3[k][1].includes(n));
+  if(good){t.classList.add('right');ok++;}else{t.classList.add('wrong');const old=t.querySelector('.sol');old&&old.remove();t.appendChild(el('span','sol','<small>→ passend: Z. '+T3[k][1].join(' oder Z. ')+'</small>'));}});
+  $('#a3msg').innerHTML=ok+' von '+T3.length+' richtig'+(ok===T3.length?' 🌟':'');if(ok===T3.length){if(!a3Award){a3Award=true;addStar(5);}markDone('a3');}};
+
+/* A4 */
+const PARTS=['Einleitung','Hauptteil','Schluss'];
+selGame($('#a4sort'),TXT.map((s,i)=>['<b>Z. '+(i+1)+'</b> '+s,i<3?0:(i<8?1:2)]),PARTS,$('#a4msg'),'a4');
+(function(){const r=el('div','');const labels=['Z. 3 (König verspricht seine Tochter)','Z. 4 (Fuchs trifft den Schneider)','Z. 8 (Drache verliert seine Kraft)','Z. 9 (Hochzeit)'];
+  r.appendChild(el('p','','<b>Welche Zeile ist der Höhepunkt (die Wendung)?</b>'));
+  labels.forEach((l,i)=>{const b=el('button','opt',l);b.onclick=()=>{r.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    if(i===2){b.classList.add('right');addStar(2);r.appendChild(el('div','why','Richtig! Hier wendet sich alles zum Guten: Der Drache ist besiegt. Danach sinkt die Spannung.')).style.display='block';markDone('a4h');}
+    else{b.classList.add('wrong');r.querySelectorAll('.opt')[2].classList.add('right');r.appendChild(el('div','why','Der Höhepunkt ist Z. 8: Der Drache verliert seine Kraft. Das ist die Wendung, danach sinkt die Spannung.')).style.display='block';markDone('a4h');}};r.appendChild(b);});
+  $('#a4hoch').appendChild(r);})();
+
+/* Probe */
+const PROBE=[
+ {q:'Was haben die Brüder Grimm getan?',o:['Märchen gesammelt und aufgeschrieben','Alle Märchen selbst erfunden','Märchen gemalt','Märchen verfilmt']},
+ {q:'Wie heißt die Märchensammlung der Brüder Grimm?',o:['Kinder- und Hausmärchen','Tausendundeine Nacht','Märchen für Kinder','Das große Märchenbuch']},
+ {q:'Aus welchem Land kommt Hans Christian Andersen?',o:['Dänemark','Frankreich','Deutschland','Italien']},
+ {q:'Was ist ein Kunstmärchen?',o:['Ein Märchen, das sich ein Dichter selbst ausgedacht hat','Ein Märchen, das gemalt wird','Ein mündlich überliefertes Märchen','Ein sehr kurzes Märchen']},
+ {q:'In welcher Zeitform erzählt man ein Märchen nach?',o:['Präteritum (Vergangenheit)','Präsens (Gegenwart)','Futur (Zukunft)','Das ist egal']},
+ {q:'Was gehört NICHT in eine Nacherzählung?',o:['Wörtliches Abschreiben und eigene Meinung','Eine Einleitung','Die richtige Reihenfolge','Verbindungswörter wie „dann“']},
+ {q:'Was machst du beim Hörverstehen WÄHREND des Hörens?',o:['Kurze Stichworte notieren','Nichts aufschreiben','Den ganzen Text mitschreiben','Die Augen zumachen und raten']},
+ {q:'„Es war einmal ein König hinter den sieben Bergen.“ Welche Merkmale erkennst du?',o:['Märchenanfang und ungenauer Ort','Genaue Zeit und genauer Ort','Happy End','Sprechendes Tier']},
+ {q:'Wie weist man ein Merkmal richtig nach?',o:['Merkmal nennen, Textstelle mit Zeile angeben, kurz erklären','Nur „Ja, das ist ein Märchen“ schreiben','Die ganze Geschichte abschreiben','Nur die Zeilennummer nennen']},
+ {q:'Was passiert in der Einleitung?',o:['Hauptfigur und Problem werden vorgestellt','Das Problem wird gelöst','Der Höhepunkt','Das Happy End']},
+ {q:'Wo liegt der Höhepunkt der Spannungskurve?',o:['Am Ende des Hauptteils (Wendung)','Ganz am Anfang','Im letzten Satz','Es gibt keinen Höhepunkt']},
+ {q:'Was passiert im Schluss?',o:['Das Problem ist gelöst, die Hauptfigur ist glücklich','Die Hauptfigur wird vorgestellt','Das Problem entsteht','Die Spannung steigt immer weiter']}
+];
+function note(p){return p>=.92?'1':p>=.81?'2':p>=.67?'3':p>=.5?'4':p>=.3?'5':'6';}
+mountQuiz($('#probe'),shuffle(PROBE),'probe',(ok,n)=>'<p>Ungefähre Note: <b>'+note(ok/n)+'</b></p>');
+</script>
+</body>
+</html>
